@@ -1,0 +1,16 @@
+# Bí mật - KHÔNG commit
+config.php
+
+# File nặng / tạm - không đẩy lên repo
+*.zip
+blog-fixed*/
+php-local/
+.blog-backup/
+
+# Vercel / hệ điều hành
+.vercel/
+Thumbs.db
+.DS_Store
+
+# Backup local của admin (chỉ giữ trên máy, không cần lên repo)
+data/backups/

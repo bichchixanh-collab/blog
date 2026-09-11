@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Thể loại - JAVA.WAP.SH</title>
+<meta name="description" content="Xem game Java theo thể loại - Hành Động, Nhập Vai, Đua Xe, Bắn Súng, Trí Tuệ, Thể Thao, Việt Hóa">
+<link rel="canonical" href="https://J2ME.VERCEL.APP/category.html">
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700&family=Mali:wght@600;700&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<meta name="theme-color" content="#ff4d8d">
+<link rel="manifest" href="manifest.webmanifest">
+<script>if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){});});}</script>
+<style>
+body{background:#fff0f6;padding:12px}
+.app{max-width:420px;margin:0 auto;background:#fff;border:2px solid #ff8ec7;border-radius:16px;overflow:hidden;box-shadow:0 6px 20px rgba(255,77,141,.18)}
+.top-info{display:flex;justify-content:space-between;align-items:center;background:#1a1a2e;color:#7fb1ff;font-family:"IBM Plex Mono",monospace;font-size:11px;padding:6px 12px}
+.header{background:linear-gradient(135deg,#ff8ec7,#ff4d8d);color:#fff;text-align:center;padding:16px 12px}
+.header .logo-icon{width:48px;height:48px;background:#fff;color:#ff4d8d;border-radius:50%;display:grid;place-items:center;font-size:22px;margin:0 auto 8px;border:2px solid #fff}
+.header h1{font-family:"Mali",cursive;font-size:18px}
+.wrap{max-width:420px;margin:0 auto;padding:10px;display:grid;gap:12px}
+.kawaii-title{font-family:"Mali",cursive;background:linear-gradient(90deg,#ff4d8d,#ff8ec7);color:#fff;padding:5px 12px;border-radius:20px;font-size:11px;font-weight:700;display:inline-block;border:1.5px solid #fff;box-shadow:0 2px 6px rgba(255,77,141,.2);margin-bottom:8px}
+.cat-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.cat-card{background:#fff;border:2px solid #ff8ec7;border-radius:14px;padding:12px;text-align:center;position:relative;box-shadow:0 3px 10px rgba(255,77,141,.12)}
+.cat-card::before{content:"";position:absolute;inset:5px;border:1.6px dashed #ffb3d9;border-radius:10px;pointer-events:none}
+.cat-card b{font-size:12px;color:#4a2a3a;display:block}
+.cat-card small{font-size:10px;color:#8a6a7a}
+.cat-card:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(255,77,141,.18)}
+.footer{background:#4a1a2e;color:#ffd0e8;text-align:center;padding:14px;font-size:11px}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="top-info"><span>◉ JAVA J2ME</span><span id="clock">00:00</span><span>▂▃▅▇ 100%</span></div>
+<header class="header"><div class="logo-icon">☺</div><h1>JAVA.WAP.SH</h1><p>Thể loại Game Java</p></header>
+<nav class="wap-nav" style="display:flex;gap:6px;overflow:auto;padding:8px 10px;background:#4a1a2e;white-space:nowrap"><a href="index.html" style="color:#ffd0e8;background:rgba(255,255,255,.08);padding:6px 12px;border-radius:20px;font-size:11px;text-decoration:none">⌂ Trang chủ</a><a href="category.html" style="background:#fff;color:#ff4d8d;padding:6px 12px;border-radius:20px;font-size:11px">≡ Thể loại</a></nav>
+
+<div class="wrap">
+  <div class="breadcrumb" style="font-size:11px;color:#8a6a7a"><a href="index.html" style="color:#ff4d8d">Trang chủ</a> › <b id="bcCat">Tất cả</b></div>
+
+  <section class="cat-grid" id="catGrid">
+    <!-- JS sẽ render -->
+  </section>
+
+  <section id="gameSection" style="display:none">
+    <div class="kawaii-title" id="catTitle">Game</div>
+    <div id="catList" style="display:grid;gap:8px"></div>
+  </section>
+</div>
+
+<footer class="footer"><p>© 2010-2026 J2ME.VERCEL.APP</p><p style="font-size:10px;opacity:.7"><a href="index.html" style="color:#fff">Trang chủ</a> · <a href="lien-he.html" style="color:#fff">Liên hệ / DMCA</a></p></footer>
+</div>
+
+<script>
+function tick(){const el=document.getElementById('clock');if(el)el.textContent=new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'})}tick();setInterval(tick,30000);
+const CATS=[
+  {id:'Hành Động',icon:'⚔️',color:'#ff4d8d'},
+  {id:'Nhập Vai',icon:'🧙',color:'#a78bfa'},
+  {id:'Đua xe',icon:'🏎️',color:'#f59e0b'},
+  {id:'Bắn súng',icon:'🔫',color:'#0ea5e9'},
+  {id:'Trí tuệ',icon:'🧩',color:'#34d399'},
+  {id:'Thể thao',icon:'⚽',color:'#f59e0b'},
+  {id:'Phiêu lưu',icon:'🗺️',color:'#8ec8ff'},
+  {id:'Nông trại',icon:'🌾',color:'#a3e635'},
+  {id:'Việt Hóa',icon:'🇻🇳',color:'#ff4d8d',filter:'vi'},
+];
+let GAMES=null;
+async function loadGames(){ if(GAMES) return GAMES; const r=await fetch('data/games.json?'+Date.now(),{cache:'no-store'}); GAMES=await r.json(); return GAMES; }
+function getCat(){ return new URLSearchParams(location.search).get('cat'); }
+// Chống XSS: escape dữ liệu game + tham số cat trước khi chèn vào HTML
+function escHtml(s){return String(s==null?'':s).replace(/[&<>"']/g,function(m){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m];});}
+
+async function render(){
+  const games=await loadGames();
+  const cat=getCat();
+  const grid=document.getElementById('catGrid');
+  const bc=document.getElementById('bcCat');
+  const section=document.getElementById('gameSection');
+  const title=document.getElementById('catTitle');
+  const list=document.getElementById('catList');
+
+  // Count per cat
+  const counts={};
+  games.forEach(g=>{
+    counts[g.cat]=(counts[g.cat]||0)+1;
+    if(g.vi) counts['Việt Hóa']=(counts['Việt Hóa']||0)+1;
+  });
+
+  // Render category grid (CATS là hằng nội bộ, an toàn)
+  grid.innerHTML=CATS.map(c=>{
+    const cnt = c.filter==='vi' ? (counts['Việt Hóa']||0) : (counts[c.id]||0);
+    return `<a href="category.html?cat=${encodeURIComponent(c.id)}" class="cat-card" style="text-decoration:none">
+      <div style="font-size:22px">${c.icon}</div>
+      <b>${c.id}</b><br><small>${cnt} game</small>
+    </a>`;
+  }).join('') + `<a href="index.html" class="cat-card" style="background:#fff0f6"><div style="font-size:22px">📚</div><b>Tất cả</b><br><small>${games.length} game</small></a>`;
+
+  if(cat){
+    const catSafe=escHtml(cat);
+    bc.textContent=cat;
+    title.textContent=(CATS.find(c=>c.id===cat)?.icon||'🎮')+' '+cat;
+    section.style.display='block';
+    let filtered;
+    if(cat==='Việt Hóa') filtered=games.filter(g=>g.vi);
+    else filtered=games.filter(g=>g.cat===cat);
+    if(filtered.length===0){
+      list.innerHTML=`<p style="padding:16px;text-align:center;color:#8a6a7a">Chưa có game nào cho <b>${catSafe}</b> — <a href="admin.php" style="color:#ff4d8d">đăng bài ngay</a> ♡</p>`;
+    } else {
+      list.innerHTML=filtered.map(g=>`
+        <a href="game/${escHtml(g.id)}.html" style="display:flex;gap:10px;align-items:center;background:#fff;border:1.5px solid #ffd0e8;border-radius:12px;padding:10px;text-decoration:none">
+          <img src="${escHtml(g.thumb)}" width="48" height="48" style="border-radius:10px;border:1.5px solid #ffd0e8;object-fit:cover;flex-shrink:0" alt="${escHtml(g.name)}">
+          <div style="flex:1;min-width:0"><b style="font-size:12px;color:#4a2a3a">${escHtml(g.name)}</b><br><small style="color:#8a6a7a">${escHtml(g.size)} • ${escHtml((g.res||[])[0]||'')}</small></div>
+          <span style="background:linear-gradient(180deg,#ff8ec7,#ff4d8d);color:#fff;padding:6px 12px;border-radius:20px;font-size:11px;font-weight:700;border:1.5px solid #fff;white-space:nowrap">⬇ JAR</span>
+        </a>
+      `).join('');
+    }
+    document.title=cat+' - Game Java | J2ME.VERCEL.APP';
+    const md=document.querySelector('meta[name="description"]'); if(md) md.content=`Game Java ${cat} hay nhất cho J2ME: tải JAR miễn phí, hỗ trợ 128x160, 240x320.`;
+    grid.style.display='none';
+  } else {
+    bc.textContent='Tất cả thể loại';
+  }
+}
+render();
+</script>
+</body>
+</html>
