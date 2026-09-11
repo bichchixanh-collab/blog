@@ -644,6 +644,7 @@ img{max-width:100%;display:block}
 
 /* Chế độ bản nhẹ: tắt ảnh/banner cho máy yếu, tiết kiệm data */
 #liteToggle{position:fixed;right:10px;bottom:10px;z-index:9000;background:#4a1a2e;color:#ffd0e8;border:1.5px solid #ff8ec7;border-radius:20px;padding:6px 12px;font-size:11px;font-weight:700;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,.25)}
+#musicToggle{position:fixed;left:10px;bottom:10px;z-index:9000;background:#4a1a2e;color:#ffd0e8;border:1.5px solid #ff8ec7;border-radius:20px;padding:6px 12px;font-size:11px;font-weight:700;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,.25)}
 html.lite .wap-banner,
 html.lite .game-thumb,
 html.lite .grid-item img,

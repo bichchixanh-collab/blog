@@ -41,7 +41,7 @@ function loadRating(slug) {
     const raw = fs.readFileSync(path.join(process.cwd(), 'data', 'comments.json'), 'utf-8');
     const list = JSON.parse(raw);
     if (!Array.isArray(list)) return null;
-    const rows = list.filter((c) => c && c.game === slug && c.status === 'approved');
+    const rows = list.filter((c) => c && c.game === slug && c.status === 'approved' && !c.parentId);
     if (!rows.length) return null;
     const total = rows.length;
     const avg = Math.round((rows.reduce((s, c) => s + (c.stars | 0), 0) / total) * 10) / 10;
@@ -172,8 +172,9 @@ module.exports = async (req, res) => {
     res.setHeader('Cache-Control', 'public, max-age=0, must-revalidate');
     res.end(html);
   } catch (err) {
+    try { console.error('game slug api error:', err && err.message); } catch (e) {}
     res.statusCode = 500;
     res.setHeader('Content-Type', 'text/plain; charset=utf-8');
-    res.end('Lỗi server: ' + err.message);
+    res.end('Lỗi hệ thống, thử lại sau.');
   }
 };

@@ -94,11 +94,13 @@ body{background:#fff0f6;padding:12px}
   <a href="game/kiem-linh-chu-tien-chi-chien.html" id="navHotLink">★ Hot</a>
   <a href="#new">Mới nhất</a>
   <a href="#viethoa">Việt Hóa</a>
+  <a href="profile.html">♡ Hồ sơ</a>
 </nav>
 <div class="wap-banner" id="wapBannerWrap"><a href="#"><img id="wapBannerImg" src="https://picsum.photos/seed/animebanner/720/240" alt="Banner game Java anime 720x240" width="720" height="240" decoding="async" fetchpriority="high"></a></div>
 
 <div class="wrap">
   <div id="noticeBox" style="display:none;font-size:11px;line-height:1.6;color:#4a2a3a;background:#fff;border:1.5px dashed #ffb3d9;border-radius:10px;padding:8px 10px"></div>
+  <div id="statsBox" style="display:none;font-size:11px;color:#8a6a7a;background:#fff;border:1.5px solid #ffd0e8;border-radius:10px;padding:8px 10px;text-align:center"></div>
   <div class="res-filter">
     <span style="font-weight:700;color:#ff4d8d;font-size:11px">📱 Màn hình:</span>
     <button class="res-btn active" data-res="all">Tất cả</button>
@@ -260,11 +262,46 @@ function escHtml(s){return String(s==null?'':s).replace(/[&<>"']/g,function(m){r
 // Yêu thích (localStorage) + cài app PWA
 function favGet(){try{const a=JSON.parse(localStorage.getItem('j2me_favs')||'[]');return Array.isArray(a)?a:[];}catch(e){return [];}}
 function favHas(id){try{return favGet().indexOf(id)>=0;}catch(e){return false;}}
-function favToggle(id){try{let a=favGet();a=a.indexOf(id)>=0?a.filter(function(x){return x!==id;}):a.concat([id]);localStorage.setItem('j2me_favs',JSON.stringify(a.slice(0,200)));refreshFavHearts();renderFavGrid();}catch(e){}}
+function favToggle(id){try{let a=favGet();const was=a.indexOf(id)>=0;a=was?a.filter(function(x){return x!==id;}):a.concat([id]);localStorage.setItem('j2me_favs',JSON.stringify(a.slice(0,200)));refreshFavHearts();renderFavGrid();return !was;}catch(e){return false;}}
 function refreshFavHearts(){try{document.querySelectorAll('[data-fav]').forEach(function(b){b.textContent=favHas(b.getAttribute('data-fav'))?'♥':'♡';});}catch(e){}}
 let deferredPrompt=null;
 window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();deferredPrompt=e;try{document.querySelectorAll('.pwa-install').forEach(function(b){b.style.display='';});}catch(err){}});
 function installApp(){if(deferredPrompt){try{deferredPrompt.prompt();deferredPrompt=null;}catch(e){}}else{alert('Mở menu trình duyệt → "Thêm vào màn hình chính" để cài app.');}}
+// Chuẩn hóa tiếng Việt không dấu để tìm kiếm ("dua xe" vẫn ra "đua xe")
+function normVn(s){return String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/đ/g,'d');}
+// XP + nhiệm vụ hằng ngày (xem 3 game / thích 1 / bình luận 1, mỗi cái +10)
+function xpAdd(n){try{const o=JSON.parse(localStorage.getItem('j2me_xp')||'{"xp":0}')||{xp:0};o.xp=(o.xp||0)+n;localStorage.setItem('j2me_xp',JSON.stringify(o));}catch(e){}}
+function xpBump(kind){
+  try{
+    if(kind==='fav'){xpAdd(3);qInc('fav');}
+  }catch(e){}
+}
+function qInc(kind){
+  try{
+    const goals={seen:3,fav:1,cmt:1};
+    if(!(kind in goals))return;
+    const day=new Date().toISOString().slice(0,10);
+    const k='j2me_q_'+kind+'_'+day, dk='j2me_qd_'+kind+'_'+day;
+    const v=+(localStorage.getItem(k)||0)+1; localStorage.setItem(k,String(v));
+    if(v>=goals[kind]&&!localStorage.getItem(dk)){localStorage.setItem(dk,'1');xpAdd(10);}
+  }catch(e){}
+}
+// Nhạc nền 8-bit (WebAudio riêng trang chủ, tắt mặc định)
+const MUS={timer:null,step:0,
+  lead:[523,659,784,659,880,784,659,523,587,659,587,523,440,523,0,0,523,659,784,880,784,659,587,659,523,587,440,523,392,440,0,0],
+  bass:[131,131,196,196,175,175,147,147,131,131,196,196,175,175,147,147,131,131,196,196,175,175,147,147,196,196,147,147,131,131,98,98]};
+let MUS_AC=null;
+function musAC(){try{if(!MUS_AC)MUS_AC=new (window.AudioContext||window.webkitAudioContext)();if(MUS_AC.state==='suspended')MUS_AC.resume().catch(function(){});}catch(e){}return MUS_AC;}
+function musNote(f,t,dur,type,vol){try{const c=musAC();if(!c||!f)return;const o=c.createOscillator(),gn=c.createGain();o.type=type;o.frequency.value=f;gn.gain.setValueAtTime(vol,c.currentTime);gn.gain.exponentialRampToValueAtTime(0.0001,c.currentTime+dur);o.connect(gn);gn.connect(c.destination);o.start(t);o.stop(t+dur);}catch(e){}}
+function musTick(){try{const c=musAC();if(!c)return;const t=c.currentTime+0.02;const i=MUS.step%32;musNote(MUS.lead[i],t,0.16,'square',0.035);musNote(MUS.bass[i]/2,t,0.2,'triangle',0.05);MUS.step++;}catch(e){}}
+function musToggle(btn){
+  try{
+    if(MUS.timer){clearInterval(MUS.timer);MUS.timer=null;try{localStorage.setItem('j2me_music','0');}catch(e){}if(btn)btn.textContent='🎵 Nhạc';return;}
+    MUS.step=0;MUS.timer=setInterval(musTick,165);
+    try{localStorage.setItem('j2me_music','1');}catch(e){}
+    if(btn)btn.textContent='🎵 Tắt';
+  }catch(e){}
+}
 function card(g, idx=0){
   const hot=g.hot?'<span style="background:#ff4d8d;color:#fff;font-size:8px;padding:2px 4px;border-radius:8px">HOT</span>':''; const vi=g.vi?'<span style="background:#0a9c4a;color:#fff;font-size:8px;padding:2px 4px;border-radius:8px">VIỆT HÓA</span>':'';
   const eager = idx < 3 ? 'loading="eager" fetchpriority="high"' : 'loading="lazy"';
@@ -294,7 +331,33 @@ function renderFavGrid(){
   sec.style.display='';
   grid.innerHTML=items.map(g=>`<div class="grid-item" style="position:relative"><a href="game/${escHtml(g.id)}.html" style="text-decoration:none"><img src="${escHtml(g.thumb)}" width="48" height="48" loading="lazy" decoding="async" alt="${escHtml(g.name)}"><span>${escHtml(String(g.name||'').split('[')[0].slice(0,14))}</span><small>${escHtml((g.res||[])[0]||'')}</small></a><button data-fav="${escHtml(g.id)}" title="Bỏ thích" style="position:absolute;top:2px;right:4px;background:none;border:none;color:#ff4d8d;font-size:14px;cursor:pointer">♥</button></div>`).join('');
 }
-document.addEventListener('click',function(e){const b=e.target&&e.target.closest?e.target.closest('[data-fav]'):null; if(!b) return; e.preventDefault(); favToggle(b.getAttribute('data-fav'));});
+document.addEventListener('click',function(e){const b=e.target&&e.target.closest?e.target.closest('[data-fav]'):null; if(!b) return; e.preventDefault(); try{if(favToggle(b.getAttribute('data-fav')))xpBump('fav');}catch(err){}});
+// Gợi ý khi gõ: dropdown tên + thumb (kết hợp tìm không dấu), bấm để sang trang game
+function initSuggest(){
+  try{
+    const form=document.getElementById('searchForm'), input=document.getElementById('searchInput');
+    if(!form||!input||document.getElementById('suggestBox'))return;
+    form.style.position='relative';
+    const box=document.createElement('div');
+    box.id='suggestBox';
+    box.style.cssText='display:none;position:absolute;top:100%;left:0;right:0;background:#fff;border:1.5px solid #ffb3d9;border-radius:10px;margin-top:4px;overflow:hidden;z-index:500;box-shadow:0 8px 20px rgba(255,77,141,.2)';
+    form.appendChild(box);
+    input.addEventListener('blur',function(){setTimeout(function(){box.style.display='none';},150);});
+    input.addEventListener('keydown',function(e){if(e.key==='Escape')box.style.display='none';});
+  }catch(e){}
+}
+function suggestGames(q){
+  try{
+    const box=document.getElementById('suggestBox'); if(!box)return;
+    const nq=normVn((q||'').trim());
+    if(nq.length<1||!CACHE||!CACHE.length){box.style.display='none';box.innerHTML='';return;}
+    const hits=CACHE.filter(g=>normVn((g.name||'')+' '+(g.cat||'')).includes(nq)).slice(0,6);
+    if(!hits.length){box.style.display='none';box.innerHTML='';return;}
+    box.innerHTML=hits.map(g=>`<a href="game/${escHtml(g.id)}.html" style="display:flex;gap:8px;align-items:center;padding:7px 10px;text-decoration:none;border-bottom:1px dashed #ffd0e8"><img src="${escHtml(g.thumb)}" width="32" height="32" style="width:32px;height:32px;border-radius:8px;object-fit:cover;border:1px solid #ffd0e8" alt=""><span style="font-size:12px;font-weight:700;color:#4a2a3a">${escHtml(g.name)}</span><small style="margin-left:auto;color:#8a6a7a;font-size:10px">${escHtml(g.cat||'')}</small></a>`).join('');
+    box.style.display='';
+    box.querySelectorAll('a').forEach(a=>a.addEventListener('mousedown',function(e){e.preventDefault();location.href=a.href;}));
+  }catch(e){}
+}
 (async()=>{
   const games=await loadGames();
   if(!games || games.length===0){
@@ -312,6 +375,28 @@ document.addEventListener('click',function(e){const b=e.target&&e.target.closest
     if(sr.ok){const sj=await sr.json(); if(sj&&sj.counts) games.forEach(g=>{const c=sj.counts[g.id]; if(c!=null) g.downloads=c;});}
   }catch(e){}
   document.getElementById('hotList').innerHTML=[...games].sort((a,b)=>(b.downloads||0)-(a.downloads||0)).slice(0,3).map((g,i)=>card(g,i)).join('');
+  // Game đang nổi: lượt tải chia số ngày tuổi (game mới mà hot tự trồi lên)
+  try{
+    const ageDays=iso=>{try{const t=new Date(iso).getTime();if(isNaN(t))return 9999;return Math.max(1,(Date.now()-t)/864e5);}catch(e){return 9999;}};
+    const trending=[...games].map(g=>({g:g,s:(g.downloads||0)/ageDays(g.created_at)})).filter(x=>x.s>0).sort((a,b)=>b.s-a.s).slice(0,3);
+    if(trending.length){
+      let sec=document.getElementById('trendSection');
+      if(!sec){sec=document.createElement('section');sec.id='trendSection';sec.className='fabric-box';const h=document.getElementById('hot');if(h&&h.after)h.after(sec);}
+      if(sec)sec.innerHTML=`<div class="fabric-title">Game đang nổi</div>`+trending.map((x,i)=>card(x.g,i)).join('');
+    }
+  }catch(e){}
+  // Box thống kê công khai (tổng lượt tải + top + tổng bình luận)
+  try{
+    const totalDl=games.reduce((s,g)=>s+(g.downloads||0),0);
+    const topG=[...games].sort((a,b)=>(b.downloads||0)-(a.downloads||0))[0];
+    let totalCmt=0;
+    await Promise.all(games.slice(0,30).map(g=>fetch('api/comments?game='+encodeURIComponent(g.id),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(j&&j.total)totalCmt+=j.total;}).catch(()=>{})));
+    const sb=document.getElementById('statsBox');
+    if(sb&&(totalDl>0||totalCmt>0)){
+      sb.innerHTML=`Tổng lượt tải: <b>${totalDl.toLocaleString('vi-VN')}</b>${topG?` • Top: <b>${escHtml(String(topG.name||'').split('[')[0].slice(0,20))}</b> (${(topG.downloads||0).toLocaleString('vi-VN')})`:''} • Bình luận: <b>${totalCmt}</b>`;
+      sb.style.display='';
+    }
+  }catch(e){}
   document.getElementById('newList').innerHTML=games.slice(0,4).map((g,i)=>card(g,i+3)).join('');
   document.getElementById('viethoaGrid').innerHTML=games.filter(g=>g.vi).slice(0,6).map(g=>`<a href="game/${escHtml(g.id)}.html" class="grid-item"><img src="${escHtml(g.thumb)}" width="48" height="48" loading="lazy" decoding="async" alt="${escHtml(g.name)}"><span>${escHtml(String(g.name||'').split('[')[0].slice(0,14))}</span><small>${escHtml((g.res||[])[0]||'')}</small></a>`).join('') || games.slice(0,6).map(g=>`<a href="game/${escHtml(g.id)}.html" class="grid-item"><img src="${escHtml(g.thumb)}" width="48" height="48" loading="lazy" decoding="async" alt="${escHtml(g.name)}"><span>${escHtml(String(g.name||'').split('[')[0].slice(0,14))}</span></a>`).join('');
   const extra=document.getElementById('extraList'); if(extra) extra.innerHTML=games.slice(3,6).map(g=>card(g)).join('');
@@ -329,9 +414,11 @@ document.addEventListener('click',function(e){const b=e.target&&e.target.closest
     }).join('');
   }
   document.getElementById('searchInput')?.addEventListener('input',e=>{
-    const q=e.target.value.toLowerCase().trim();
-    document.querySelectorAll('.game-item').forEach(it=>{const hit=!q||it.dataset.name.includes(q); it.style.display=hit?'flex':'none'})
+    const q=normVn(e.target.value.trim());
+    document.querySelectorAll('.game-item').forEach(it=>{const hit=!q||normVn(it.dataset.name||'').includes(q); it.style.display=hit?'flex':'none'})
+    suggestGames(e.target.value);
   });
+  initSuggest();
   document.querySelectorAll('.res-btn').forEach(b=>b.addEventListener('click',()=>{
     document.querySelectorAll('.res-btn').forEach(x=>x.classList.remove('active')); b.classList.add('active');
     const res=b.dataset.res;
@@ -360,5 +447,7 @@ document.addEventListener('click',function(e){const b=e.target&&e.target.closest
 <script>
 (function(){function paint(){try{var on=document.documentElement.classList.contains('lite');var b=document.getElementById('liteToggle');if(b)b.textContent=on?'📶 Đủ':'📴 Nhẹ';}catch(e){}}try{var b=document.getElementById('liteToggle');if(b)b.onclick=function(){try{var h=document.documentElement;if(h.classList.contains('lite')){h.classList.remove('lite');localStorage.setItem('j2me_lite','0');}else{h.classList.add('lite');localStorage.setItem('j2me_lite','1');}paint();}catch(e){}};paint();}catch(e){}})();
 </script>
+<button id="musicToggle" title="Nhạc nền 8-bit">🎵 Nhạc</button>
+<script>(function(){try{var b=document.getElementById('musicToggle');if(!b)return;b.onclick=function(){try{musToggle(b);}catch(e){}};}catch(e){}})();</script>
 </body>
 </html>

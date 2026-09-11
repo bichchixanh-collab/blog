@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Hồ sơ game thủ - J2ME.VERCEL.APP</title>
+<meta name="description" content="Hồ sơ game thủ: cấp độ, huy hiệu, game yêu thích, đã tải, đã phá đảo - lưu trên máy bạn, không cần tài khoản.">
+<link rel="canonical" href="https://J2ME.VERCEL.APP/profile.html">
+<meta name="theme-color" content="#ff4d8d">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="stylesheet" href="style.css">
+<script>try{if(localStorage.getItem('j2me_lite')==='1')document.documentElement.classList.add('lite');}catch(e){}</script>
+<script>if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){});});}</script>
+<style>
+body{background:#fff0f6;padding:12px;font-family:"Quicksand","Be Vietnam Pro",system-ui,sans-serif;color:#4a2a3a}
+.app{max-width:420px;margin:0 auto;background:#fff;border:2px solid #ff8ec7;border-radius:16px;overflow:hidden}
+.top-info{display:flex;justify-content:space-between;background:#1a1a2e;color:#7fb1ff;font-family:monospace;font-size:11px;padding:6px 12px}
+.header{background:linear-gradient(135deg,#ff8ec7,#ff4d8d);color:#fff;text-align:center;padding:16px 12px}
+.header h1{font-family:"Mali",cursive;font-size:18px;margin:0}
+.wrap{padding:10px;display:grid;gap:12px}
+.box{border:2px solid #ff8ec7;border-radius:14px;padding:12px;background:#fff}
+.lv-name{font-size:16px;font-weight:800;color:#ff4d8d}
+.bar{background:#fff0f6;border:1px solid #ffb3d9;border-radius:10px;height:12px;overflow:hidden;margin:6px 0}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,#ff4d8d,#ff8ec7)}
+.stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center}
+.stat-grid b{font-size:16px;color:#ff4d8d;display:block}
+.stat-grid small{font-size:10px;color:#8a6a7a}
+.badge-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.bdg{border:1.5px solid #ffd0e8;border-radius:10px;padding:8px 4px;text-align:center;font-size:10px;color:#8a6a7a}
+.bdg.on{border-color:#ff4d8d;color:#4a2a3a;background:#fff5fa}
+.bdg .e{font-size:20px;display:block}
+.quest{display:flex;justify-content:space-between;font-size:12px;padding:6px 0;border-bottom:1px dashed #ffd0e8}
+.quest:last-child{border:none}
+.fav-row{display:flex;gap:8px;align-items:center;padding:6px 0;border-bottom:1px dashed #ffd0e8;font-size:12px}
+.fav-row:last-child{border:none}
+.fav-row img{width:36px;height:36px;border-radius:8px;object-fit:cover;border:1px solid #ffd0e8}
+.btn{border:none;border-radius:14px;padding:7px 12px;font-size:11px;font-weight:700;cursor:pointer;background:#fff;border:1.5px solid #ffb3d9;color:#ff4d8d;margin:2px}
+.footer{background:#4a1a2e;color:#ffd0e8;text-align:center;padding:14px;font-size:11px}
+.footer a{color:#fff}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="top-info"><span>◉ HỒ SƠ</span><span>GAME THỦ</span><span>100%</span></div>
+<div class="header"><h1>Hồ sơ game thủ</h1><p style="margin:4px 0 0;font-size:11px">Lưu trên máy bạn, không cần tài khoản ♡</p></div>
+<div class="wrap">
+  <div class="box">
+    <div class="lv-name" id="lvName">Tân thủ</div>
+    <small style="color:#8a6a7a" id="lvXp">0 XP</small>
+    <div class="bar"><i id="lvBar" style="width:0%"></i></div>
+    <small style="color:#8a6a7a" id="lvNext"></small>
+  </div>
+  <div class="box">
+    <b style="font-size:12px">Nhiệm vụ hằng ngày (+10 XP/cái)</b>
+    <div id="questList"></div>
+  </div>
+  <div class="box">
+    <b style="font-size:12px">Tổng kết</b>
+    <div class="stat-grid" style="margin-top:8px" id="statGrid"></div>
+  </div>
+  <div class="box">
+    <b style="font-size:12px">Huy hiệu</b>
+    <div class="badge-grid" style="margin-top:8px" id="badgeGrid"></div>
+  </div>
+  <div class="box">
+    <b style="font-size:12px">Game yêu thích</b>
+    <div id="favList" style="margin-top:6px"><small style="color:#8a6a7a">Chưa thích game nào — bấm ♡ ở trang game nha!</small></div>
+  </div>
+  <div class="box">
+    <b style="font-size:12px">Sao lưu hồ sơ</b><br>
+    <small style="color:#8a6a7a">Đổi máy không mất thành tích: xuất file rồi nhập lại.</small>
+    <div style="margin-top:6px">
+      <button class="btn" id="expBtn">⬇ Xuất file</button>
+      <label class="btn" style="cursor:pointer">⬆ Nhập file<input id="impFile" type="file" accept=".json,application/json" style="display:none"></label>
+      <button class="btn" id="resetBtn" style="color:#a00;border-color:#e8a0a0">Xóa hết</button>
+    </div>
+  </div>
+</div>
+<footer class="footer"><p><a href="index.html">Trang chủ</a> · <a href="category.html">Thể loại</a> · <a href="lien-he.html">Liên hệ / DMCA</a></p><p>© 2010-2026 J2ME.VERCEL.APP</p></footer>
+</div>
+<script>
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(m){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m];});}
+function J(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v);}catch(e){return d;}}
+const LEVELS=[[0,'Tân thủ'],[30,'Mới chơi'],[80,'Game thủ'],[150,'Cao thủ'],[300,'Lão làng WAP'],[600,'Huyền thoại WAP']];
+function levelOf(xp){let t=LEVELS[0];for(const lv of LEVELS){if(xp>=lv[0])t=lv;}const i=LEVELS.indexOf(t);return {name:t[1],next:i+1<LEVELS.length?LEVELS[i+1]:null,cur:t[0]};}
+function favs(){const a=J('j2me_favs',[]);return Array.isArray(a)?a:[];}
+function seen(){const a=J('j2me_seen',[]);return Array.isArray(a)?a:[];}
+function done(){const a=J('j2me_done',[]);return Array.isArray(a)?a:[];}
+function dlIds(){const out={};try{for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.indexOf('dl_')===0){const parts=k.split('_');if(parts.length>=2)out[parts.slice(1,parts.length-1).join('_')]=true;}}}catch(e){}return Object.keys(out);}
+(async function(){
+  const KEEP=k=>k&&(k.indexOf('j2me_')===0||k.indexOf('dl_')===0||k.indexOf('react_')===0||k.indexOf('cmt_')===0);
+  const xp=(J('j2me_xp',{xp:0}).xp)||0;
+  const lv=levelOf(xp);
+  document.getElementById('lvName').textContent=lv.name;
+  document.getElementById('lvXp').textContent=xp.toLocaleString('vi-VN')+' XP';
+  if(lv.next){
+    const pct=Math.min(100,Math.round(100*(xp-lv.cur)/(lv.next[0]-lv.cur)));
+    document.getElementById('lvBar').style.width=pct+'%';
+    document.getElementById('lvNext').textContent='Còn '+(lv.next[0]-xp).toLocaleString('vi-VN')+' XP lên '+lv.next[1];
+  }else{document.getElementById('lvBar').style.width='100%';document.getElementById('lvNext').textContent='MAX rồi, huyền thoại!';}
+  const day=new Date().toISOString().slice(0,10);
+  const qs=[['seen','Mở 3 game',3],['fav','Thích 1 game',1],['cmt','Bình luận 1 cái',1]];
+  document.getElementById('questList').innerHTML=qs.map(function(q){
+    const v=+(localStorage.getItem('j2me_q_'+q[0]+'_'+day)||0);
+    const doneQ=v>=q[2];
+    return `<div class="quest"><span>${q[1]}</span><b style="color:${doneQ?'#0a9c4a':'#8a6a7a'}">${Math.min(v,q[2])}/${q[2]}${doneQ?' ✓':''}</b></div>`;
+  }).join('');
+  const dlTotal=+(localStorage.getItem('j2me_dl_total')||0), cmtTotal=+(localStorage.getItem('j2me_cmt_total')||0);
+  const F=favs(), S=seen(), D=done(), DL=dlIds();
+  const stats=[['Đã xem',S.length],['Đã tải',DL.length],['Yêu thích',F.length],['Phá đảo',D.length],['Bình luận',cmtTotal],['Lượt tải',dlTotal]];
+  document.getElementById('statGrid').innerHTML=stats.map(s=>`<div><b>${s[1]}</b><small>${s[0]}</small></div>`).join('');
+  const badges=[['🎮','Chơi 1 game',S.length>=1],['🎮🎮','Xem 5 game',S.length>=5],['🏆','Xem 20 game',S.length>=20],['⬇','Tải đầu tiên',DL.length>=1],['📦','Tải 5 game',DL.length>=5],['💾','Tải 20 game',DL.length>=20],['♡','Thích đầu tiên',F.length>=1],['💖','Thích 15 game',F.length>=15],['⚔','Phá đảo đầu tiên',D.length>=1]];
+  document.getElementById('badgeGrid').innerHTML=badges.map(b=>`<div class="bdg${b[2]?' on':''}"><span class="e">${b[0]}</span>${b[1]}</div>`).join('');
+  try{
+    const r=await fetch('data/games.json?'+Date.now(),{cache:'no-store'});
+    if(r.ok){
+      const games=await r.json();
+      const byId={};games.forEach(g=>{byId[g.id]=g;});
+      const box=document.getElementById('favList');
+      if(F.length)box.innerHTML=F.map(id=>byId[id]?`<div class="fav-row"><img src="${esc(byId[id].thumb)}" alt="" loading="lazy"><a href="game/${esc(id)}.html" style="color:#ff4d8d;font-weight:700">${esc(byId[id].name)}</a></div>`:'').join('')||box.innerHTML;
+    }
+  }catch(e){}
+  document.getElementById('expBtn').onclick=function(){
+    try{
+      const dump={};
+      for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(KEEP(k))dump[k]=localStorage.getItem(k);}
+      const blob=new Blob([JSON.stringify(dump)],{type:'application/json'});
+      const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='j2me-profile.json';a.click();
+      setTimeout(function(){URL.revokeObjectURL(a.href);},2000);
+    }catch(e){alert('Không xuất được.');}
+  };
+  document.getElementById('impFile').onchange=function(e){
+    const f=e.target.files[0];if(!f)return;
+    const rd=new FileReader();
+    rd.onload=function(){try{const j=JSON.parse(rd.result);Object.keys(j).forEach(k=>{if(KEEP(k))localStorage.setItem(k,String(j[k]));});location.reload();}catch(err){alert('File không hợp lệ.');}};
+    rd.readAsText(f);
+  };
+  document.getElementById('resetBtn').onclick=function(){
+    if(!confirm('Xóa hết thành tích trên máy này?'))return;
+    try{const ks=[];for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(KEEP(k))ks.push(k);}ks.forEach(k=>localStorage.removeItem(k));}catch(e){}
+    location.reload();
+  };
+})();
+</script>
+<button id="liteToggle" title="Tiết kiệm data">📴 Nhẹ</button>
+<script>
+(function(){function paint(){try{var on=document.documentElement.classList.contains('lite');var b=document.getElementById('liteToggle');if(b)b.textContent=on?'📶 Đủ':'📴 Nhẹ';}catch(e){}}try{var b=document.getElementById('liteToggle');if(b)b.onclick=function(){try{var h=document.documentElement;if(h.classList.contains('lite')){h.classList.remove('lite');localStorage.setItem('j2me_lite','0');}else{h.classList.add('lite');localStorage.setItem('j2me_lite','1');}paint();}catch(e){}};paint();}catch(e){}})();
+</script>
+</body>
+</html>

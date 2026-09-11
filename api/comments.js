@@ -81,24 +81,42 @@ function validGameId(id) {
   }
 }
 
+function pubComment(c) {
+  return {
+    id: c.id || '',
+    name: String(c.name || '').slice(0, 30),
+    stars: c.parentId ? 0 : Math.min(5, Math.max(1, c.stars | 0)),
+    text: String(c.text || '').slice(0, 500),
+    created_at: c.created_at || '',
+    replies: [],
+  };
+}
+
 function summarize(list, game) {
-  const rows = list
-    .filter((c) => c && c.game === game && c.status === 'approved')
+  const approved = list.filter((c) => c && c.game === game && c.status === 'approved');
+  const tops = approved
+    .filter((c) => !c.parentId)
     .sort((a, b) => String(b.created_at || '').localeCompare(String(a.created_at || '')));
-  const total = rows.length;
+  const byParent = {};
+  approved
+    .filter((c) => c.parentId)
+    .sort((a, b) => String(a.created_at || '').localeCompare(String(b.created_at || '')))
+    .forEach((c) => {
+      (byParent[c.parentId] = byParent[c.parentId] || []).push(c);
+    });
+  const total = tops.length;
   const avg = total
-    ? Math.round((rows.reduce((s, c) => s + (c.stars || 0), 0) / total) * 10) / 10
+    ? Math.round((tops.reduce((s, c) => s + (c.stars || 0), 0) / total) * 10) / 10
     : 0;
   return {
     game,
     avg,
     total,
-    comments: rows.slice(0, 50).map((c) => ({
-      name: String(c.name || '').slice(0, 30),
-      stars: Math.min(5, Math.max(1, c.stars | 0)),
-      text: String(c.text || '').slice(0, 500),
-      created_at: c.created_at || '',
-    })),
+    comments: tops.slice(0, 50).map((c) => {
+      const o = pubComment(c);
+      o.replies = (byParent[c.id] || []).slice(0, 20).map(pubComment);
+      return o;
+    }),
   };
 }
 
@@ -143,6 +161,33 @@ function readJsonBody(req) {
   });
 }
 
+// Chống spam: giới hạn số request/IP (best-effort; instance lạnh có thể reset).
+const RATE = new Map();
+function clientIp(req) {
+  try {
+    const f = (req.headers && req.headers['x-forwarded-for']) || '';
+    const ip = String(f).split(',')[0].trim();
+    if (ip) return ip;
+    if (req.socket && req.socket.remoteAddress) return String(req.socket.remoteAddress);
+  } catch (e) {}
+  return 'unknown';
+}
+function hitRate(ip, route, limit, windowMs) {
+  const now = Date.now();
+  const key = ip + '|' + route;
+  let arr = RATE.get(key);
+  if (!Array.isArray(arr)) arr = [];
+  arr = arr.filter((t) => now - t < windowMs);
+  if (arr.length >= limit) {
+    RATE.set(key, arr);
+    return false;
+  }
+  arr.push(now);
+  if (RATE.size > 3000) RATE.clear();
+  RATE.set(key, arr);
+  return true;
+}
+
 module.exports = async (req, res) => {
   try {
     if (req.method === 'OPTIONS') {
@@ -152,6 +197,11 @@ module.exports = async (req, res) => {
       res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
       res.end();
       return;
+    }
+
+    const isPost = req.method === 'POST';
+    if (!hitRate(clientIp(req), isPost ? 'cmt-post' : 'cmt-get', isPost ? 10 : 100, isPost ? 10 * 60 * 1000 : 60 * 1000)) {
+      return send(res, 429, { error: 'Thao tác quá nhanh, thử lại sau ít phút.' });
     }
 
     const token = process.env.GITHUB_TOKEN || '';
@@ -178,29 +228,39 @@ module.exports = async (req, res) => {
       const game = String(p.game || '').slice(0, 120);
       const name = String(p.name || '').trim().slice(0, 30);
       const text = String(p.text || '').trim().slice(0, 500);
+      const replyTo = String(p.replyTo || '').slice(0, 64);
       const stars = Math.min(5, Math.max(1, parseInt(p.stars, 10) || 0));
       if (!validGameId(game)) return send(res, 400, { error: 'game invalid' });
       if (name.length < 2) return send(res, 400, { error: 'name too short' });
       if (text.length < 2) return send(res, 400, { error: 'text too short' });
-      if (!stars) return send(res, 400, { error: 'stars invalid' });
+      if (!replyTo && !stars) return send(res, 400, { error: 'stars invalid' });
       if (!token) return send(res, 503, { error: 'comments not configured' });
 
       let lastErr = null;
       for (let attempt = 0; attempt < 3; attempt++) {
         memCache.at = 0;
         const { list, sha } = await readLive(token);
+        let parentId = null;
+        if (replyTo) {
+          const parent = list.find((c) => c && c.id === replyTo && c.game === game && !c.parentId);
+          if (!parent || parent.status !== 'approved') {
+            return send(res, 400, { error: 'reply target invalid' });
+          }
+          parentId = parent.id;
+        }
         list.push({
           id: `c${Date.now().toString(36)}${Math.floor(Math.random() * 1e6).toString(36)}`,
           game,
           name,
-          stars,
+          stars: parentId ? 0 : stars,
           text,
           status: 'pending',
           created_at: new Date().toISOString(),
+          ...(parentId ? { parentId } : {}),
         });
         const content = Buffer.from(JSON.stringify(list)).toString('base64');
         const put = await gh('PUT', `/repos/${REPO}/contents/${FILE_PATH}`, token, {
-          message: `[skip ci] comments: new pending on ${game}`,
+          message: `[skip ci] comments: new pending ${parentId ? 'reply ' : ''}on ${game}`,
           content,
           branch: BRANCH,
           ...(sha ? { sha } : {}),

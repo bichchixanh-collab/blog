@@ -215,7 +215,7 @@ a{color:#ff4d8d;text-decoration:none}
   </div>
   <footer style="background:#4a1a2e;color:#ffd0e8;text-align:center;padding:14px;font-size:11px;border-radius:12px;margin-top:4px">
     <p style="margin:0">© 2010-2026 J2ME.VERCEL.APP — Anime WAP</p>
-    <p style="margin:6px 0 0;font-size:10px;opacity:.7"><a href="index.html" data-root-link="index.html" style="color:#fff">Trang chủ</a> · <a href="category.html" data-root-link="category.html" style="color:#fff">Thể loại</a> · <a href="lien-he.html" data-root-link="lien-he.html" style="color:#fff">Liên hệ / DMCA</a></p>
+    <p style="margin:6px 0 0;font-size:10px;opacity:.7"><a href="index.html" data-root-link="index.html" style="color:#fff">Trang chủ</a> · <a href="category.html" data-root-link="category.html" style="color:#fff">Thể loại</a> · <a href="profile.html" data-root-link="profile.html" style="color:#fff">Hồ sơ</a> · <a href="lien-he.html" data-root-link="lien-he.html" style="color:#fff">Liên hệ / DMCA</a></p>
     <p style="margin:6px 0 0"><button class="dl-btn pwa-install" style="display:none;font-size:10px" onclick="installApp()">Cài app về máy</button></p>
   </footer>
 </div>
@@ -434,6 +434,7 @@ function countDownload(gameId){
     const k='dl_'+gameId+'_'+day;
     if(localStorage.getItem(k))return;
     localStorage.setItem(k,'1');
+    xpBump('download',gameId);
     const body=JSON.stringify({id:gameId});
     // Dùng fetch JSON + keepalive (giống luồng bình luận đã chạy ổn), không dùng
     // sendBeacon vì nó gửi text/plain khiến Vercel không parse được body.
@@ -445,6 +446,52 @@ function favGet(){try{const a=JSON.parse(localStorage.getItem('j2me_favs')||'[]'
 function favHas(id){try{return favGet().indexOf(id)>=0;}catch(e){return false;}}
 function favToggle(id){try{let a=favGet();a=a.indexOf(id)>=0?a.filter(function(x){return x!==id;}):a.concat([id]);localStorage.setItem('j2me_favs',JSON.stringify(a.slice(0,200)));return a.indexOf(id)>=0;}catch(e){return false;}}
 function copyPageUrl(url,btn){function done(t){if(btn){btn.textContent=t;setTimeout(function(){btn.textContent='Copy link';},1500);}}if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(url).then(function(){done('Đã copy!');}).catch(function(){done('Copy lỗi');});}else{try{const ta=document.createElement('textarea');ta.value=url;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);done('Đã copy!');}catch(e){done('Copy lỗi');}}}
+// XP + nhiệm vụ hằng ngày (xem 3 game / thích 1 / bình luận 1, mỗi cái +10)
+function xpAdd(n){try{const o=JSON.parse(localStorage.getItem('j2me_xp')||'{"xp":0}')||{xp:0};o.xp=(o.xp||0)+n;localStorage.setItem('j2me_xp',JSON.stringify(o));}catch(e){}}
+function xpBump(kind,gameId){
+  try{
+    if(kind==='visit'&&gameId){let a=[];try{a=JSON.parse(localStorage.getItem('j2me_seen')||'[]');}catch(e){}if(a.indexOf(gameId)<0){a.push(gameId);localStorage.setItem('j2me_seen',JSON.stringify(a.slice(0,500)));xpAdd(5);qInc('seen');}}
+    if(kind==='download'&&gameId){xpAdd(10);try{localStorage.setItem('j2me_dl_total',String(+(localStorage.getItem('j2me_dl_total')||0)+1));}catch(e){}}
+    if(kind==='fav'){xpAdd(3);qInc('fav');}
+    if(kind==='comment'){xpAdd(15);qInc('cmt');try{localStorage.setItem('j2me_cmt_total',String(+(localStorage.getItem('j2me_cmt_total')||0)+1));}catch(e){}}
+  }catch(e){}
+}
+function qInc(kind){
+  try{
+    const goals={seen:3,fav:1,cmt:1};
+    if(!(kind in goals))return;
+    const day=new Date().toISOString().slice(0,10);
+    const k='j2me_q_'+kind+'_'+day, dk='j2me_qd_'+kind+'_'+day;
+    const v=+(localStorage.getItem(k)||0)+1; localStorage.setItem(k,String(v));
+    if(v>=goals[kind]&&!localStorage.getItem(dk)){localStorage.setItem(dk,'1');xpAdd(10);}
+  }catch(e){}
+}
+function xpLevel(xp){const L=[[0,'Tân thủ'],[30,'Mới chơi'],[80,'Game thủ'],[150,'Cao thủ'],[300,'Lão làng WAP'],[600,'Huyền thoại WAP']];let t=L[0];for(const lv of L){if(xp>=lv[0])t=lv;}const i=L.indexOf(t);return {name:t[1],xp:xp,next:i+1<L.length?L[i+1]:null};}
+// Gửi reaction (mỗi máy 1 lượt/game, bấm lại để đổi)
+function sendReact(gameId,kind){
+  if(!gameId||isPreviewMode())return;
+  try{
+    const k='react_'+gameId, prev=localStorage.getItem(k);
+    if(prev===kind)return;
+    fetch(apiRoot()+'/api/stats',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:gameId,react:kind,prev:prev||undefined})}).then(function(r){return r.json();}).then(function(j){
+      if(j&&j.reactions){localStorage.setItem(k,kind);['love','ok','sad'].forEach(function(x){const el=document.getElementById('rc-'+x);if(el)el.textContent=j.reactions[x]||0;});}
+    }).catch(function(){});
+  }catch(e){}
+}
+// Nhạc nền 8-bit (WebAudio, tắt mặc định, dùng chung AudioContext)
+const MUS={timer:null,step:0,
+  lead:[523,659,784,659,880,784,659,523,587,659,587,523,440,523,0,0,523,659,784,880,784,659,587,659,523,587,440,523,392,440,0,0],
+  bass:[131,131,196,196,175,175,147,147,131,131,196,196,175,175,147,147,131,131,196,196,175,175,147,147,196,196,147,147,131,131,98,98]};
+function musNote(f,t,dur,type,vol){try{const c=getAC();if(!c||!f)return;const o=c.createOscillator(),gn=c.createGain();o.type=type;o.frequency.value=f;gn.gain.setValueAtTime(vol,c.currentTime);gn.gain.exponentialRampToValueAtTime(0.0001,c.currentTime+dur);o.connect(gn);gn.connect(c.destination);o.start(t);o.stop(t+dur);}catch(e){}}
+function musTick(){try{const c=getAC();if(!c)return;const t=c.currentTime+0.02;const i=MUS.step%32;musNote(MUS.lead[i],t,0.16,'square',0.035);musNote(MUS.bass[i]/2,t,0.2,'triangle',0.05);MUS.step++;}catch(e){}}
+function musToggle(btn){
+  try{
+    if(MUS.timer){clearInterval(MUS.timer);MUS.timer=null;localStorage.setItem('j2me_music','0');if(btn)btn.textContent='🎵 Nhạc';return;}
+    const c=getAC(); if(c&&c.resume)c.resume().catch(function(){});
+    MUS.step=0; MUS.timer=setInterval(musTick,165);
+    localStorage.setItem('j2me_music','1');if(btn)btn.textContent='🎵 Tắt';
+  }catch(e){}
+}
 // Nút cài app PWA (hiện khi trình duyệt cho phép)
 let deferredPrompt=null;
 window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();deferredPrompt=e;try{document.querySelectorAll('.pwa-install').forEach(function(b){b.style.display='';});}catch(err){}});
@@ -460,6 +507,7 @@ async function renderDetail(){
     GAMES=await loadMap(); id=getId(); g=GAMES[id];
   }
   if(!g){const nf=document.querySelector('.kawaii-d')||document.querySelector('.wrap'); if(nf)nf.innerHTML=`<div style="padding:20px;text-align:center"><h2>Không tìm thấy game!</h2><p><a href="${apiRoot()}/index.html">‹ Về trang chủ</a></p></div>`; return;}
+  if(!isPreview){try{xpBump('visit',id);}catch(e){}}
   document.title=g.name+' - Tải Game Java '+g.res[0]+' | J2ME.VERCEL.APP';
   const bc2=document.getElementById('bcName'); if(bc2) bc2.textContent=g.name;
   const can=document.querySelector('link[rel="canonical"]'); if(can) can.href=`https://J2ME.VERCEL.APP/game/${id}.html`;
@@ -473,12 +521,13 @@ async function renderDetail(){
   // detail-head (kèm ngày đăng nếu bài có lưu created_at)
   let dateStr='';
   try{ if(g.created_at){ const dd=new Date(g.created_at); if(!isNaN(dd)) dateStr=dd.toLocaleDateString('vi-VN',{day:'2-digit',month:'2-digit',year:'numeric'}); } }catch(e){}
-  // Lượt tải thật từ api/stats (rớt thì dùng số tĩnh trong JSON)
+  // Lượt tải thật + reactions từ api/stats (rớt thì dùng số tĩnh trong JSON)
   let dlCount=(typeof g.downloads==='number'&&g.downloads>0)?g.downloads:null;
+  let dlReact={love:0,ok:0,sad:0};
   if(!isPreview){
     try{
       const sr=await fetch(apiRoot()+'/api/stats?id='+encodeURIComponent(id),{cache:'no-store'});
-      if(sr.ok){const sj=await sr.json(); if(sj&&typeof sj.downloads==='number') dlCount=sj.downloads;}
+      if(sr.ok){const sj=await sr.json(); if(sj&&typeof sj.downloads==='number')dlCount=sj.downloads; if(sj&&sj.reactions)dlReact={love:0,ok:0,sad:0,...sj.reactions};}
     }catch(e){}
   }
   const head=document.querySelector('.detail-head');
@@ -497,11 +546,18 @@ async function renderDetail(){
       +`<a href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(pageUrl)}" target="_blank" rel="noopener" class="dl-btn" style="font-size:11px">Facebook</a>`
       +`<button id="copyLinkBtn" class="dl-btn" style="font-size:11px">Copy link</button>`
       +`<button id="qrBtn" class="dl-btn" style="font-size:11px">QR</button>`
-      +`<button id="favBtn" class="dl-btn" style="font-size:11px">${favOn?'♥ Đã thích':'♡ Thích'}</button></div>`
+      +`<button id="favBtn" class="dl-btn" style="font-size:11px">${favOn?'♥ Đã thích':'♡ Thích'}</button>`
+      +`<button id="doneBtn" class="dl-btn" style="font-size:11px">${(function(){try{return JSON.parse(localStorage.getItem('j2me_done')||'[]').indexOf(id)>=0;}catch(e){return false;}})()?'✓ Đã phá đảo':'Phá đảo?'}</button></div>`
+      +`<div id="reactRow" style="display:flex;gap:8px;margin-top:8px;align-items:center;flex-wrap:wrap">`
+      +`<span style="font-size:11px;color:#8a6a7a">Cảm nhận:</span>`
+      +['love|😍','ok|😐','sad|👎'].map(function(p){const kv=p.split('|');return `<button data-react="${kv[0]}" style="background:#fff;border:1.5px solid #ffb3d9;border-radius:20px;padding:4px 10px;font-size:12px;cursor:pointer">${kv[1]} <b id="rc-${kv[0]}">${dlReact[kv[0]]||0}</b></button>`;}).join('')
+      +`</div>`
       +`<div id="qrWrap" style="display:none;text-align:center;margin-top:8px"><img id="qrImg" alt="QR mở trên điện thoại" width="160" height="160" style="width:160px;height:160px;border:2px solid #ffd0e8;border-radius:12px;background:#fff"><br><small style="color:#8a6a7a;font-size:10px">Quét để mở trên điện thoại</small></div>`;
       document.getElementById('copyLinkBtn').onclick=function(){copyPageUrl(pageUrl,this);};
       document.getElementById('qrBtn').onclick=function(){const w=document.getElementById('qrWrap');const im=document.getElementById('qrImg');if(w.style.display==='none'){if(!im.src)im.src='https://api.qrserver.com/v1/create-qr-code/?size=160x160&data='+encodeURIComponent(pageUrl);w.style.display='block';}else{w.style.display='none';}};
-      document.getElementById('favBtn').onclick=function(){favToggle(id);this.textContent=favHas(id)?'♥ Đã thích':'♡ Thích';};
+      document.getElementById('favBtn').onclick=function(){const on=favToggle(id);this.textContent=favHas(id)?'♥ Đã thích':'♡ Thích';if(on){xpBump('fav');}};
+      document.getElementById('doneBtn').onclick=function(){try{let a=JSON.parse(localStorage.getItem('j2me_done')||'[]');const has=a.indexOf(id)>=0;a=has?a.filter(function(x){return x!==id;}):a.concat([id]);localStorage.setItem('j2me_done',JSON.stringify(a.slice(0,500)));this.textContent=has?'Phá đảo?':'✓ Đã phá đảo';}catch(e){}};
+      shareBox.querySelectorAll('#reactRow [data-react]').forEach(function(b){b.onclick=function(){sendReact(id,b.getAttribute('data-react'));};});
     }
   }catch(e){}
   // body — lưới demo tự cân theo số lượng ảnh: 1 ảnh căn giữa khổ lớn, 2 ảnh chia đôi,
@@ -583,11 +639,27 @@ async function loadComments(gameId){
     if(!r.ok) throw new Error(r.status);
     const j=await r.json();
     sum.innerHTML=j.total?('★ <b>'+escHtml(String(j.avg))+'</b> — '+j.total+' đánh giá'):'Chưa có đánh giá nào. Hãy là người đầu tiên!';
+    window._cmtReplyTo=null;
+    const fmtD=function(iso){try{const dt=new Date(iso); if(!isNaN(dt))return dt.toLocaleDateString('vi-VN');}catch(e){} return '';};
+    const itemHtml=function(c,reply){
+      const st=reply?'':('<div class="stars">'+'★'.repeat(c.stars)+'☆'.repeat(5-c.stars)+'</div>');
+      return '<div class="cmt-item"'+(reply?' style="margin:6px 0 0 18px;border-style:dashed"':'')+'>'+st+'<b>'+escHtml(c.name)+'</b> <small>'+escHtml(fmtD(c.created_at))+'</small><div>'+escHtml(c.text)+'</div>'
+      +(reply?'':'<div><button data-reply="'+escHtml(c.id)+'" data-rname="'+escHtml(c.name)+'" style="background:none;border:none;color:#ff4d8d;font-size:11px;cursor:pointer;padding:0">↳ Trả lời</button></div>')+'</div>';
+    };
     list.innerHTML=(j.comments||[]).map(function(c){
-      const st='★'.repeat(c.stars)+'☆'.repeat(5-c.stars);
-      let d=''; try{const dt=new Date(c.created_at); if(!isNaN(dt)) d=dt.toLocaleDateString('vi-VN');}catch(e){}
-      return '<div class="cmt-item"><div class="stars">'+st+'</div><b>'+escHtml(c.name)+'</b> <small>'+escHtml(d)+'</small><div>'+escHtml(c.text)+'</div></div>';
+      return itemHtml(c,false)+((c.replies||[]).map(function(r){return itemHtml(r,true);}).join(''));
     }).join('');
+    list.querySelectorAll('[data-reply]').forEach(function(b){
+      b.onclick=function(){
+        window._cmtReplyTo={id:b.getAttribute('data-reply'),name:b.getAttribute('data-rname')};
+        let tag=document.getElementById('replyTag');
+        if(!tag){tag=document.createElement('div');tag.id='replyTag';tag.style.cssText='font-size:11px;color:#ff4d8d';form.insertBefore(tag,form.firstChild);}
+        tag.innerHTML='Đang trả lời <b></b> <a href="#" id="replyCancel" style="color:#8a6a7a">[hủy]</a>';
+        tag.querySelector('b').textContent=window._cmtReplyTo.name;
+        tag.querySelector('#replyCancel').onclick=function(e){e.preventDefault();window._cmtReplyTo=null;tag.remove();};
+        document.getElementById('cmtText').focus();
+      };
+    });
   }catch(e){ sum.textContent='Không tải được bình luận lúc này.'; }
   const form=document.getElementById('cmtForm');
   form.onsubmit=function(ev){
@@ -595,10 +667,11 @@ async function loadComments(gameId){
     msg.textContent='Đang gửi...';
     try{const last=+localStorage.getItem('cmt_last')||0; if(Date.now()-last<5*60*1000){msg.textContent='Bạn gửi quá nhanh, thử lại sau vài phút.';return;}}catch(e){}
     const payload={game:gameId,name:document.getElementById('cmtName').value,stars:document.getElementById('cmtStars').value,text:document.getElementById('cmtText').value,website:document.getElementById('cmtWeb').value};
+    if(window._cmtReplyTo&&window._cmtReplyTo.id)payload.replyTo=window._cmtReplyTo.id;
     fetch(apiRoot()+'/api/comments',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)})
       .then(function(r){return r.text().then(function(t){let j={};try{j=JSON.parse(t);}catch(e){}return {st:r.status,j:j};});})
       .then(function(o){
-        if(o.st===200&&o.j.ok){msg.textContent='Đã gửi! Bình luận hiện sau khi admin duyệt.';document.getElementById('cmtText').value='';try{localStorage.setItem('cmt_last',String(Date.now()));}catch(e){}}
+        if(o.st===200&&o.j.ok){msg.textContent='Đã gửi! Bình luận hiện sau khi admin duyệt.';document.getElementById('cmtText').value='';window._cmtReplyTo=null;const tg=document.getElementById('replyTag');if(tg)tg.remove();try{localStorage.setItem('cmt_last',String(Date.now()));}catch(e){}try{xpBump('comment');}catch(e){}}
         else if(o.st===503){msg.textContent='Chức năng bình luận chưa được bật trên hosting này.';}
         else{msg.textContent='Lỗi: '+((o.j&&o.j.error)||'không gửi được');}
       })
@@ -629,5 +702,7 @@ renderDetail();
 <script>
 (function(){function paint(){try{var on=document.documentElement.classList.contains('lite');var b=document.getElementById('liteToggle');if(b)b.textContent=on?'📶 Đủ':'📴 Nhẹ';}catch(e){}}try{var b=document.getElementById('liteToggle');if(b)b.onclick=function(){try{var h=document.documentElement;if(h.classList.contains('lite')){h.classList.remove('lite');localStorage.setItem('j2me_lite','0');}else{h.classList.add('lite');localStorage.setItem('j2me_lite','1');}paint();}catch(e){}};paint();}catch(e){}})();
 </script>
+<button id="musicToggle" title="Nhạc nền 8-bit">🎵 Nhạc</button>
+<script>(function(){try{var b=document.getElementById('musicToggle');if(!b)return;try{if(localStorage.getItem('j2me_music')==='1')b.textContent='🎵 Tắt';}catch(e){}b.onclick=function(){try{musToggle(b);}catch(e){}};}catch(e){}})();</script>
 </body>
 </html>

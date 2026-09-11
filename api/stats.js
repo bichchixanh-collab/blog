@@ -84,6 +84,19 @@ function countsOf(data) {
   return out;
 }
 
+const REACTS = ['love', 'ok', 'sad'];
+function reactionsOf(data, id) {
+  const out = { love: 0, ok: 0, sad: 0 };
+  const r = data && data[id] && data[id].reactions;
+  if (r && typeof r === 'object') {
+    for (const k of REACTS) {
+      const n = parseInt(r[k], 10);
+      if (!isNaN(n) && n > 0) out[k] = n;
+    }
+  }
+  return out;
+}
+
 function send(res, code, obj) {
   res.statusCode = code;
   res.setHeader('Content-Type', 'application/json; charset=utf-8');
@@ -126,6 +139,33 @@ function readJsonBody(req) {
   });
 }
 
+// Chống spam: giới hạn số request/IP (best-effort; instance lạnh có thể reset).
+const RATE = new Map();
+function clientIp(req) {
+  try {
+    const f = (req.headers && req.headers['x-forwarded-for']) || '';
+    const ip = String(f).split(',')[0].trim();
+    if (ip) return ip;
+    if (req.socket && req.socket.remoteAddress) return String(req.socket.remoteAddress);
+  } catch (e) {}
+  return 'unknown';
+}
+function hitRate(ip, route, limit, windowMs) {
+  const now = Date.now();
+  const key = ip + '|' + route;
+  let arr = RATE.get(key);
+  if (!Array.isArray(arr)) arr = [];
+  arr = arr.filter((t) => now - t < windowMs);
+  if (arr.length >= limit) {
+    RATE.set(key, arr);
+    return false;
+  }
+  arr.push(now);
+  if (RATE.size > 3000) RATE.clear();
+  RATE.set(key, arr);
+  return true;
+}
+
 module.exports = async (req, res) => {
   try {
     if (req.method === 'OPTIONS') {
@@ -137,21 +177,27 @@ module.exports = async (req, res) => {
       return;
     }
 
+    const isPost = req.method === 'POST';
+    if (!hitRate(clientIp(req), isPost ? 'stats-post' : 'stats-get', isPost ? 30 : 100, 60 * 1000)) {
+      return send(res, 429, { error: 'Thao tác quá nhanh, thử lại sau ít phút.' });
+    }
+
     const token = process.env.GITHUB_TOKEN || '';
 
     if (req.method === 'GET') {
       const id = (req.query && req.query.id) || '';
-      let counts = {};
+      let raw = {};
       if (token) {
         try {
-          counts = countsOf((await readLive(token)).data);
+          raw = (await readLive(token)).data;
         } catch (e) {
-          counts = countsOf(readBundled());
+          raw = readBundled();
         }
       } else {
-        counts = countsOf(readBundled());
+        raw = readBundled();
       }
-      if (id) return send(res, 200, { id, downloads: counts[id] || 0 });
+      const counts = countsOf(raw);
+      if (id) return send(res, 200, { id, downloads: counts[id] || 0, reactions: reactionsOf(raw, id) });
       return send(res, 200, { counts });
     }
 
@@ -159,6 +205,8 @@ module.exports = async (req, res) => {
       const payload = (await readJsonBody(req)) || {};
       const id = String(payload.id || '').slice(0, 120);
       if (!/^[a-z0-9\-]+$/i.test(id)) return send(res, 400, { error: 'id invalid' });
+      const react = payload.react == null || payload.react === '' ? null : String(payload.react);
+      if (react !== null && REACTS.indexOf(react) < 0) return send(res, 400, { error: 'react invalid' });
       if (!token) return send(res, 503, { error: 'counter not configured' });
 
       // read-modify-write, thử lại khi xung đột sha (2 tab bấm cùng lúc)
@@ -166,15 +214,26 @@ module.exports = async (req, res) => {
       for (let attempt = 0; attempt < 3; attempt++) {
         memCache.at = 0; // bỏ cache để đọc sha mới nhất
         const { data, sha } = await readLive(token);
-        const cur = (data[id] && typeof data[id].dl === 'number' ? data[id].dl : 0) + 1;
-        data[id] = { dl: cur };
+        if (!data[id] || typeof data[id] !== 'object') data[id] = { dl: 0 };
+        let cur, out;
+        if (react) {
+          const r = reactionsOf(data, id);
+          r[react] += 1;
+          data[id].reactions = r;
+          cur = typeof data[id].dl === 'number' ? data[id].dl : 0;
+          out = { id, downloads: cur, reactions: r };
+        } else {
+          cur = (typeof data[id].dl === 'number' ? data[id].dl : 0) + 1;
+          data[id].dl = cur;
+          out = { id, downloads: cur, reactions: reactionsOf(data, id) };
+        }
         const content = Buffer.from(JSON.stringify(data)).toString('base64');
         const put = await gh(
           'PUT',
           `/repos/${REPO}/contents/${FILE_PATH}`,
           token,
           {
-            message: `[skip ci] stats: +1 download ${id}`,
+            message: `[skip ci] stats: ${react ? 'react ' + react : '+1 download'} ${id}`,
             content,
             branch: BRANCH,
             ...(sha ? { sha } : {}),
@@ -182,19 +241,21 @@ module.exports = async (req, res) => {
         );
         if (put.code === 200 || put.code === 201) {
           memCache = { at: Date.now(), data, sha: JSON.parse(put.body).content.sha };
-          return send(res, 200, { id, downloads: cur });
+          return send(res, 200, out);
         }
         if (put.code === 409 || put.code === 422) {
           lastErr = new Error(`conflict ${put.code}`);
           continue;
         }
-        return send(res, 502, { error: `GitHub write ${put.code}` });
+        try { console.error('stats write failed:', put.code, String(put.body || '').slice(0, 200)); } catch (e) {}
+        return send(res, 502, { error: 'Không lưu được, thử lại sau.' });
       }
       return send(res, 409, { error: String((lastErr && lastErr.message) || 'conflict') });
     }
 
     return send(res, 405, { error: 'method not allowed' });
   } catch (err) {
-    return send(res, 500, { error: err.message });
+    try { console.error('stats api error:', err && err.message); } catch (e) {}
+    return send(res, 500, { error: 'Lỗi hệ thống, thử lại sau.' });
   }
 };
