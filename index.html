@@ -33,6 +33,7 @@
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"J2ME.VERCEL.APP","url":"https://J2ME.VERCEL.APP/","description":"Kho game Java J2ME anime ","potentialAction":{"@type":"SearchAction","target":"https://J2ME.VERCEL.APP/?q={search_term_string}","query-input":"required name=search_term_string"}}</script>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700&family=Mali:wght@600;700&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
+<script>try{if(localStorage.getItem('j2me_lite')==='1')document.documentElement.classList.add('lite');}catch(e){}</script>
 <style>
 body{background:#fff0f6;padding:12px}
 .app{max-width:420px;margin:0 auto;background:#fff;border:2px solid #ff8ec7;border-radius:16px;overflow:hidden;box-shadow:0 6px 20px rgba(255,77,141,.18)}
@@ -97,6 +98,7 @@ body{background:#fff0f6;padding:12px}
 <div class="wap-banner" id="wapBannerWrap"><a href="#"><img id="wapBannerImg" src="https://picsum.photos/seed/animebanner/720/240" alt="Banner game Java anime 720x240" width="720" height="240" decoding="async" fetchpriority="high"></a></div>
 
 <div class="wrap">
+  <div id="noticeBox" style="display:none;font-size:11px;line-height:1.6;color:#4a2a3a;background:#fff;border:1.5px dashed #ffb3d9;border-radius:10px;padding:8px 10px"></div>
   <div class="res-filter">
     <span style="font-weight:700;color:#ff4d8d;font-size:11px">📱 Màn hình:</span>
     <button class="res-btn active" data-res="all">Tất cả</button>
@@ -269,6 +271,19 @@ function card(g, idx=0){
   const gid=escHtml(g.id||''), gname=escHtml(g.name||''), gcat=escHtml(g.cat||''), gsize=escHtml(g.size||''), gthumb=escHtml(g.thumb||'');
   return `<div class="game-item" data-name="${(gname+' '+gcat).toLowerCase()}"><img src="${gthumb}" class="game-thumb" width="48" height="48" decoding="async" ${eager} alt="${gname}"><div style="flex:1"><h3><a href="game/${gid}.html">${gname}</a> ${hot} ${vi}</h3><div class="game-meta">${gcat} • ${gsize}</div></div><div style="display:grid;gap:4px;justify-items:center"><a href="game/${gid}.html" class="dl-btn">⬇ JAR</a><button data-fav="${gid}" title="Yêu thích" style="background:none;border:none;color:#ff4d8d;font-size:15px;cursor:pointer;line-height:1">${favHas(g.id)?'♥':'♡'}</button></div></div>`;
 }
+// Hộp thông báo ghim (admin sửa 1 dòng, đóng thì nhớ tới khi có tin mới)
+(function(){
+  const box=document.getElementById('noticeBox'); if(!box) return;
+  fetch('data/notice.json?'+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{
+    const t=j&&String(j.text||'').trim(); if(!t) return;
+    const key='notice_seen_'+(j.updated_at||'x');
+    try{if(localStorage.getItem(key)) return;}catch(e){}
+    box.innerHTML='<b>📢 Thông báo:</b> <span id="noticeText"></span> <a href="#" id="noticeHide" style="color:#ff4d8d;white-space:nowrap">[đóng]</a>';
+    box.querySelector('#noticeText').textContent=t;
+    box.style.display='';
+    box.querySelector('#noticeHide').onclick=function(e){e.preventDefault();box.style.display='none';try{localStorage.setItem(key,'1');}catch(err){}};
+  }).catch(function(){});
+})();
 function renderFavGrid(){
   const sec=document.getElementById('favSection'), grid=document.getElementById('favGrid');
   if(!sec||!grid) return;
@@ -326,26 +341,8 @@ document.addEventListener('click',function(e){const b=e.target&&e.target.closest
     });
   }));
 })();
-let pending={href:'#'};
-function doDownload(name,res){
-  pending.href=`/files/${res}/${name}.jar`;
-  document.getElementById('modalMsg').textContent=`Bạn sắp tải ${name} (${res})`;
-  const img=document.querySelector('.modal-anime-img');
-  if(img){
-    const pool=['assets/anime-girl.png','assets/anime-1.png','assets/anime-2.png','assets/anime-3.png','assets/anime-4.png','assets/anime-5.png','assets/anime-6.png','assets/anime-7.png','assets/anime-8.png'];
-    img.src=pool[Math.floor(Math.random()*pool.length)];
-  }
-  const banner=document.querySelector('.modal-banner img');
-  if(banner){
-    try{banner.src=(window.pickRandomBanner?window.pickRandomBanner():window.__BANNER_FALLBACK[Math.floor(Math.random()*window.__BANNER_FALLBACK.length)]);}catch(e){}
-    if(window.getBannerList)window.getBannerList().then(function(list){try{banner.src=window.pickRandomBanner(list);}catch(e){}}).catch(function(){});
-  }
-  document.getElementById('modalConfirm').href=pending.href;
-  document.getElementById('dlModal').classList.remove('hidden');
-  document.body.style.overflow='hidden';
-  return false;
-}
-document.addEventListener('click',e=>{const a=e.target.closest('.dl-btn'); if(a){e.preventDefault(); const card=a.closest('.game-item'); const name=card?.querySelector('h3 a')?.textContent||'Game'; doDownload(name,'240x320')}});
+// Trang chủ: nút ⬇ JAR dẫn thẳng tới trang chi tiết để chọn độ phân giải + tải link thật.
+// (Không chặn modal ở đây như trước nữa — bản cũ tự chế link /files/ giả nên toàn báo "link demo".)
 (function(){
   const modal=document.getElementById('dlModal');
   const close=()=>{
@@ -356,16 +353,12 @@ document.addEventListener('click',e=>{const a=e.target.closest('.dl-btn'); if(a)
   document.getElementById('modalCancel')?.addEventListener('click',close);
   modal?.addEventListener('click',e=>{if(e.target===modal)close()});
   document.addEventListener('keydown',e=>{ if(e.key==='Escape' && !modal.classList.contains('hidden')) close(); });
-  document.getElementById('modalConfirm')?.addEventListener('click',e=>{
-    if(pending.href.startsWith('/files/')){
-      e.preventDefault();
-      document.getElementById('modalMsg').textContent='⚠ Link demo - vào admin.php nhập link thật!';
-      setTimeout(close,1400);
-      return;
-    }
-    close();
-  });
+  document.getElementById('modalConfirm')?.addEventListener('click',()=>{close();});
 })();
+</script>
+<button id="liteToggle" title="Tiết kiệm data">📴 Nhẹ</button>
+<script>
+(function(){function paint(){try{var on=document.documentElement.classList.contains('lite');var b=document.getElementById('liteToggle');if(b)b.textContent=on?'📶 Đủ':'📴 Nhẹ';}catch(e){}}try{var b=document.getElementById('liteToggle');if(b)b.onclick=function(){try{var h=document.documentElement;if(h.classList.contains('lite')){h.classList.remove('lite');localStorage.setItem('j2me_lite','0');}else{h.classList.add('lite');localStorage.setItem('j2me_lite','1');}paint();}catch(e){}};paint();}catch(e){}})();
 </script>
 </body>
 </html>

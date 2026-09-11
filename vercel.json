@@ -18,15 +18,19 @@
       "headers": [{ "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }]
     },
     {
+      "source": "/data/notice.json",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }]
+    },
+    {
       "source": "/assets/(.*)",
       "headers": [
-        { "key": "Cache-Control", "value": "public, max-age=604800, immutable" },
+        { "key": "Cache-Control", "value": "public, max-age=604800, must-revalidate" },
         { "key": "X-Content-Type-Options", "value": "nosniff" }
       ]
     },
     {
       "source": "/assets/banners/(.*)",
-      "headers": [{ "key": "Cache-Control", "value": "public, max-age=604800, immutable" }]
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=604800, must-revalidate" }]
     },
     {
       "source": "/(.*).jpg",

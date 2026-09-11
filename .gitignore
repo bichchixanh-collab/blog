@@ -14,3 +14,4 @@ Thumbs.db
 
 # Backup local của admin (chỉ giữ trên máy, không cần lên repo)
 data/backups/
+assets/.orig-backup/
