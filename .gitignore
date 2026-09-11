@@ -1,5 +1,13 @@
 # Bí mật - KHÔNG commit
 config.php
+config.*.bak-*
+
+# PHP chỉ chạy local/XAMPP - Vercel sẽ serve dạng text nếu lọt lên, cấm commit
+admin.php
+api/banners.php
+gen_sitemap.php
+sitemap_lib.php
+tinyfilemanager.php
 
 # File nặng / tạm - không đẩy lên repo
 *.zip

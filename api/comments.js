@@ -273,13 +273,15 @@ module.exports = async (req, res) => {
           lastErr = new Error(`conflict ${put.code}`);
           continue;
         }
-        return send(res, 502, { error: `GitHub write ${put.code}` });
+        try { console.error('comments write failed:', put.code, String(put.body || '').slice(0, 200)); } catch (e) {}
+        return send(res, 502, { error: 'Không lưu được, thử lại sau.' });
       }
       return send(res, 409, { error: String((lastErr && lastErr.message) || 'conflict') });
     }
 
     return send(res, 405, { error: 'method not allowed' });
   } catch (err) {
-    return send(res, 500, { error: err.message });
+    try { console.error('comments api error:', err && err.message); } catch (e) {}
+    return send(res, 500, { error: 'Lỗi hệ thống, thử lại sau.' });
   }
 };

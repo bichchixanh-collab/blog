@@ -26,8 +26,9 @@ module.exports = async (req, res) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.end(JSON.stringify(files));
   } catch (err) {
+    try { console.error('banners api error:', err && err.message); } catch (e) {}
     res.statusCode = 500;
     res.setHeader('Content-Type', 'application/json; charset=utf-8');
-    res.end(JSON.stringify({ error: err.message }));
+    res.end(JSON.stringify({ error: 'Lỗi hệ thống, thử lại sau.' }));
   }
 };
