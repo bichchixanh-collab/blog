@@ -1,5 +1,59 @@
 [
     {
+        "id": "chinh-phuc-coi-than",
+        "name": "Chinh Phục Cõi Thần",
+        "cat": "Nhập vai",
+        "size": "1.03 MB",
+        "res": [
+            "240x320"
+        ],
+        "hot": false,
+        "vi": true,
+        "new": false,
+        "desc": "Siêu Phẩm 🔥CHINH PHỤC CÕI THẦN VIỆT HOÁ 🔥\r\n\r\n- Thể Loại: Nhập Vai, ARPG\r\n\r\n- Màn Hình: 240x320\r\n\r\n- Việt Hoá 99,99% by me và A.I (còn 0,01% nữa là do tìm ko ra file mã hóa để việt hóa chữ \"Lên cấp\") 😂\r\n\r\n- Giới thiệu:\r\n\r\nNhững cuộc chiến giữa ánh sáng và bóng tối, giữa tình yêu và lòng thù hận, cùng hành trình kỳ vĩ đưa bạn qua nhiều vùng đất khác nhau. Hãy nỗ lực hết mình để vượt qua tất cả các thử thách đó.\r\n\r\nNhững màn giao tranh kịch tính, vô số đòn combo cùng kho vũ khí đa dạng – tất cả đều hội tụ trong tựa game này!\r\n\r\nP\/s: Gửi lời cảm ơn chân thành và sâu sắc nhất đến b Mộc Lam Ca Ca đã nhiệt tình hướng dẫn và chỉ bảo mình trong việc vh game 🥰\r\n\r\nNguồn từ FB: Thành Nam",
+        "thumb": "https:\/\/i.imgur.com\/3OFRX6c.jpeg",
+        "shots": [
+            "https:\/\/i.imgur.com\/3OFRX6c.jpeg",
+            "https:\/\/i.imgur.com\/ViDz6ZK.jpeg",
+            "https:\/\/i.imgur.com\/jDsD3IX.jpeg",
+            "https:\/\/i.imgur.com\/ehNJi1z.jpeg"
+        ],
+        "jar": {
+            "240x320": "https:\/\/www.mediafire.com\/file\/urt85szvkv0dqgv\/Chinh_Phuc_Coi_Than.jar\/file"
+        },
+        "downloads": 0,
+        "created_at": "2026-09-11T12:53:53+02:00",
+        "updated_at": "2026-09-11T12:53:53+02:00"
+    },
+    {
+        "id": "do-re-mon-tay-du-ky",
+        "name": "Đô rê mon Tây du ký",
+        "cat": "Phiêu lưu",
+        "size": "465 Kb",
+        "res": [
+            "240x320"
+        ],
+        "hot": false,
+        "vi": false,
+        "new": true,
+        "desc": "Đôrêmon Tây Du Ký việt hoá bởi LKT Pro\r\nTình hình là thấy game java cũ này cũng vui nhưng chưa có ai việt hoá nên mình mà g về việt hoá để mọi người hiểu cốt truyện.\r\n\r\nCốt truyện đơn giản là Nôbita muốn vào thế giới Tây Du chơi nên nhờ Đôrêmon mang bảo bối thế giới mộng ảo để được trải nghiệm du lịch. Cố gắng thu thập bảo bối để giải cứu thầy trò Đường Tăng, tiêu diệt quái và thoát ra ngoài thôi :)\r\n\r\nĐã việt hoá full thoại và menu, còn lại mấy cái lặt vặt không dịch do lười, chủ yếu là chơi trải nghiệm cốt truyện thôi.",
+        "thumb": "https:\/\/i.imgur.com\/cIFxSr1.jpeg",
+        "shots": [
+            "https:\/\/i.imgur.com\/XBJJ5dC.jpeg",
+            "https:\/\/i.imgur.com\/FP3XXgb.jpeg",
+            "https:\/\/i.imgur.com\/kwFiOaC.jpeg",
+            "https:\/\/i.imgur.com\/dNweRBf.jpeg",
+            "https:\/\/i.imgur.com\/Tuw9aSh.jpeg",
+            "https:\/\/i.imgur.com\/cIFxSr1.jpeg"
+        ],
+        "jar": {
+            "240x320": "https:\/\/drive.google.com\/file\/d\/1O-FTBEKLwc_sKcgAvOIhbTrZBicAecJx\/view?usp=drivesdk&fbclid=IwcGRvZgNleHRuA2FlbQMxMDAAc3J0YwZhcHBfaWQPMjc1MjU0NjkyNTk4Mjc5AAEevYMdnUyvSioNRT0_RIGtEEdZlt4xyxw8o_W086Ff3lxb-os4dcbhnMz0gRQ_aem_xOrr5EfbwNNTo9GZxAPvKg"
+        },
+        "downloads": 0,
+        "created_at": "2026-09-11T12:25:03+02:00",
+        "updated_at": "2026-09-11T12:27:30+02:00"
+    },
+    {
         "id": "castle-of-magic",
         "name": "Castle Of Magic",
         "cat": "Nhập vai",
