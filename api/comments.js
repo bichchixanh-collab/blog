@@ -110,6 +110,39 @@ function send(res, code, obj, maxAge = 30) {
   res.end(JSON.stringify(obj));
 }
 
+// Đọc body JSON mọi trường hợp (đã parse / chuỗi thô / stream chưa đọc).
+function readJsonBody(req) {
+  return new Promise((resolve) => {
+    const b = req.body;
+    if (b && typeof b === 'object') return resolve(b);
+    if (typeof b === 'string') {
+      try {
+        return resolve(JSON.parse(b));
+      } catch (e) {
+        return resolve({});
+      }
+    }
+    if (!req.on || req.readableEnded) return resolve({});
+    const chunks = [];
+    let done = false;
+    const finish = (val) => {
+      if (!done) {
+        done = true;
+        resolve(val);
+      }
+    };
+    req.on('data', (c) => chunks.push(c));
+    req.on('end', () => {
+      try {
+        finish(JSON.parse(Buffer.concat(chunks).toString('utf8')));
+      } catch (e) {
+        finish({});
+      }
+    });
+    req.on('error', () => finish({}));
+  });
+}
+
 module.exports = async (req, res) => {
   try {
     if (req.method === 'OPTIONS') {
@@ -140,15 +173,7 @@ module.exports = async (req, res) => {
     }
 
     if (req.method === 'POST') {
-      let p = req.body;
-      if (typeof p === 'string') {
-        try {
-          p = JSON.parse(p);
-        } catch (e) {
-          p = {};
-        }
-      }
-      p = p || {};
+      const p = (await readJsonBody(req)) || {};
       if (String(p.website || '').trim() !== '') return send(res, 200, { ok: true }); // bẫy bot: im lặng cho qua
       const game = String(p.game || '').slice(0, 120);
       const name = String(p.name || '').trim().slice(0, 30);

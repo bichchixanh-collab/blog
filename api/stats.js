@@ -92,6 +92,40 @@ function send(res, code, obj) {
   res.end(JSON.stringify(obj));
 }
 
+// Đọc body JSON chắc chắn mọi trường hợp: Vercel có khi parse sẵn (object),
+// có khi để chuỗi thô, có khi (text/plain như sendBeacon cũ) không parse gì cả.
+function readJsonBody(req) {
+  return new Promise((resolve) => {
+    const b = req.body;
+    if (b && typeof b === 'object') return resolve(b);
+    if (typeof b === 'string') {
+      try {
+        return resolve(JSON.parse(b));
+      } catch (e) {
+        return resolve({});
+      }
+    }
+    if (!req.on || req.readableEnded) return resolve({});
+    const chunks = [];
+    let done = false;
+    const finish = (val) => {
+      if (!done) {
+        done = true;
+        resolve(val);
+      }
+    };
+    req.on('data', (c) => chunks.push(c));
+    req.on('end', () => {
+      try {
+        finish(JSON.parse(Buffer.concat(chunks).toString('utf8')));
+      } catch (e) {
+        finish({});
+      }
+    });
+    req.on('error', () => finish({}));
+  });
+}
+
 module.exports = async (req, res) => {
   try {
     if (req.method === 'OPTIONS') {
@@ -122,15 +156,8 @@ module.exports = async (req, res) => {
     }
 
     if (req.method === 'POST') {
-      let payload = req.body;
-      if (typeof payload === 'string') {
-        try {
-          payload = JSON.parse(payload);
-        } catch (e) {
-          payload = {};
-        }
-      }
-      const id = String((payload && payload.id) || '').slice(0, 120);
+      const payload = (await readJsonBody(req)) || {};
+      const id = String(payload.id || '').slice(0, 120);
       if (!/^[a-z0-9\-]+$/i.test(id)) return send(res, 400, { error: 'id invalid' });
       if (!token) return send(res, 503, { error: 'counter not configured' });
 

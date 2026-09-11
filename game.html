@@ -435,7 +435,8 @@ function countDownload(gameId){
     if(localStorage.getItem(k))return;
     localStorage.setItem(k,'1');
     const body=JSON.stringify({id:gameId});
-    if(navigator.sendBeacon){try{navigator.sendBeacon(apiRoot()+'/api/stats',body);return;}catch(e){}}
+    // Dùng fetch JSON + keepalive (giống luồng bình luận đã chạy ổn), không dùng
+    // sendBeacon vì nó gửi text/plain khiến Vercel không parse được body.
     fetch(apiRoot()+'/api/stats',{method:'POST',headers:{'Content-Type':'application/json'},body:body,keepalive:true}).catch(function(){});
   }catch(e){}
 }
