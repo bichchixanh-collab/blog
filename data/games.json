@@ -1,5 +1,42 @@
 [
     {
+        "id": "cuong-hon-di-gioi-than-binh",
+        "name": "Cuồng Hồn - Dị Giới Thần Binh",
+        "cat": "Nhập vai",
+        "size": "1.03 MB",
+        "res": [
+            "240x320"
+        ],
+        "hot": true,
+        "vi": true,
+        "new": false,
+        "gate": {
+            "type": "pet",
+            "lines": 1,
+            "level": 2,
+            "badge": "rare",
+            "xp": 100
+        },
+        "desc": "### Bối cảnh\r\n\r\nCâu chuyện bắt đầu từ lúc **“Cánh cổng đến thế giới khác được mở ra”**, từ đó hình thành một thế giới giả tưởng nơi **con người, ma quỷ và thần linh** cùng tồn tại và đan xen với nhau.\r\n\r\nNgười chơi vào vai **Kẻ Sát Hồn**, phải ký khế ước với một **nữ ma quyến rũ**, sau đó tu luyện **chân nguyên linh hồn** để từng bước phá bỏ vòng luân hồi và số phận đã kéo dài hàng nghìn năm.\r\n\r\nMạch truyện chính xoay quanh những trận chiến quy mô lớn như **phá trận giữa hàng nghìn quân**, **chiến đấu trên chiến trường**... Người chơi sẽ khám phá cách **luyện hóa thần khí** trong một không gian nơi **giấc mơ và hiện thực đan xen**.\r\n\r\n### Lối chơi\r\n\r\n**Hệ thống chiến đấu:**\r\nSử dụng hình thức chiến đấu thời gian thực. Nhân vật có thể **hợp thể với nữ ma** để tung ra các kỹ năng đặc biệt. Trò chơi có nhiều kiểu chiến đấu khác nhau, chẳng hạn như **đột kích chiến trường, giải cơ quan, vượt chướng ngại** và nhiều tình huống khác.\r\n\r\n**Hệ thống phát triển nhân vật:**\r\nNgười chơi tiêu diệt quái vật để thu thập **chân nguyên**, từ đó tăng cấp và cường hóa linh hồn. Khi phát triển nhân vật, người chơi có thể mở khóa **cây kỹ năng song tu** và tính năng **rèn trang bị**.\r\n\r\n**Chế độ vượt ải:**\r\nCác màn chơi được sắp xếp theo mức độ khó tăng dần. Mỗi màn đều có **cốt truyện ẩn** để khám phá và những trận đấu với **trùm**.\r\n\r\n### Phong cách hình ảnh\r\n\r\nTrò chơi sử dụng phong cách hình ảnh **thế giới khác u tối**, với nhiều khu vực có thiết kế khác nhau như **địa ngục dung nham**, **thành phố máy móc**...\r\n\r\nThiết kế nhân vật lấy cảm hứng từ **thần thoại phương Đông**, đặc biệt là các nhân vật nữ ma được xây dựng với sự kết hợp giữa vẻ **ma mị, kỳ dị** và nét **thiêng liêng**.\r\n\r\nHiệu ứng chiến đấu sử dụng **hiệu ứng ánh sáng dạng hạt** và **làm mờ chuyển động** để tạo cảm giác đòn đánh mạnh và chân thực hơn.\r\n\r\n### Điều khiển và hệ thống\r\n\r\nTrò chơi có **hướng dẫn dành cho người mới** bao phủ toàn bộ quá trình chơi. Giao diện điều khiển kết hợp **joystick ảo** với **bảng kỹ năng dạng vòng tròn**.\r\n\r\nNgoài ra còn có hệ thống **theo dõi thành tựu**, tính năng **tự động tìm đường** và hỗ trợ **tự động treo máy khi offline để tích lũy kinh nghiệm**.\r\n\r\nPhiên bản phát hành vào thời điểm đó cũng đã hỗ trợ **nhiều độ phân giải màn hình**, đồng thời tối ưu để trò chơi chạy tốt hơn trên **các thiết bị cấu hình thấp**.\r\n\r\n### Thông tin phiên bản\r\n\r\nPhiên bản này có các chương cốt truyện cơ bản và cho người chơi lựa chọn nhiều **nhánh nghề nghiệp** khác nhau.\r\n\r\nSau đó, nhà phát triển tiếp tục cho ra mắt các sản phẩm liên quan như **“Sổ Sát Hồn”** và **“Sát Hồn Online”**, từ đó phát triển trò chơi thành một **chuỗi sản phẩm cùng thương hiệu**.\r\n\r\nTrò chơi sử dụng hình thức **bán vật phẩm trong game**. Cửa hàng cung cấp các nội dung trả phí như **trang phục, ngoại hình nhân vật** và **phù văn tăng cường sức mạnh**.\r\n\r\n### Yếu tố văn hóa\r\n\r\nTrò chơi kết hợp giữa **tu chân phương Đông** và **thế giới fantasy phương Tây**. Hệ thống tu luyện **chân nguyên linh hồn** được sử dụng để xây dựng lại cách phát triển chỉ số nhân vật thường thấy trong các game RPG truyền thống.\r\n\r\nPhần hội thoại trong cốt truyện có lồng ghép các yếu tố từ **thơ ca cổ điển Trung Quốc**. Thiết kế kiến trúc trong game lấy cảm hứng từ **hoa văn đồ đồng thời Thương – Chu**, đồng thời kết hợp với những đặc điểm của **kiến trúc Gothic**.",
+        "thumb": "https:\/\/i.imgur.com\/xDGFCGE.png",
+        "shots": [
+            "https:\/\/i.imgur.com\/xDGFCGE.png",
+            "https:\/\/i.imgur.com\/40rV4lz.png",
+            "https:\/\/i.imgur.com\/oKla13X.png",
+            "https:\/\/i.imgur.com\/liylqhC.png",
+            "https:\/\/i.imgur.com\/rcZQaZz.png",
+            "https:\/\/i.imgur.com\/y1EU3K9.png",
+            "https:\/\/i.imgur.com\/ZrjYNi8.jpeg",
+            "https:\/\/i.imgur.com\/68ibs8Z.jpeg"
+        ],
+        "jar": {
+            "240x320": "https:\/\/www.mediafire.com\/file\/ubs4brazp79jm6b\/DiGioiThanBinh_HT_Bakawap.jar\/file"
+        },
+        "downloads": 0,
+        "created_at": "2026-09-13T15:33:42+02:00",
+        "updated_at": "2026-09-13T15:33:42+02:00"
+    },
+    {
         "id": "haku-farm",
         "name": "HAKU Farm",
         "cat": "Nông trại",
