@@ -6,21 +6,23 @@ import { hasFav, toggleFav, checkin } from './store.js';
 const $ = (s, r = document) => r.querySelector(s);
 
 // Markup Y HỆT bản gốc (game-item/dl-btn/game-thumb) để UI không đổi
+function lockBadge(g) { return (g && g.gate && g.gate.type && g.gate.type !== 'none') ? '<span style="background:#7a5a00;color:#fff;font-size:8px;padding:2px 4px;border-radius:8px">🔒</span>' : ''; }
 function card(g, eager = false) {
   const hot = g.hot ? '<span style="background:#ff4d8d;color:#fff;font-size:8px;padding:2px 4px;border-radius:8px">HOT</span>' : '';
   const vi = g.vi ? '<span style="background:#0a9c4a;color:#fff;font-size:8px;padding:2px 4px;border-radius:8px">VIỆT HÓA</span>' : '';
+  const lock = lockBadge(g);
   const load = eager ? 'loading="eager" fetchpriority="high"' : 'loading="lazy" decoding="async"';
   const root = apiRoot();
   return `<div class="game-item" data-name="${esc(normVn((g.name || '') + ' ' + (g.cat || '')))}" style="display:flex;gap:10px;align-items:center;padding:8px 0;border-bottom:1px dashed #ffd0e8">`
     + `<img src="${esc(g.thumb)}" class="game-thumb" width="48" height="48" ${load} alt="${esc(g.name)}" style="width:48px;height:48px;border-radius:10px;border:1.5px solid #ffd0e8;object-fit:cover;flex-shrink:0">`
-    + `<div style="flex:1"><h3 style="font-size:12px"><a href="${esc(root)}/game/${esc(g.id)}.html">${esc(g.name)}</a> ${hot} ${vi}</h3>`
+    + `<div style="flex:1"><h3 style="font-size:12px"><a href="${esc(root)}/game/${esc(g.id)}.html">${esc(g.name)}</a> ${hot} ${vi} ${lock}</h3>`
     + `<div class="game-meta" style="font-size:10px;color:#8a6a7a">${esc(g.cat || '')} • ${esc(g.size || '')}</div></div>`
     + `<div style="display:grid;gap:4px;justify-items:center"><a href="${esc(root)}/game/${esc(g.id)}.html" class="dl-btn" style="display:inline-flex;background:linear-gradient(180deg,#ff8ec7,#ff4d8d);color:#fff;padding:8px 16px;border-radius:24px;font-weight:800;font-size:11px;border:2px solid #fff;text-decoration:none">⬇ JAR</a>`
     + `<button data-fav="${esc(g.id)}" title="Yêu thích" style="background:none;border:none;color:#ff4d8d;font-size:15px;cursor:pointer">${hasFav(g.id) ? '♥' : '♡'}</button></div></div>`;
 }
 function gridItem(g) {
   const root = apiRoot();
-  return `<a href="${esc(root)}/game/${esc(g.id)}.html" class="grid-item" style="background:#fff;border:1.5px solid #ffd0e8;border-radius:10px;padding:6px;text-align:center;text-decoration:none"><img src="${esc(g.thumb)}" width="48" height="48" loading="lazy" decoding="async" alt="${esc(g.name)}" style="width:48px;height:48px;border-radius:8px;margin:0 auto;object-fit:cover"><span style="font-size:10px;font-weight:700;display:block;color:#4a2a3a">${esc(String(g.name || '').split('[')[0].slice(0, 14))}</span><small style="font-size:9px;color:#8a6a7a">${esc((g.res || [])[0] || '')}</small></a>`;
+  return `<a href="${esc(root)}/game/${esc(g.id)}.html" class="grid-item" style="background:#fff;border:1.5px solid #ffd0e8;border-radius:10px;padding:6px;text-align:center;text-decoration:none"><img src="${esc(g.thumb)}" width="48" height="48" loading="lazy" decoding="async" alt="${esc(g.name)}" style="width:48px;height:48px;border-radius:8px;margin:0 auto;object-fit:cover"><span style="font-size:10px;font-weight:700;display:block;color:#4a2a3a">${esc(String(g.name || '').split('[')[0].slice(0, 14))} ${lockBadge(g)}</span><small style="font-size:9px;color:#8a6a7a">${esc((g.res || [])[0] || '')}</small></a>`;
 }
 async function init() {
   const tick = () => { const el = $('#clock'); if (el) el.textContent = new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }); };

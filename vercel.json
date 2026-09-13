@@ -16,7 +16,7 @@
         { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=()" }
       ]
     },
-    { "source": "/data/games.json", "headers": [{ "key": "Cache-Control", "value": "public, max-age=300, must-revalidate" }] },
+    { "source": "/data/games.json", "headers": [{ "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }] },
     { "source": "/assets/(.*)", "headers": [{ "key": "Cache-Control", "value": "public, max-age=604800, immutable" }] }
   ]
 }

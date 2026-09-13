@@ -308,11 +308,12 @@ function musToggle(btn){
 addEventListener('pagehide',function(){try{if(MUS.timer){clearInterval(MUS.timer);MUS.timer=null;}}catch(e){}});
 document.addEventListener('visibilitychange',function(){if(document.hidden&&MUS.timer){clearInterval(MUS.timer);MUS.timer=null;}});
 function card(g, idx=0){
-  const hot=g.hot?'<span style="background:#ff4d8d;color:#fff;font-size:8px;padding:2px 4px;border-radius:8px">HOT</span>':''; const vi=g.vi?'<span style="background:#0a9c4a;color:#fff;font-size:8px;padding:2px 4px;border-radius:8px">VIỆT HÓA</span>':'';
+  const hot=g.hot?'<span style="background:#ff4d8d;color:#fff;font-size:8px;padding:2px 4px;border-radius:8px">HOT</span>':''; const vi=g.vi?'<span style="background:#0a9c4a;color:#fff;font-size:8px;padding:2px 4px;border-radius:8px">VIỆT HÓA</span>':''; const lock=(g.gate&&g.gate.type&&g.gate.type!=='none')?'<span style="background:#7a5a00;color:#fff;font-size:8px;padding:2px 4px;border-radius:8px" title="Cần đủ điều kiện mới tải được">🔒</span>':'';
   const eager = idx < 3 ? 'loading="eager" fetchpriority="high"' : 'loading="lazy"';
   const gid=escHtml(g.id||''), gname=escHtml(g.name||''), gcat=escHtml(g.cat||''), gsize=escHtml(g.size||''), gthumb=escHtml(g.thumb||'');
-  return `<div class="game-item" data-name="${(gname+' '+gcat).toLowerCase()}"><img src="${gthumb}" class="game-thumb" width="48" height="48" decoding="async" ${eager} alt="${gname}"><div style="flex:1"><h3><a href="game/${gid}.html">${gname}</a> ${hot} ${vi}</h3><div class="game-meta">${gcat} • ${gsize}</div></div><div style="display:grid;gap:4px;justify-items:center"><a href="game/${gid}.html" class="dl-btn">⬇ JAR</a><button data-fav="${gid}" title="Yêu thích" style="background:none;border:none;color:#ff4d8d;font-size:15px;cursor:pointer;line-height:1">${favHas(g.id)?'♥':'♡'}</button></div></div>`;
+  return `<div class="game-item" data-name="${(gname+' '+gcat).toLowerCase()}"><img src="${gthumb}" class="game-thumb" width="48" height="48" decoding="async" ${eager} alt="${gname}"><div style="flex:1"><h3><a href="game/${gid}.html">${gname}</a> ${hot} ${vi} ${lock}</h3><div class="game-meta">${gcat} • ${gsize}</div></div><div style="display:grid;gap:4px;justify-items:center"><a href="game/${gid}.html" class="dl-btn">⬇ JAR</a><button data-fav="${gid}" title="Yêu thích" style="background:none;border:none;color:#ff4d8d;font-size:15px;cursor:pointer;line-height:1">${favHas(g.id)?'♥':'♡'}</button></div></div>`;
 }
+function lockBadge(g){return (g&&g.gate&&g.gate.type&&g.gate.type!=='none')?'<span style="background:#7a5a00;color:#fff;font-size:8px;padding:1px 4px;border-radius:4px" title="Cần đủ điều kiện mới tải được">🔒</span>':'';}
 // Hộp thông báo ghim (admin sửa 1 dòng, đóng thì nhớ tới khi có tin mới)
 (function(){
   const box=document.getElementById('noticeBox'); if(!box) return;
@@ -364,16 +365,35 @@ function suggestGames(q){
   }catch(e){}
 }
 (async()=>{
-  const games=await loadGames();
-  if(!games || games.length===0){
+  const games0=await loadGames();
+  if(!games0 || games0.length===0){
     document.getElementById('hotList').innerHTML='<p style="padding:16px;text-align:center;color:#8a6a7a">Chưa có game nào — vào <a href="admin.php">admin.php</a> để đăng bài đầu tiên ♡</p>';
     document.getElementById('newList').innerHTML='';
     document.getElementById('viethoaGrid').innerHTML='';
-    const ex=document.getElementById('extraList'); if(ex) ex.innerHTML='';
-    const ex2=document.getElementById('extraGrid2'); if(ex2) ex2.innerHTML='';
-    const rnd=document.getElementById('randomList'); if(rnd) rnd.innerHTML='';
+    const ex0=document.getElementById('extraList'); if(ex0) ex0.innerHTML='';
+    const ex20=document.getElementById('extraGrid2'); if(ex20) ex20.innerHTML='';
+    const rnd0=document.getElementById('randomList'); if(rnd0) rnd0.innerHTML='';
     return;
   }
+  await paintIndex(games0);
+  bindIndexOnce();
+  // Revalidate nền: bỏ qua cache 5 phút, có bài mới/sửa thì vẽ lại ngay trong lần mở này
+  try{
+    const rr=await fetch('data/games.json',{cache:'no-store',headers:{Accept:'application/json'}});
+    if(rr.ok){
+      const fresh=await rr.json();
+      if(Array.isArray(fresh)&&fresh.length){
+        const sig=a=>a.map(g=>g.id+'|'+(g.updated_at||'')+'|'+(g.name||'')).join(';');
+        if(sig(fresh)!==sig(games0)){
+          CACHE=fresh; GAME_AT=Date.now();
+          try{localStorage.setItem('j2me_games',JSON.stringify({at:GAME_AT,data:CACHE}));}catch(e){}
+          await paintIndex(fresh);
+        }
+      }
+    }
+  }catch(e){}
+})();
+async function paintIndex(games){
   // Gộp lượt tải thật từ api/stats để bảng HOT/Top xếp đúng (rớt thì dùng số tĩnh)
   try{
     const sr=await fetch('api/stats',{cache:'no-store'});
@@ -403,9 +423,9 @@ function suggestGames(q){
     }
   }catch(e){}
   document.getElementById('newList').innerHTML=games.slice(0,4).map((g,i)=>card(g,i+3)).join('');
-  document.getElementById('viethoaGrid').innerHTML=games.filter(g=>g.vi).slice(0,6).map(g=>`<a href="game/${escHtml(g.id)}.html" class="grid-item"><img src="${escHtml(g.thumb)}" width="48" height="48" loading="lazy" decoding="async" alt="${escHtml(g.name)}"><span>${escHtml(String(g.name||'').split('[')[0].slice(0,14))}</span><small>${escHtml((g.res||[])[0]||'')}</small></a>`).join('') || games.slice(0,6).map(g=>`<a href="game/${escHtml(g.id)}.html" class="grid-item"><img src="${escHtml(g.thumb)}" width="48" height="48" loading="lazy" decoding="async" alt="${escHtml(g.name)}"><span>${escHtml(String(g.name||'').split('[')[0].slice(0,14))}</span></a>`).join('');
+  document.getElementById('viethoaGrid').innerHTML=games.filter(g=>g.vi).slice(0,6).map(g=>`<a href="game/${escHtml(g.id)}.html" class="grid-item"><img src="${escHtml(g.thumb)}" width="48" height="48" loading="lazy" decoding="async" alt="${escHtml(g.name)}"><span>${escHtml(String(g.name||'').split('[')[0].slice(0,14))} ${lockBadge(g)}</span><small>${escHtml((g.res||[])[0]||'')}</small></a>`).join('') || games.slice(0,6).map(g=>`<a href="game/${escHtml(g.id)}.html" class="grid-item"><img src="${escHtml(g.thumb)}" width="48" height="48" loading="lazy" decoding="async" alt="${escHtml(g.name)}"><span>${escHtml(String(g.name||'').split('[')[0].slice(0,14))} ${lockBadge(g)}</span></a>`).join('');
   const extra=document.getElementById('extraList'); if(extra) extra.innerHTML=games.slice(3,6).map(g=>card(g)).join('');
-  const extra2=document.getElementById('extraGrid2'); if(extra2) extra2.innerHTML=games.slice(6,9).map(g=>`<a href="game/${escHtml(g.id)}.html" class="grid-item"><img src="${escHtml(g.thumb)}" width="48" height="48" loading="lazy" alt="${escHtml(g.name)}"><span>${escHtml(String(g.name||'').split('[')[0].slice(0,12))}</span><small>${escHtml(g.size||'')}</small></a>`).join('');
+  const extra2=document.getElementById('extraGrid2'); if(extra2) extra2.innerHTML=games.slice(6,9).map(g=>`<a href="game/${escHtml(g.id)}.html" class="grid-item"><img src="${escHtml(g.thumb)}" width="48" height="48" loading="lazy" alt="${escHtml(g.name)}"><span>${escHtml(String(g.name||'').split('[')[0].slice(0,12))} ${lockBadge(g)}</span><small>${escHtml(g.size||'')}</small></a>`).join('');
   const rnd=document.getElementById('randomList'); if(rnd) rnd.innerHTML=[...games].sort(()=>0.5-Math.random()).slice(0,3).map(g=>card(g)).join('');
   refreshFavHearts(); renderFavGrid();
   const catIdx=document.getElementById('catGridIndex');
@@ -418,6 +438,10 @@ function suggestGames(q){
       return `<a href="category.html?cat=${encodeURIComponent(c)}" style="background:#fff;border:1.5px solid #ffd0e8;border-radius:10px;padding:8px;text-align:center;text-decoration:none"><div style="font-size:18px">${icon}</div><b style="font-size:10px;color:#4a2a3a">${c}</b><br><small style="color:#8a6a7a">${cnt}</small></a>`;
     }).join('');
   }
+}
+let __indexBound=false;
+function bindIndexOnce(){
+  if(__indexBound) return; __indexBound=true;
   document.getElementById('searchInput')?.addEventListener('input',e=>{
     const q=normVn(e.target.value.trim());
     document.querySelectorAll('.game-item').forEach(it=>{const hit=!q||normVn(it.dataset.name||'').includes(q); it.style.display=hit?'flex':'none'})
@@ -432,7 +456,7 @@ function suggestGames(q){
       it.style.display=(res==='all'||meta.includes(res))?'flex':'none';
     });
   }));
-})();
+}
 // Trang chủ: nút ⬇ JAR dẫn thẳng tới trang chi tiết để chọn độ phân giải + tải link thật.
 // (Không chặn modal ở đây như trước nữa — bản cũ tự chế link /files/ giả nên toàn báo "link demo".)
 (function(){
