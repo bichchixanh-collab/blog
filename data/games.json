@@ -122,17 +122,26 @@
         "hot": false,
         "vi": true,
         "new": false,
+        "gate": {
+            "type": "none",
+            "lines": 1,
+            "level": 3,
+            "badge": "rare",
+            "xp": 100
+        },
         "desc": "Tên: Kiếm Linh - Chư Tiên Chi Chiến\r\nThể loại: ARPG\r\nMàn hình: 240x320\r\nVH full bởi bigame, cờ nhách sms bởi skypeaful\r\nSiêu phẩm tặt tém kiếm hiệp\r\nCó đầy đủ các hệ thống (gần giống) 1 game mmorpg: trang bị, vật phẩm, nâng cấp bằng đá, nhiệm vụ, bản đồ, kỹ năng...",
-        "thumb": "https:\/\/scontent-mxp1-1.xx.fbcdn.net\/v\/t39.30808-6\/752638694_122127871281222302_2549871545557120252_n.jpg?stp=dst-jpg_tt6&cstp=mx1080x1440&ctp=s590x590&_nc_cat=103&ccb=1-7&_nc_sid=833d8c&_nc_ohc=vgWGNPzC_1MQ7kNvwFwPLCW&_nc_oc=AdrDa1ixAkxhpKbmb_IzOiBnJIS2InNNX-prDuRdo-1bOlsTU1FnjuBvPrc_CgzzI4w&_nc_zt=23&_nc_ht=scontent-mxp1-1.xx&_nc_gid=CAAhx8TpDjlkYLPMmuBQlA&_nc_ss=792a8&oh=00_AQK8I4tbhOxAWFKQ1BtkTEagwRLM2QtfJ5rNavpiadeFCg&oe=6AA5A18E",
+        "thumb": "https:\/\/i.imgur.com\/KFC6CtS.jpeg",
         "shots": [
-            "https:\/\/scontent-mxp1-1.xx.fbcdn.net\/v\/t39.30808-6\/752279309_122127871245222302_5362517630129733642_n.jpg?stp=dst-jpg_tt6&cstp=mx1080x1440&ctp=s590x590&_nc_cat=106&ccb=1-7&_nc_sid=833d8c&_nc_ohc=d8u6DY3XPggQ7kNvwE293Hy&_nc_oc=AdqFhS7ylK9NyNdSao0UYUPWGWPFSq6EwBOpzB4YcMh_90PdpnPT9yWJP0UHPmZ71oI&_nc_zt=23&_nc_ht=scontent-mxp1-1.xx&_nc_gid=CAAhx8TpDjlkYLPMmuBQlA&_nc_ss=792a8&oh=00_AQLjIL8-78J9LJx7f24Dq2R4SHSvQs3N4bI1Xe_Ystfh1w&oe=6AA5AA4D",
-            "https:\/\/scontent-mxp1-1.xx.fbcdn.net\/v\/t39.30808-6\/753989869_122127871257222302_7272751751942500616_n.jpg?stp=dst-jpg_tt6&cstp=mx1080x1440&ctp=s590x590&_nc_cat=108&ccb=1-7&_nc_sid=833d8c&_nc_ohc=jGa35srBDE4Q7kNvwHpg1Uh&_nc_oc=AdrvsFwiprp8JKgh7tjVdCVEn_uRUVY6LMEdA_dc8JLXZLsNLsQ0LfgOA3i2SewwGYo&_nc_zt=23&_nc_ht=scontent-mxp1-1.xx&_nc_gid=CAAhx8TpDjlkYLPMmuBQlA&_nc_ss=792a8&oh=00_AQLAN48F8BpP-iO_OlkoazNMkTy09kBzeKXxI4Iy-cB_Wg&oe=6AA57D21",
-            "https:\/\/scontent-mxp1-1.xx.fbcdn.net\/v\/t39.30808-6\/752638694_122127871281222302_2549871545557120252_n.jpg?stp=dst-jpg_tt6&cstp=mx1080x1440&ctp=s590x590&_nc_cat=103&ccb=1-7&_nc_sid=833d8c&_nc_ohc=vgWGNPzC_1MQ7kNvwFwPLCW&_nc_oc=AdrDa1ixAkxhpKbmb_IzOiBnJIS2InNNX-prDuRdo-1bOlsTU1FnjuBvPrc_CgzzI4w&_nc_zt=23&_nc_ht=scontent-mxp1-1.xx&_nc_gid=CAAhx8TpDjlkYLPMmuBQlA&_nc_ss=792a8&oh=00_AQK8I4tbhOxAWFKQ1BtkTEagwRLM2QtfJ5rNavpiadeFCg&oe=6AA5A18E"
+            "https:\/\/i.imgur.com\/KFC6CtS.jpeg",
+            "https:\/\/i.imgur.com\/glcv8ua.jpeg",
+            "https:\/\/i.imgur.com\/2JhYdsh.jpeg"
         ],
         "jar": {
             "240x320": "https:\/\/www.mediafire.com\/file\/p04iu0herly5w2k\/Kiem_Linh_Chu_Tien_Chi_Chien_BAKAWAP.jar\/file"
         },
-        "created_at": "2026-09-10T14:10:07+02:00"
+        "downloads": 0,
+        "created_at": "2026-09-10T14:10:07+02:00",
+        "updated_at": "2026-09-13T08:23:20+02:00"
     },
     {
         "id": "phieu-mieu-tien-do-tinh-than-kiem",
