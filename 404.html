@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Lạc rồi! - J2ME.VERCEL.APP</title>
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#ff4d8d">
+<link rel="icon" href="assets/anime-girl.png" type="image/png">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#fff0f6;padding:12px;font-family:"Be Vietnam Pro",system-ui,sans-serif;color:#4a2a3a;min-height:100vh}
+.app{max-width:420px;margin:0 auto;background:#fff;border:2px solid #ff8ec7;border-radius:16px;overflow:hidden;box-shadow:0 6px 20px rgba(255,77,141,.18)}
+.top{display:flex;justify-content:space-between;background:#1a1a2e;color:#7fb1ff;font-family:monospace;font-size:11px;padding:6px 12px}
+.hero{background:linear-gradient(135deg,#8ec8ff,#ff8ec7 60%,#ff4d8d);color:#fff;text-align:center;padding:18px 12px 14px}
+.hero .mascot{width:72px;height:72px;border-radius:50%;border:2px solid #fff;background:#fff;object-fit:cover;margin:0 auto 8px;display:block;box-shadow:0 4px 12px rgba(0,0,0,.2)}
+.hero h1{font-family:"Mali",cursive,sans-serif;font-size:18px}
+.hero p{font-size:11px;opacity:.9;margin-top:2px}
+.body{position:relative;margin:10px;border:2px solid #8ec8ff;border-radius:14px;padding:20px 14px;text-align:center;background:#fff}
+.body::before{content:"";position:absolute;inset:6px;border:1.6px dashed #bae6fd;border-radius:10px;pointer-events:none}
+.big{font-size:52px;animation:float 2.4s ease-in-out infinite}
+@keyframes float{50%{transform:translateY(-6px) rotate(-6deg)}}
+.code{display:inline-block;margin-top:6px;background:#1a1a2e;color:#7fb1ff;font-family:monospace;font-size:11px;padding:3px 12px;border-radius:20px;letter-spacing:.15em}
+h2{font-size:15px;color:#ff4d8d;margin:8px 0 6px;font-family:"Mali",cursive,sans-serif}
+p{font-size:12px;color:#8a6a7a;line-height:1.7}
+.btns{margin-top:12px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+a.btn{display:inline-block;background:linear-gradient(180deg,#ff8ec7,#ff4d8d);color:#fff;padding:9px 22px;border-radius:24px;font-weight:800;font-size:12px;border:2px solid #fff;box-shadow:0 4px 0 #d43a6f;text-decoration:none;font-family:"Mali",cursive,sans-serif}
+a.btn:active{transform:translateY(2px);box-shadow:0 2px 0 #d43a6f}
+a.btn.ghost{background:#fff;color:#ff4d8d;border:1.5px solid #ffb3d9;box-shadow:none}
+.foot{background:#4a1a2e;color:#ffd0e8;text-align:center;padding:12px;font-size:11px}
+.foot a{color:#fff}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="top"><span>◉ JAVA J2ME</span><span id="clock">00:00</span><span>▂▃▅ 🛸</span></div>
+<div class="hero">
+<img class="mascot" src="assets/anime-girl.png" alt="anime" width="72" height="72" onerror="this.style.display='none'">
+<h1>J2ME.VERCEL.APP</h1>
+<p>Kho game Java .JAR • Anime</p>
+</div>
+<div class="body">
+<div class="big">🛸</div>
+<div class="code">ERROR 404</div>
+<h2>Lạc đường rồi Senpai~</h2>
+<p>Trang này không tồn tại hoặc đã bị xóa.<br>Về trang chủ tìm game khác nha!</p>
+<div class="btns"><a class="btn" href="index.html">Về trang chủ</a><a class="btn ghost" href="category.html">Thể loại</a></div>
+</div>
+<div class="foot"><p>© <span class="js-year">2026</span> J2ME.VERCEL.APP — Anime WAP</p></div>
+</div>
+<script>var el=document.getElementById('clock');if(el)el.textContent=new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'});</script>
+<script>try{document.querySelectorAll('.js-year').forEach(function(el){el.textContent=new Date().getFullYear();});}catch(e){}</script>
+</body>
+</html>
