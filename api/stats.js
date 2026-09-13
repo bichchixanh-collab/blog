@@ -85,19 +85,6 @@ function countsOf(data) {
   return out;
 }
 
-const REACTS = ['love', 'ok', 'sad'];
-function reactionsOf(data, id) {
-  const out = { love: 0, ok: 0, sad: 0 };
-  const r = data && data[id] && data[id].reactions;
-  if (r && typeof r === 'object') {
-    for (const k of REACTS) {
-      const n = parseInt(r[k], 10);
-      if (!isNaN(n) && n > 0) out[k] = n;
-    }
-  }
-  return out;
-}
-
 function send(res, code, obj) {
   res.statusCode = code;
   res.setHeader('Content-Type', 'application/json; charset=utf-8');
@@ -142,11 +129,20 @@ function readJsonBody(req) {
 // Dùng chung rate-limit (Upstash khi có env, fallback memory).
 const { check: rateCheck, ipOf } = require('./_rate');
 // 'same' | 'cross' | 'unverified' — thiếu Origin không còn tự động cho qua.
+// 'same' = đúng host, hoặc cùng nền tảng *.vercel.app (preview deployment,
+// www/non-www, domain phụ cùng dự án), hoặc khớp SITE_URL — khớp quy ước _lib.js.
 function originStatus(req) {
   const o = req.headers.origin || req.headers.referer || '';
   if (!o) return 'unverified';
-  try { return new URL(o).host === String(req.headers.host).split(':')[0] ? 'same' : 'cross'; }
-  catch { return 'cross'; }
+  let oh = '';
+  try { oh = new URL(o).host.toLowerCase(); } catch { return 'cross'; }
+  const host = String(req.headers.host || '').split(':')[0].toLowerCase();
+  if (oh === host) return 'same';
+  if (oh.endsWith('.vercel.app')) return 'same';
+  try {
+    if (process.env.SITE_URL && oh === new URL(process.env.SITE_URL).host.toLowerCase()) return 'same';
+  } catch {}
+  return 'cross';
 }
 
 module.exports = async (req, res) => {
@@ -190,7 +186,7 @@ module.exports = async (req, res) => {
         raw = readBundled();
       }
       const counts = countsOf(raw);
-      if (id) return send(res, 200, { id, downloads: counts[id] || 0, reactions: reactionsOf(raw, id) });
+      if (id) return send(res, 200, { id, downloads: counts[id] || 0 });
       return send(res, 200, { counts });
     }
 
@@ -198,26 +194,17 @@ module.exports = async (req, res) => {
       const payload = (await readJsonBody(req)) || {};
       const id = String(payload.id || '').slice(0, 120);
       if (!/^[a-z0-9\-]+$/i.test(id)) return send(res, 400, { error: 'id invalid' });
-      const react = payload.react == null || payload.react === '' ? null : String(payload.react);
-      if (react !== null && REACTS.indexOf(react) < 0) return send(res, 400, { error: 'react invalid' });
       const _ip = ipOf(req);
-      if (!react) {
-        // Tải: trần ngày/IP để 1 IP không bơm hàng chục nghìn lượt (bot đổi IP vẫn qua được — xem Cloudflare/Turnstile).
-        if (!(await rateCheck({ ip: _ip, route: 'dl-day', limit: 200, windowS: 86400 }))) return send(res, 429, { error: 'slow down' });
-      } else {
-        // Reaction: 5 lượt/ngày/IP/game — đủ cho cả nhà dùng chung IP, bot bị chặn ở x5.
-        if (!(await rateCheck({ ip: _ip, route: 'vote:' + id, limit: 5, windowS: 86400 }))) return send(res, 409, { error: 'already voted' });
-      }
+      // Trần ngày/IP để 1 IP không bơm hàng chục nghìn lượt (bot đổi IP vẫn qua được — xem Cloudflare/Turnstile).
+      if (!(await rateCheck({ ip: _ip, route: 'dl-day', limit: 200, windowS: 86400 }))) return send(res, 429, { error: 'slow down' });
       if ((token || '').startsWith('ghp_')) try { console.warn('[sec] classic PAT in use — nên đổi sang fine-grained chỉ RW data/stats.json'); } catch {}
-      if (!react) {
-        // Lượt tải thuần: gom qua _store (Redis nếu có, không thì cộng dồn + flush 1 commit/phút)
-        // thay vì 1 commit GitHub/lượt — hết conflict khi nhiều người bấm cùng lúc.
-        try {
-          const { countDl } = require('./_store');
-          const n = await countDl(id);
-          return send(res, 200, { id, downloads: n, reactions: reactionsOf(readBundled(), id) });
-        } catch (e) { /* rớt xuống luồng ghi trực tiếp bên dưới */ }
-      }
+      // Lượt tải thuần: gom qua _store (Redis nếu có, không thì cộng dồn + flush 1 commit/phút)
+      // thay vì 1 commit GitHub/lượt — hết conflict khi nhiều người bấm cùng lúc.
+      try {
+        const { countDl } = require('./_store');
+        const n = await countDl(id);
+        return send(res, 200, { id, downloads: n });
+      } catch (e) { /* rớt xuống luồng ghi trực tiếp bên dưới */ }
       if (!token) return send(res, 503, { error: 'counter not configured' });
 
       // read-modify-write, thử lại khi xung đột sha (2 tab bấm cùng lúc)
@@ -227,25 +214,16 @@ module.exports = async (req, res) => {
         memCache.at = 0; // bỏ cache để đọc sha mới nhất
         const { data, sha } = await readLive(token);
         if (!data[id] || typeof data[id] !== 'object') data[id] = { dl: 0 };
-        let cur, out;
-        if (react) {
-          const r = reactionsOf(data, id);
-          r[react] += 1;
-          data[id].reactions = r;
-          cur = typeof data[id].dl === 'number' ? data[id].dl : 0;
-          out = { id, downloads: cur, reactions: r };
-        } else {
-          cur = (typeof data[id].dl === 'number' ? data[id].dl : 0) + 1;
-          data[id].dl = cur;
-          out = { id, downloads: cur, reactions: reactionsOf(data, id) };
-        }
+        const cur = (typeof data[id].dl === 'number' ? data[id].dl : 0) + 1;
+        data[id].dl = cur;
+        const out = { id, downloads: cur };
         const content = Buffer.from(JSON.stringify(data)).toString('base64');
         const put = await gh(
           'PUT',
           `/repos/${REPO}/contents/${FILE_PATH}`,
           token,
           {
-            message: `[skip ci] stats: ${react ? 'react ' + react : '+1 download'} ${id}`,
+            message: `[skip ci] stats: +1 download ${id}`,
             content,
             branch: BRANCH,
             ...(sha ? { sha } : {}),

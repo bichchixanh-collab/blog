@@ -87,7 +87,7 @@ function seen(){const a=J('j2me_seen',[]);return Array.isArray(a)?a:[];}
 function done(){const a=J('j2me_done',[]);return Array.isArray(a)?a:[];}
 function dlIds(){const out={};try{for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.indexOf('dl_')===0){const parts=k.split('_');if(parts.length>=2)out[parts.slice(1,parts.length-1).join('_')]=true;}}}catch(e){}return Object.keys(out);}
 (async function(){
-  const KEEP=k=>k&&(k.indexOf('j2me_')===0||k.indexOf('dl_')===0||k.indexOf('react_')===0||k.indexOf('cmt_')===0);
+  const KEEP=k=>k&&(k.indexOf('j2me_')===0||k.indexOf('dl_')===0||k.indexOf('cmt_')===0);
   const xp=(J('j2me_xp',{xp:0}).xp)||0;
   const lv=levelOf(xp);
   document.getElementById('lvName').textContent=lv.name;

@@ -180,11 +180,20 @@ async function verifyTurnstile(token, ip) {
 // POST không xác định được origin bị chặn cứng như 'cross' (xem chỗ gọi bên dưới);
 // khác với dl.js/stats.js nơi hành vi thiếu Origin ít nhạy cảm hơn, ở comments
 // (ghi nội dung công khai chờ duyệt) siết chặt ngay từ đầu là hợp lý hơn.
+// 'same' = đúng host, hoặc cùng nền tảng *.vercel.app (preview deployment,
+// www/non-www, domain phụ cùng dự án), hoặc khớp SITE_URL — khớp quy ước _lib.js.
 function originStatus(req) {
   const o = req.headers.origin || req.headers.referer || '';
   if (!o) return 'unverified';
-  try { return new URL(o).host === String(req.headers.host).split(':')[0] ? 'same' : 'cross'; }
-  catch { return 'cross'; }
+  let oh = '';
+  try { oh = new URL(o).host.toLowerCase(); } catch { return 'cross'; }
+  const host = String(req.headers.host || '').split(':')[0].toLowerCase();
+  if (oh === host) return 'same';
+  if (oh.endsWith('.vercel.app')) return 'same';
+  try {
+    if (process.env.SITE_URL && oh === new URL(process.env.SITE_URL).host.toLowerCase()) return 'same';
+  } catch {}
+  return 'cross';
 }
 
 module.exports = async (req, res) => {
