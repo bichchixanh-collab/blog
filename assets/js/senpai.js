@@ -381,7 +381,7 @@ function paintBingo() {
   var b = bingoBoard();
   box.innerHTML = b.cells.map(function (c, i) {
     var d = bIsDone(b, i);
-    return '<div style="background:' + (d ? '#e6f9ec' : '#fff') + ';border:1.5px solid ' + (d ? '#0a9c4a' : '#ffd0e8') + ';border-radius:10px;padding:8px 4px;text-align:center;font-size:10px;line-height:1.4">'
+    return '<div style="background:' + (d ? '#e6f9ec' : '#fff') + ';border:1.5px solid ' + (d ? '#0a9c4a' : '#b8d8f8') + ';border-radius:10px;padding:8px 4px;text-align:center;font-size:10px;line-height:1.4">'
       + '<div style="font-size:20px">' + (d ? '✅' : c.emo) + '</div>' + c.label + '</div>';
   }).join('');
   var done = bLines(b).length;
@@ -396,7 +396,7 @@ function paintEatList() {
   var box = $('eatList'); if (!box) return;
   var all = null;
   try { var o = JSON.parse(localStorage.getItem('j2me_games') || 'null'); if (o && o.data) all = o.data.slice(0, 12); } catch (e) {}
-  if (!all || !all.length) { box.innerHTML = '<small style="color:#8a6a7a">Mở trang chủ 1 lần để nạp danh sách game vào máy đã~</small>'; return; }
+  if (!all || !all.length) { box.innerHTML = '<small style="color:#4a7a9a">Mở trang chủ 1 lần để nạp danh sách game vào máy đã~</small>'; return; }
   box.innerHTML = all.map(function (g) {
     return '<button class="btn ghost" style="font-size:10px" onclick="SEN.eatGame(\'' + String(g.id).replace(/'/g, '') + '\')">' + String(g.name).slice(0, 12) + '</button>';
   }).join('');

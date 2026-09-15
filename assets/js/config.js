@@ -2,7 +2,7 @@
 export const SITE = {
   name: 'J2ME',
   domain: 'https://j2me.vercel.app',
-  theme: '#ff4d8d',
+  theme: '#0066cc',
 };
 export const CATS = [
   { id: 'Hành Động', icon: '⚔️' }, { id: 'Nhập Vai', icon: '🧙' },

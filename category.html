@@ -8,35 +8,36 @@
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700&family=Mali:wght@600;700&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.min.css">
 <script>try{if(localStorage.getItem('j2me_lite')==='1')document.documentElement.classList.add('lite');}catch(e){}</script>
-<meta name="theme-color" content="#ff4d8d">
+<meta name="theme-color" content="#0066cc">
 <link rel="manifest" href="manifest.webmanifest">
 <script>if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){});});}</script>
 <style>
-body{background:#fff0f6;padding:12px}
-.app{max-width:420px;margin:0 auto;background:#fff;border:2px solid #ff8ec7;border-radius:16px;overflow:hidden;box-shadow:0 6px 20px rgba(255,77,141,.18)}
+body{background:#e8f4fd;padding:12px}
+.app{max-width:420px;margin:0 auto;background:#fff;border:2px solid #4da6ff;border-radius:16px;overflow:hidden;box-shadow:0 6px 20px rgba(0,102,204,.18)}
 .top-info{display:flex;justify-content:space-between;align-items:center;background:#1a1a2e;color:#7fb1ff;font-family:"IBM Plex Mono",monospace;font-size:11px;padding:6px 12px}
-.header{background:linear-gradient(135deg,#ff8ec7,#ff4d8d);color:#fff;text-align:center;padding:16px 12px}
-.header .logo-icon{width:48px;height:48px;background:#fff;color:#ff4d8d;border-radius:50%;display:grid;place-items:center;font-size:22px;margin:0 auto 8px;border:2px solid #fff}
+.header{background:linear-gradient(135deg,#4da6ff,#0066cc);color:#fff;text-align:center;padding:16px 12px}
+.header .logo-icon{width:48px;height:48px;background:#fff;color:#0066cc;border-radius:50%;display:grid;place-items:center;font-size:22px;margin:0 auto 8px;border:2px solid #fff}
 .header h1{font-family:"Mali",cursive;font-size:18px}
 .wrap{max-width:420px;margin:0 auto;padding:10px;display:grid;gap:12px}
-.kawaii-title{font-family:"Mali",cursive;background:linear-gradient(90deg,#ff4d8d,#ff8ec7);color:#fff;padding:5px 12px;border-radius:20px;font-size:11px;font-weight:700;display:inline-block;border:1.5px solid #fff;box-shadow:0 2px 6px rgba(255,77,141,.2);margin-bottom:8px}
+.kawaii-title{font-family:"Mali",cursive;background:linear-gradient(90deg,#0066cc,#4da6ff);color:#fff;padding:5px 12px;border-radius:20px;font-size:11px;font-weight:700;display:inline-block;border:1.5px solid #fff;box-shadow:0 2px 6px rgba(0,102,204,.2);margin-bottom:8px}
 .cat-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
-.cat-card{background:#fff;border:2px solid #ff8ec7;border-radius:14px;padding:12px;text-align:center;position:relative;box-shadow:0 3px 10px rgba(255,77,141,.12)}
-.cat-card::before{content:"";position:absolute;inset:5px;border:1.6px dashed #ffb3d9;border-radius:10px;pointer-events:none}
-.cat-card b{font-size:12px;color:#4a2a3a;display:block}
-.cat-card small{font-size:10px;color:#8a6a7a}
-.cat-card:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(255,77,141,.18)}
-.footer{background:#4a1a2e;color:#ffd0e8;text-align:center;padding:14px;font-size:11px}
+.cat-card{background:#fff;border:2px solid #4da6ff;border-radius:14px;padding:12px;text-align:center;position:relative;box-shadow:0 3px 10px rgba(0,102,204,.12)}
+.cat-card::before{content:"";position:absolute;inset:5px;border:1.6px dashed #81c7f0;border-radius:10px;pointer-events:none}
+.cat-card b{font-size:12px;color:#1a3a5c;display:block}
+.cat-card small{font-size:10px;color:#4a7a9a}
+.cat-card:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(0,102,204,.18)}
+.footer{background:#1a3a5c;color:#b8d8f8;text-align:center;padding:14px;font-size:11px}
 </style>
+<link rel="stylesheet" href="assets/css/manga.css">
 </head>
 <body>
 <div class="app">
 <div class="top-info"><span>◉ JAVA J2ME</span><span id="clock">00:00</span><span>▂▃▅▇ 100%</span></div>
-<header class="header"><div class="logo-icon">☺</div><h1>JAVA.WAP.SH</h1><p>Thể loại Game Java</p></header>
-<nav class="wap-nav" style="display:flex;gap:6px;overflow:auto;padding:8px 10px;background:#4a1a2e;white-space:nowrap"><a href="index.html" style="color:#ffd0e8;background:rgba(255,255,255,.08);padding:6px 12px;border-radius:20px;font-size:11px;text-decoration:none">⌂ Trang chủ</a><a href="category.html" style="background:#fff;color:#ff4d8d;padding:6px 12px;border-radius:20px;font-size:11px">≡ Thể loại</a></nav>
+<header class="header"><div class="logo-icon">🔔</div><h1>JAVA.WAP.SH</h1><p>Thể loại Game Java</p></header>
+<nav class="wap-nav" style="display:flex;gap:6px;overflow:auto;padding:8px 10px;background:#1a3a5c;white-space:nowrap"><a href="index.html" style="color:#b8d8f8;background:rgba(255,255,255,.08);padding:6px 12px;border-radius:20px;font-size:11px;text-decoration:none">⌂ Trang chủ</a><a href="category.html" style="background:#fff;color:#0066cc;padding:6px 12px;border-radius:20px;font-size:11px">≡ Thể loại</a></nav>
 
 <div class="wrap">
-  <div class="breadcrumb" style="font-size:11px;color:#8a6a7a"><a href="index.html" style="color:#ff4d8d">Trang chủ</a> › <b id="bcCat">Tất cả</b></div>
+  <div class="breadcrumb" style="font-size:11px;color:#4a7a9a"><a href="index.html" style="color:#0066cc">Trang chủ</a> › <b id="bcCat">Tất cả</b></div>
 
   <section class="cat-grid" id="catGrid">
     <!-- JS sẽ render -->
@@ -54,7 +55,7 @@ body{background:#fff0f6;padding:12px}
 <script>
 function tick(){const el=document.getElementById('clock');if(el)el.textContent=new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'})}tick();setInterval(tick,30000);
 const CATS=[
-  {id:'Hành Động',icon:'⚔️',color:'#ff4d8d'},
+  {id:'Hành Động',icon:'⚔️',color:'#0066cc'},
   {id:'Nhập Vai',icon:'🧙',color:'#a78bfa'},
   {id:'Đua xe',icon:'🏎️',color:'#f59e0b'},
   {id:'Bắn súng',icon:'🔫',color:'#0ea5e9'},
@@ -62,7 +63,7 @@ const CATS=[
   {id:'Thể thao',icon:'⚽',color:'#f59e0b'},
   {id:'Phiêu lưu',icon:'🗺️',color:'#8ec8ff'},
   {id:'Nông trại',icon:'🌾',color:'#a3e635'},
-  {id:'Việt Hóa',icon:'🇻🇳',color:'#ff4d8d',filter:'vi'},
+  {id:'Việt Hóa',icon:'🇻🇳',color:'#0066cc',filter:'vi'},
 ];
 let GAMES=null;
 async function loadGames(){ if(GAMES) return GAMES; const r=await fetch('data/games.json',{headers:{Accept:'application/json'}}); GAMES=await r.json(); return GAMES; }
@@ -93,7 +94,7 @@ async function render(){
       <div style="font-size:22px">${c.icon}</div>
       <b>${c.id}</b><br><small>${cnt} game</small>
     </a>`;
-  }).join('') + `<a href="index.html" class="cat-card" style="background:#fff0f6"><div style="font-size:22px">📚</div><b>Tất cả</b><br><small>${games.length} game</small></a>`;
+  }).join('') + `<a href="index.html" class="cat-card" style="background:#e8f4fd"><div style="font-size:22px">📚</div><b>Tất cả</b><br><small>${games.length} game</small></a>`;
 
   if(cat){
     const catSafe=escHtml(cat);
@@ -104,13 +105,13 @@ async function render(){
     if(cat==='Việt Hóa') filtered=games.filter(g=>g.vi);
     else filtered=games.filter(g=>g.cat===cat);
     if(filtered.length===0){
-      list.innerHTML=`<p style="padding:16px;text-align:center;color:#8a6a7a">Chưa có game nào cho <b>${catSafe}</b> — <a href="admin.php" style="color:#ff4d8d">đăng bài ngay</a> ♡</p>`;
+      list.innerHTML=`<p style="padding:16px;text-align:center;color:#4a7a9a">Chưa có game nào cho <b>${catSafe}</b> — <a href="admin.php" style="color:#0066cc">đăng bài ngay</a> ♡</p>`;
     } else {
       list.innerHTML=filtered.map(g=>`
-        <a href="game/${escHtml(g.id)}.html" style="display:flex;gap:10px;align-items:center;background:#fff;border:1.5px solid #ffd0e8;border-radius:12px;padding:10px;text-decoration:none">
-          <img src="${escHtml(g.thumb)}" width="48" height="48" style="border-radius:10px;border:1.5px solid #ffd0e8;object-fit:cover;flex-shrink:0" alt="${escHtml(g.name)}">
-          <div style="flex:1;min-width:0"><b style="font-size:12px;color:#4a2a3a">${escHtml(g.name)} ${(g.gate&&g.gate.type&&g.gate.type!=='none')?'<span style="background:#7a5a00;color:#fff;font-size:8px;padding:1px 4px;border-radius:4px">🔒</span>':''}</b><br><small style="color:#8a6a7a">${escHtml(g.size)} • ${escHtml((g.res||[])[0]||'')}</small></div>
-          <span style="background:linear-gradient(180deg,#ff8ec7,#ff4d8d);color:#fff;padding:6px 12px;border-radius:20px;font-size:11px;font-weight:700;border:1.5px solid #fff;white-space:nowrap">⬇ JAR</span>
+        <a href="game/${escHtml(g.id)}.html" style="display:flex;gap:10px;align-items:center;background:#fff;border:1.5px solid #b8d8f8;border-radius:12px;padding:10px;text-decoration:none">
+          <img src="${escHtml(g.thumb)}" width="48" height="48" style="border-radius:10px;border:1.5px solid #b8d8f8;object-fit:cover;flex-shrink:0" alt="${escHtml(g.name)}">
+          <div style="flex:1;min-width:0"><b style="font-size:12px;color:#1a3a5c">${escHtml(g.name)} ${(g.gate&&g.gate.type&&g.gate.type!=='none')?'<span style="background:#7a5a00;color:#fff;font-size:8px;padding:1px 4px;border-radius:4px">🔒</span>':''}</b><br><small style="color:#4a7a9a">${escHtml(g.size)} • ${escHtml((g.res||[])[0]||'')}</small></div>
+          <span style="background:linear-gradient(180deg,#4da6ff,#0066cc);color:#fff;padding:6px 12px;border-radius:20px;font-size:11px;font-weight:700;border:1.5px solid #fff;white-space:nowrap">⬇ JAR</span>
         </a>
       `).join('');
     }

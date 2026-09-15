@@ -18,7 +18,7 @@
 <link rel="dns-prefetch" href="https://api.waifu.pics">
 <link rel="dns-prefetch" href="https://api.waifu.pics">
 <link rel="preload" href="/assets/anime-girl.png" data-root-href="assets/anime-girl.png" as="image" fetchpriority="low">
-<meta name="theme-color" content="#ff4d8d">
+<meta name="theme-color" content="#0066cc">
 <link id="pwaManifest" rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" id="appleIcon" href="/assets/anime-girl.png" data-root-href="assets/anime-girl.png">
 <script>(function(){try{var p=location.pathname||'/';var gi=p.indexOf('/game/');var r=gi>=0?p.slice(0,gi).replace(/\/$/,''):(p.length>1&&p.charAt(p.length-1)==='/'?p.slice(0,-1):p.slice(0,Math.max(0,p.lastIndexOf('/'))));var m=document.getElementById('pwaManifest');if(m)m.href=r+'/manifest.webmanifest';if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register(r+'/sw.js').catch(function(){});});}}catch(e){}})();</script>
@@ -30,113 +30,115 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{overflow-x:hidden;max-width:100%}
-body{font-family:"Be Vietnam Pro",system-ui;background:#fff0f6;color:#4a2a3a;padding:12px}
+body{font-family:"Be Vietnam Pro",system-ui;background:#e8f4fd;color:#1a3a5c;padding:12px}
 img{max-width:100%;height:auto}
-a{color:#ff4d8d;text-decoration:none}
+a{color:#0066cc;text-decoration:none}
 .wrap{max-width:420px;margin:0 auto;display:grid;gap:14px;min-width:0}
 .wrap>*{min-width:0}
-.header{background:linear-gradient(135deg,#ff8ec7,#ff4d8d);color:#fff;padding:14px;border-radius:14px;text-align:center;border:2px solid #fff;box-shadow:0 4px 12px rgba(255,77,141,.3)}
+.header{background:linear-gradient(135deg,#4da6ff,#0066cc);color:#fff;padding:14px;border-radius:14px;text-align:center;border:2px solid #fff;box-shadow:0 4px 12px rgba(0,102,204,.3)}
 .header h1{font-family:"Mali",cursive;font-size:18px}
 .header p{font-size:11px;opacity:.9}
-.breadcrumb{font-size:11px;color:#8a6a7a;padding:4px 2px}
-.breadcrumb a{color:#ff4d8d}
+.breadcrumb{font-size:11px;color:#4a7a9a;padding:4px 2px}
+.breadcrumb a{color:#0066cc}
 
 /* Fabric box */
 .fabric-box{
   position:relative;
-  background: radial-gradient(circle at 1px 1px, rgba(255,141,199,.14) 1px, transparent 0), #fff;
+  background: radial-gradient(circle at 1px 1px, rgba(0,102,204,.14) 1px, transparent 0), #fff;
   background-size:12px 12px;
-  border:2px solid #ff8ec7;
+  border:2px solid #4da6ff;
   border-radius:14px;
   padding:14px;
-  box-shadow:0 4px 14px rgba(255,77,141,.16);
+  box-shadow:0 4px 14px rgba(0,102,204,.16);
 }
 .fabric-box::before{
   content:"";position:absolute;inset:6px;
-  border:1.6px dashed #ffb3d9;border-radius:10px;pointer-events:none;
+  border:1.6px dashed #81c7f0;border-radius:10px;pointer-events:none;
 }
 .fabric-box::after{
-  content:"✿";position:absolute;top:-9px;left:18px;
-  background:#fff0f6;border:1px solid #ffb3d9;border-radius:50%;
-  width:18px;height:18px;display:grid;place-items:center;font-size:10px;color:#ff4d8d;
+  content:"🔔";position:absolute;top:-9px;left:18px;
+  background:#e8f4fd;border:1px solid #81c7f0;border-radius:50%;
+  width:18px;height:18px;display:grid;place-items:center;font-size:10px;color:#0066cc;
 }
 .fabric-title{
   font-family:"Mali",cursive;font-weight:700;
-  background:linear-gradient(90deg,#ff4d8d,#ff8ec7);
+  background:linear-gradient(90deg,#0066cc,#4da6ff);
   color:#fff;display:inline-flex;gap:6px;align-items:center;
   padding:5px 12px;border-radius:20px;font-size:11px;
-  border:1.5px solid #fff;box-shadow:0 2px 6px rgba(255,77,141,.3);
+  border:1.5px solid #fff;box-shadow:0 2px 6px rgba(0,102,204,.3);
   margin-bottom:10px;
 }
 .detail-head{display:flex;gap:12px;position:relative;min-width:0}
-.detail-head img{width:84px;height:84px;border-radius:12px;border:2px solid #ffd0e8;object-fit:cover;flex-shrink:0}
+.detail-head img{width:84px;height:84px;border-radius:12px;border:2px solid #b8d8f8;object-fit:cover;flex-shrink:0}
 .detail-head>div{min-width:0;flex:1}
 .detail-head h2{font-size:14px;line-height:1.3;overflow-wrap:break-word;word-break:break-word}
-.meta{font-size:11px;color:#8a6a7a;margin:4px 0;display:flex;gap:8px;flex-wrap:wrap}
+.meta{font-size:11px;color:#4a7a9a;margin:4px 0;display:flex;gap:8px;flex-wrap:wrap}
 .info-table{width:100%;max-width:100%;table-layout:fixed;border-collapse:collapse;font-size:11px;margin-top:6px}
-.info-table th{background:#fff0f6;padding:5px 6px;border:1px solid #ffd0e8;text-align:left;color:#ff4d8d;width:28%}
-.info-table td{padding:5px 6px;border:1px solid #ffd0e8;background:#fff;overflow-wrap:break-word;word-break:break-word}
-.res-tag{background:#ff8ec7;color:#fff;padding:2px 7px;border-radius:10px;font-size:10px;margin-right:4px;display:inline-block;margin-bottom:2px}
+.info-table th{background:#e8f4fd;padding:5px 6px;border:1px solid #b8d8f8;text-align:left;color:#0066cc;width:28%}
+.info-table td{padding:5px 6px;border:1px solid #b8d8f8;background:#fff;overflow-wrap:break-word;word-break:break-word}
+.res-tag{background:#4da6ff;color:#fff;padding:2px 7px;border-radius:10px;font-size:10px;margin-right:4px;display:inline-block;margin-bottom:2px}
 
 /* DL box vải hồng đậm */
 .dl-fabric{
-  background:#fff;border:2px solid #ff4d8d;border-radius:14px;overflow:hidden;
-  box-shadow:0 4px 14px rgba(255,77,141,.18);
+  background:#fff;border:2px solid #0066cc;border-radius:14px;overflow:hidden;
+  box-shadow:0 4px 14px rgba(0,102,204,.18);
   position:relative;
 }
 .dl-fabric::before{
-  content:"";position:absolute;inset:5px;border:1.4px dashed rgba(255,77,141,.45);border-radius:10px;pointer-events:none;
+  content:"";position:absolute;inset:5px;border:1.4px dashed rgba(0,102,204,.45);border-radius:10px;pointer-events:none;
 }
-.dl-title{background:linear-gradient(90deg,#ff4d8d,#ff8ec7);color:#fff;text-align:center;padding:7px;font-weight:700;font-size:11px;font-family:"Mali",cursive;letter-spacing:.04em}
-.dl-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:12px;background:#fff0f6}
-.dl-option{background:#fff;border:1.5px solid #ffb3d9;border-radius:12px;padding:10px;text-align:center;position:relative}
-.dl-option::after{content:"";position:absolute;inset:5px;border:1px dashed #ffd0e8;border-radius:8px;pointer-events:none}
-.dl-option b{font-size:13px;color:#ff4d8d}
+.dl-title{background:linear-gradient(90deg,#0066cc,#4da6ff);color:#fff;text-align:center;padding:7px;font-weight:700;font-size:11px;font-family:"Mali",cursive;letter-spacing:.04em}
+.dl-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:12px;background:#e8f4fd}
+.dl-option{background:#fff;border:1.5px solid #81c7f0;border-radius:12px;padding:10px;text-align:center;position:relative}
+.dl-option::after{content:"";position:absolute;inset:5px;border:1px dashed #b8d8f8;border-radius:8px;pointer-events:none}
+.dl-option b{font-size:13px;color:#0066cc}
 .dl-btn{
   display:inline-flex;align-items:center;gap:4px;
   margin-top:8px;
-  background:linear-gradient(180deg,#ff8ec7 0%, #ff4d8d 100%);color:#fff;
+  background:linear-gradient(180deg,#4da6ff 0%, #0066cc 100%);color:#fff;
   padding:8px 16px;border-radius:24px;font-weight:800;font-size:12px;
-  border:2px solid #fff;box-shadow:0 4px 0 #d43a6f, 0 6px 14px rgba(255,77,141,.3);
+  border:2px solid #fff;box-shadow:0 4px 0 #004499, 0 6px 14px rgba(0,102,204,.3);
   position:relative;overflow:hidden;transition:.12s;font-family:"Mali",cursive;
 }
 .dl-btn::before{content:"";position:absolute;top:1px;left:6px;right:6px;height:7px;background:linear-gradient(180deg, rgba(255,255,255,.75), transparent);border-radius:10px;pointer-events:none}
-.dl-btn::after{content:"✦";position:absolute;top:-4px;right:6px;font-size:8px;opacity:.9}
-.dl-btn:hover{transform:translateY(-1px);box-shadow:0 5px 0 #d43a6f, 0 8px 16px rgba(255,77,141,.35)}
-.dl-btn:active{transform:translateY(2px);box-shadow:0 2px 0 #d43a6f, 0 3px 8px rgba(255,77,141,.25)}
+.dl-btn::after{content:"🥞";position:absolute;top:-4px;right:6px;font-size:8px;opacity:.9}
+.dl-btn:hover{transform:translateY(-1px);box-shadow:0 5px 0 #004499, 0 8px 16px rgba(0,102,204,.35)}
+.dl-btn:active{transform:translateY(2px);box-shadow:0 2px 0 #004499, 0 3px 8px rgba(0,102,204,.25)}
 
-.body-text{font-size:12px;line-height:1.6;overflow-wrap:anywhere}
+.body-text{font-size:14px;line-height:1.7;overflow-wrap:anywhere}
 .body-text p{word-wrap:break-word;overflow-wrap:anywhere;word-break:break-word;white-space:pre-line}
-.body-text p a{color:#ff4d8d;text-decoration:underline}
-.body-text h3{font-family:"Mali",cursive;color:#ff4d8d;margin:10px 0 6px;border-left:3px solid #ff8ec7;padding-left:8px;font-size:13px}
+.body-text p a{color:#0066cc;text-decoration:underline}
+.body-text b{color:#0066cc}
+.body-text h3{font-family:"Mali",cursive;color:#0066cc;margin:10px 0 6px;border-left:3px solid #4da6ff;padding-left:8px;font-size:15px}
 .shot-grid{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;min-width:0}
-.shot-grid img{flex:0 1 calc((100% - 16px)/3);width:calc((100% - 16px)/3);max-width:calc((100% - 16px)/3);aspect-ratio:3/4;object-fit:cover;border-radius:10px;border:1.5px solid #ffd0e8;background:#fff0f6}
+.shot-grid img{flex:0 1 calc((100% - 16px)/3);width:calc((100% - 16px)/3);max-width:calc((100% - 16px)/3);aspect-ratio:3/4;object-fit:cover;border-radius:10px;border:1.5px solid #b8d8f8;background:#e8f4fd}
 .shot-grid.count-1 img{flex-basis:62%;width:62%;max-width:230px}
 .shot-grid.count-2 img{flex-basis:calc((100% - 8px)/2);width:calc((100% - 8px)/2);max-width:calc((100% - 8px)/2)}
 
-.note{font-size:11px;color:#8a6a7a;text-align:center;padding:8px;background:#fff;border:1px dashed #ffb3d9;border-radius:10px}
+.note{font-size:11px;color:#4a7a9a;text-align:center;padding:8px;background:#fff;border:1px dashed #81c7f0;border-radius:10px}
 /* Skeleton trung tính lúc chờ JS (không còn nội dung mẫu sai game) */
-.skel{position:relative;overflow:hidden;background:#f3e3ec;border-radius:8px;min-height:14px}
+.skel{position:relative;overflow:hidden;background:#d0e4f5;border-radius:8px;min-height:14px}
 .skel::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.7),transparent);animation:skel 1.2s infinite}
 @keyframes skel{from{transform:translateX(-100%)}to{transform:translateX(100%)}}
 .skel-thumb{width:84px;height:84px;border-radius:12px;flex-shrink:0}
 .skel-img{aspect-ratio:3/4}
 .shot-grid .skel{flex:0 1 calc((100% - 16px)/3)}
 span.skel{display:block}
-.cmt-item{background:#fff;border:1.5px solid #ffd0e8;border-radius:10px;padding:8px;font-size:11px;line-height:1.6;overflow-wrap:anywhere}
+.cmt-item{background:#fff;border:1.5px solid #b8d8f8;border-radius:10px;padding:8px;font-size:11px;line-height:1.6;overflow-wrap:anywhere}
 .cmt-item .stars{color:#f59e0b;letter-spacing:2px}
-.cmt-item small{color:#8a6a7a}
+.cmt-item small{color:#4a7a9a}
 .cmt-item div{white-space:pre-line}
 </style>
+<link rel="stylesheet" href="/assets/css/manga.css" data-root-href="assets/css/manga.css">
 </head>
 <body>
 <div class="wrap">
-  <div style="background:#1a1a2e;color:#7fb1ff;font-family:monospace;font-size:11px;display:flex;justify-content:space-between;padding:6px 10px;border-radius:8px 8px 0 0;border:1px solid #ff8ec7;border-bottom:none">
+  <div style="background:#1a1a2e;color:#7fb1ff;font-family:monospace;font-size:11px;display:flex;justify-content:space-between;padding:6px 10px;border-radius:8px 8px 0 0;border:1px solid #4da6ff;border-bottom:none">
     <span>◉ JAVA J2ME</span><span id="clock">09:42</span><span>▂▃▅▇ 100%</span>
   </div>
   <div class="header" style="border-radius:0 0 14px 14px;margin-bottom:0">
     <div style="display:flex;gap:12px;align-items:center;justify-content:center">
-      <div style="width:44px;height:44px;background:#fff;color:#ff4d8d;border-radius:50%;display:grid;place-items:center;font-size:22px;border:2px solid #fff;flex-shrink:0">☺</div>
+      <div style="width:44px;height:44px;background:#fff;color:#0066cc;border-radius:50%;display:grid;place-items:center;font-size:22px;border:2px solid #fff;flex-shrink:0">🔔</div>
       <div style="text-align:left">
         <h1 style="margin:0">J2ME.VERCEL.APP</h1>
         <p style="margin:0">Kho game Java .JAR • WAP Anime </p>
@@ -144,14 +146,14 @@ span.skel{display:block}
     </div>
   </div>
   <div class="wap-banner" style="margin:0 0 10px">
-    <a href="#"><img id="wapBannerImg" src="/assets/banners/banner1.png" data-root-src="assets/banners/banner1.png" alt="Banner game Java anime 720x240" width="720" height="240" decoding="async" fetchpriority="high" style="width:100%;height:120px;object-fit:cover;border-radius:12px;border:2px solid #ff8ec7;display:block"></a>
+    <a href="#"><img id="wapBannerImg" src="/assets/banners/banner1.png" data-root-src="assets/banners/banner1.png" alt="Banner game Java anime 720x240" width="720" height="240" decoding="async" fetchpriority="high" style="width:100%;height:120px;object-fit:cover;border-radius:12px;border:2px solid #4da6ff;display:block"></a>
   </div>
   <div class="breadcrumb" id="breadcrumb"><a href="index.html" data-root-link="index.html">Trang chủ</a> › <a href="index.html" data-root-link="index.html">Game Java</a> › <b id="bcName">…</b></div>
 
   <!-- Chi tiết vải - Bánh Dâu -->
   <div class="kawaii-d">
     <div class="dripping"></div>
-    <div class="kawaii-title" style="background:linear-gradient(90deg,#ff6b6b,#ffd93d);color:#4a2a3a">🍓 Chi Tiết Game</div>
+    <div class="kawaii-title" style="background:linear-gradient(90deg,#ff6b6b,#ffd93d);color:#1a3a5c">🍓 Chi Tiết Game</div>
     <div class="detail-head">
 <!--SLOT:HEAD-->
       <div class="skel skel-thumb"></div>
@@ -166,7 +168,7 @@ span.skel{display:block}
   <!-- Tải vải - Kẹo Dẻo -->
   <div class="kawaii-e">
     <div class="gummy">gummy ♡</div>
-    <div class="kawaii-title" style="background:linear-gradient(90deg,#a78bfa,#ff8ec7)">🍬 TẢI GAME — Chọn đúng màn hình nha ♡</div>
+    <div class="kawaii-title" style="background:linear-gradient(90deg,#a78bfa,#4da6ff)">🍬 TẢI GAME — Chọn đúng màn hình nha ♡</div>
     <div class="dl-grid" style="background:transparent">
 <!--SLOT:DL-->
       <div class="dl-option">
@@ -206,22 +208,22 @@ span.skel{display:block}
   </div>
   <div id="cmtBox" class="kawaii-f" style="display:none">
     <div class="kawaii-title">★ Đánh giá & Bình luận</div>
-    <div id="cmtSummary" style="font-size:11px;color:#8a6a7a;margin-bottom:8px"></div>
+    <div id="cmtSummary" style="font-size:11px;color:#4a7a9a;margin-bottom:8px"></div>
     <div id="cmtList" style="display:grid;gap:8px"></div>
     <form id="cmtForm" style="display:grid;gap:8px;margin-top:10px">
       <div style="display:flex;gap:8px">
-        <input id="cmtName" maxlength="30" placeholder="Tên của bạn *" style="flex:1;min-width:0;padding:7px 8px;border:1px solid #ffb3d9;border-radius:8px;font-size:12px">
-        <select id="cmtStars" style="padding:7px;border:1px solid #ffb3d9;border-radius:8px;font-size:12px;background:#fff">
+        <input id="cmtName" maxlength="30" placeholder="Tên của bạn *" style="flex:1;min-width:0;padding:7px 8px;border:1px solid #81c7f0;border-radius:8px;font-size:12px">
+        <select id="cmtStars" style="padding:7px;border:1px solid #81c7f0;border-radius:8px;font-size:12px;background:#fff">
           <option value="5">★★★★★</option><option value="4">★★★★</option><option value="3">★★★</option><option value="2">★★</option><option value="1">★</option>
         </select>
       </div>
-      <textarea id="cmtText" rows="2" maxlength="500" placeholder="Nhận xét về game... (hiện sau khi duyệt) *" style="padding:7px 8px;border:1px solid #ffb3d9;border-radius:8px;font-size:12px;font-family:inherit"></textarea>
+      <textarea id="cmtText" rows="2" maxlength="500" placeholder="Nhận xét về game... (hiện sau khi duyệt) *" style="padding:7px 8px;border:1px solid #81c7f0;border-radius:8px;font-size:12px;font-family:inherit"></textarea>
       <input id="cmtWeb" type="text" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;top:-9999px">
       <button type="submit" class="dl-btn" style="justify-content:center">Gửi bình luận</button>
-      <p id="cmtMsg" style="font-size:11px;color:#8a6a7a;margin:0"></p>
+      <p id="cmtMsg" style="font-size:11px;color:#4a7a9a;margin:0"></p>
     </form>
   </div>
-  <footer style="background:#4a1a2e;color:#ffd0e8;text-align:center;padding:14px;font-size:11px;border-radius:12px;margin-top:4px">
+  <footer style="background:#1a3a5c;color:#b8d8f8;text-align:center;padding:14px;font-size:11px;border-radius:12px;margin-top:4px">
     <p style="margin:0">© <span class="js-year">2026</span> J2ME.VERCEL.APP — Anime WAP</p>
     <p style="margin:6px 0 0;font-size:10px;opacity:.7"><a href="index.html" data-root-link="index.html" style="color:#fff">Trang chủ</a> · <a href="category.html" data-root-link="category.html" style="color:#fff">Thể loại</a> · <a href="profile.html" data-root-link="profile.html" style="color:#fff">Hồ sơ</a> · <a href="lien-he.html" data-root-link="lien-he.html" style="color:#fff">Liên hệ / DMCA</a></p>
     <p style="margin:6px 0 0"><button class="dl-btn pwa-install" style="display:none;font-size:10px" onclick="installApp()">Cài app về máy</button></p>
@@ -233,32 +235,32 @@ span.skel{display:block}
 <style>
 .modal-overlay{display:grid;place-items:center}
 .modal-overlay.hidden{display:none !important}
-.modal-card{background:#fff;border-radius:16px;max-width:520px;width:100%;display:flex;overflow:hidden;border:2px solid #ffb3d9;position:relative;box-shadow:0 20px 50px rgba(0,0,0,.3)}
-.modal-anime{width:150px;background:linear-gradient(180deg,#e8f0ff,#ffe4f0);display:grid;place-items:center;padding:10px}
+.modal-card{background:#fff;border-radius:16px;max-width:520px;width:100%;display:flex;overflow:hidden;border:2px solid #81c7f0;position:relative;box-shadow:0 20px 50px rgba(0,0,0,.3)}
+.modal-anime{width:150px;background:linear-gradient(180deg,#e8f0ff,#e8f4fd);display:grid;place-items:center;padding:10px}
 .modal-anime-img{width:128px;height:168px;object-fit:contain;border-radius:12px;border:2px solid #fff;background:#fff;transition:filter .15s}
 .modal-anime:hover .modal-anime-img{animation:animeGlitch .32s steps(2,end) infinite}
 @keyframes animeGlitch{0%{filter:hue-rotate(0deg)}20%{filter:hue-rotate(18deg)}40%{filter:hue-rotate(-10deg)}100%{filter:hue-rotate(0deg)}}
 .modal-content{flex:1;padding:16px}
-.modal-content h3{font-size:14px;color:#4a1a2e}
-@media(max-width:520px){.modal-card{flex-direction:column;max-width:360px;max-height:92vh;overflow:auto}.modal-body{flex-direction:column}.modal-anime{width:100%;height:42vh;min-height:220px;padding:8px;display:grid;place-items:center;background:#fff;flex-shrink:0;border-radius:12px;overflow:hidden}.modal-anime-img{width:auto;height:100%;max-height:100%;max-width:100%;aspect-ratio:9/16;object-fit:contain;border:2px solid #fff;border-radius:14px;box-shadow:0 2px 8px rgba(255,77,141,.18);background:#fff}}
+.modal-content h3{font-size:14px;color:#1a3a5c}
+@media(max-width:520px){.modal-card{flex-direction:column;max-width:360px;max-height:92vh;overflow:auto}.modal-body{flex-direction:column}.modal-anime{width:100%;height:42vh;min-height:220px;padding:8px;display:grid;place-items:center;background:#fff;flex-shrink:0;border-radius:12px;overflow:hidden}.modal-anime-img{width:auto;height:100%;max-height:100%;max-width:100%;aspect-ratio:9/16;object-fit:contain;border:2px solid #fff;border-radius:14px;box-shadow:0 2px 8px rgba(0,102,204,.18);background:#fff}}
 </style>
   <div class="modal-card" style="flex-direction:column;overflow:visible">
-    <div class="modal-banner" style="height:72px;border-radius:14px 14px 0 0;overflow:hidden;border-bottom:2px solid #ff8ec7;position:relative;flex-shrink:0"><img src="/assets/banners/banner1.png" data-root-src="assets/banners/banner1.png" alt="SOS banner" width="720" height="120" style="width:100%;height:100%;object-fit:cover;display:block" loading="lazy"><div style="position:absolute;top:8px;left:50%;transform:translateX(-50%);background:#ff4d8d;color:#fff;font-weight:800;font-size:10px;padding:4px 14px;border-radius:20px;border:2px solid #fff;box-shadow:0 3px 8px rgba(255,77,141,.35);letter-spacing:.08em;white-space:nowrap">SOS</div></div>
+    <div class="modal-banner" style="height:72px;border-radius:14px 14px 0 0;overflow:hidden;border-bottom:2px solid #4da6ff;position:relative;flex-shrink:0"><img src="/assets/banners/banner1.png" data-root-src="assets/banners/banner1.png" alt="SOS banner" width="720" height="120" style="width:100%;height:100%;object-fit:cover;display:block" loading="lazy"><div style="position:absolute;top:8px;left:50%;transform:translateX(-50%);background:#0066cc;color:#fff;font-weight:800;font-size:10px;padding:4px 14px;border-radius:20px;border:2px solid #fff;box-shadow:0 3px 8px rgba(0,102,204,.35);letter-spacing:.08em;white-space:nowrap">SOS</div></div>
     <div class="modal-body" style="display:flex;width:100%;flex:1;min-height:0">
-      <div class="modal-anime"><img src="/assets/anime-girl.png" data-root-src="assets/anime-girl.png" class="modal-anime-img" alt="anime girl 128x168" width="128" height="168" decoding="async" loading="eager" onerror="this.style.display='none'"><svg viewBox="0 0 120 148" style="display:none"><text x="60" y="70" text-anchor="middle" fill="#ff4d8d">✿</text></svg></div>
-      <div class="modal-content"><h3>Khoan đã Senpai~ ⚠️</h3><p id="modalMsg">Bạn sắp tải JAR đó!</p><div style="display:flex;gap:8px;margin-top:12px"><a id="modalConfirm" href="#" style="flex:1;background:#ff4d8d;color:#fff;padding:8px;text-align:center;border-radius:20px;font-weight:700;text-decoration:none">✓ Có, tải ngay »</a><button id="modalCancel" style="flex:1;background:#fff;border:1.5px solid #ffb3d9;padding:8px;border-radius:20px">✕ Không</button></div></div>
+      <div class="modal-anime"><img src="/assets/anime-girl.png" data-root-src="assets/anime-girl.png" class="modal-anime-img" alt="anime girl 128x168" width="128" height="168" decoding="async" loading="eager" onerror="this.style.display='none'"><svg viewBox="0 0 120 148" style="display:none"><text x="60" y="70" text-anchor="middle" fill="#0066cc">✿</text></svg></div>
+      <div class="modal-content"><h3>Khoan đã Senpai~ ⚠️</h3><p id="modalMsg">Bạn sắp tải JAR đó!</p><div style="display:flex;gap:8px;margin-top:12px"><a id="modalConfirm" href="#" style="flex:1;background:#0066cc;color:#fff;padding:8px;text-align:center;border-radius:20px;font-weight:700;text-decoration:none">✓ Có, tải ngay »</a><button id="modalCancel" style="flex:1;background:#fff;border:1.5px solid #81c7f0;padding:8px;border-radius:20px">✕ Không</button></div></div>
     </div>
-    <button id="modalClose" style="position:absolute;top:8px;right:8px;width:28px;height:28px;border-radius:50%;border:1px solid #ffd0e8;background:#fff;z-index:2">×</button>
+    <button id="modalClose" style="position:absolute;top:8px;right:8px;width:28px;height:28px;border-radius:50%;border:1px solid #b8d8f8;background:#fff;z-index:2">×</button>
   </div>
 </div>
 
 <!-- Cảnh báo link ngoài -->
 <div id="extModal" class="modal-overlay hidden" style="position:fixed;inset:0;background:rgba(10,18,36,.62);z-index:10001;padding:16px">
   <div class="modal-card" style="flex-direction:column;max-width:360px;padding:16px;gap:8px">
-    <h3 style="font-size:13px;color:#4a1a2e;margin:0">Rời khỏi J2ME?</h3>
-    <p style="font-size:11px;color:#8a6a7a;margin:0">Bạn sắp mở link ngoài, cẩn thận link lạ:</p>
-    <p id="extUrl" style="font-size:11px;color:#ff4d8d;overflow-wrap:anywhere;margin:0"></p>
-    <div style="display:flex;gap:8px"><a id="extGo" href="#" target="_blank" rel="noopener" style="flex:1;background:#ff4d8d;color:#fff;padding:8px;text-align:center;border-radius:20px;font-weight:700;text-decoration:none;font-size:12px">Mở link »</a><button id="extBack" style="flex:1;background:#fff;border:1.5px solid #ffb3d9;padding:8px;border-radius:20px;font-size:12px">Ở lại</button></div>
+    <h3 style="font-size:13px;color:#1a3a5c;margin:0">Rời khỏi J2ME?</h3>
+    <p style="font-size:11px;color:#4a7a9a;margin:0">Bạn sắp mở link ngoài, cẩn thận link lạ:</p>
+    <p id="extUrl" style="font-size:11px;color:#0066cc;overflow-wrap:anywhere;margin:0"></p>
+    <div style="display:flex;gap:8px"><a id="extGo" href="#" target="_blank" rel="noopener" style="flex:1;background:#0066cc;color:#fff;padding:8px;text-align:center;border-radius:20px;font-weight:700;text-decoration:none;font-size:12px">Mở link »</a><button id="extBack" style="flex:1;background:#fff;border:1.5px solid #81c7f0;padding:8px;border-radius:20px;font-size:12px">Ở lại</button></div>
   </div>
 </div>
 
@@ -434,7 +436,7 @@ function getId(){
 }
 // Chống XSS: escape mọi dữ liệu game trước khi chèn vào HTML; linkify biến URL trong mô tả thành link bấm được
 function escHtml(s){return String(s==null?'':s).replace(/[&<>"']/g,function(m){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m];});}
-function linkify(s){return escHtml(s).replace(/(https?:\/\/[^\s<>"']+)/g,'<a href="$1" target="_blank" rel="noopener">$1</a>');}
+function linkify(s){return escHtml(s).replace(/\*\*([^*<>]+)\*\*/g,'<b>$1</b>').replace(/(https?:\/\/[^\s<>"']+)/g,'<a href="$1" target="_blank" rel="noopener">$1</a>');}
 function apiRoot(){try{const p=location.pathname||'/';const gi=p.indexOf('/game/');return gi>=0?p.slice(0,gi):'';}catch(e){return '';}}
 function isPreviewMode(){try{return new URLSearchParams(location.search).get('preview')==='1';}catch(e){return false;}}
 // Đếm lượt bấm tải thật: mỗi máy 1 lượt/ngày/game, gửi nền không chặn tải
@@ -571,9 +573,9 @@ async function renderDetail(){
     }catch(e){}
   }
   const head=document.querySelector('.detail-head');
-  head.innerHTML=`<img src="${escHtml(g.thumb)}" alt="${escHtml(g.name)} thumb" width="84" height="84" decoding="async" fetchpriority="high"><div><h2>${escHtml(g.name)} ${g.hot?'<span style="background:#ff4d8d;color:#fff;font-size:8px;padding:2px 5px;border-radius:8px">HOT</span>':''} ${g.vi?'<span style="background:#0a9c4a;color:#fff;font-size:8px;padding:2px 5px;border-radius:8px">VIỆT HÓA</span>':''}</h2><table class="info-table"><tr><th>Thể loại</th><td><a href="${apiRoot()}/category.html?cat=${encodeURIComponent(g.cat||'')}" style="color:#ff4d8d">${escHtml(g.cat)}</a></td></tr><tr><th>Dung lượng</th><td>${escHtml(g.size)}</td></tr><tr><th>Màn hình</th><td>${(g.res||[]).map(r=>`<span class="res-tag">${escHtml(r)}</span>`).join(' ')}</td></tr>${dateStr?`<tr><th>Ngày đăng</th><td>${dateStr}</td></tr>`:''}${dlCount!=null?`<tr><th>Lượt tải</th><td>${Number(dlCount).toLocaleString('vi-VN')}</td></tr>`:''}</table></div>`;
+  head.innerHTML=`<img src="${escHtml(g.thumb)}" alt="${escHtml(g.name)} thumb" width="84" height="84" decoding="async" fetchpriority="high"><div><h2>${escHtml(g.name)} ${g.hot?'<span style="background:#0066cc;color:#fff;font-size:8px;padding:2px 5px;border-radius:8px">HOT</span>':''} ${g.vi?'<span style="background:#0a9c4a;color:#fff;font-size:8px;padding:2px 5px;border-radius:8px">VIỆT HÓA</span>':''}</h2><table class="info-table"><tr><th>Thể loại</th><td><a href="${apiRoot()}/category.html?cat=${encodeURIComponent(g.cat||'')}" style="color:#0066cc">${escHtml(g.cat)}</a></td></tr><tr><th>Dung lượng</th><td>${escHtml(g.size)}</td></tr><tr><th>Màn hình</th><td>${(g.res||[]).map(r=>`<span class="res-tag">${escHtml(r)}</span>`).join(' ')}</td></tr>${dateStr?`<tr><th>Ngày đăng</th><td>${dateStr}</td></tr>`:''}${dlCount!=null?`<tr><th>Lượt tải</th><td>${Number(dlCount).toLocaleString('vi-VN')}</td></tr>`:''}</table></div>`;
   // dl
-  document.querySelector('.dl-grid').innerHTML=(g.res||[]).map(r=>`<div class="dl-option"><b>${escHtml(r)}</b><br><small style="color:#8a6a7a;font-size:10px">${escHtml(g.size)} • ${String(r).includes('240')?'QVGA':'QCIF'}</small><br><a href="${escHtml(apiRoot()+'/api/dl?id='+encodeURIComponent(g.id)+'&res='+encodeURIComponent(r))}" class="dl-btn" data-dl-btn="1" data-name="${escHtml(g.name)}" data-res="${escHtml(r)}">⬇ Tải JAR</a></div>`).join('');
+  document.querySelector('.dl-grid').innerHTML=(g.res||[]).map(r=>`<div class="dl-option"><b>${escHtml(r)}</b><br><small style="color:#4a7a9a;font-size:10px">${escHtml(g.size)} • ${String(r).includes('240')?'QVGA':'QCIF'}</small><br><a href="${escHtml(apiRoot()+'/api/dl?id='+encodeURIComponent(g.id)+'&res='+encodeURIComponent(r))}" class="dl-btn" data-dl-btn="1" data-name="${escHtml(g.name)}" data-res="${escHtml(r)}">⬇ Tải JAR</a></div>`).join('');
   // Chia sẻ + QR + yêu thích
   try{
     const pageUrl=isPreview?location.href:('https://J2ME.VERCEL.APP/game/'+id+'.html');
@@ -588,7 +590,7 @@ async function renderDetail(){
       +`<button id="qrBtn" class="dl-btn" style="font-size:11px">QR</button>`
       +`<button id="favBtn" class="dl-btn" style="font-size:11px">${favOn?'♥ Đã thích':'♡ Thích'}</button>`
       +`<button id="doneBtn" class="dl-btn" style="font-size:11px">${(function(){try{return JSON.parse(localStorage.getItem('j2me_done')||'[]').indexOf(id)>=0;}catch(e){return false;}})()?'✓ Đã phá đảo':'Phá đảo?'}</button></div>`
-      +`<div id="qrWrap" style="display:none;text-align:center;margin-top:8px"><img id="qrImg" alt="QR mở trên điện thoại" width="160" height="160" style="width:160px;height:160px;border:2px solid #ffd0e8;border-radius:12px;background:#fff"><br><small style="color:#8a6a7a;font-size:10px">Quét để mở trên điện thoại</small></div>`;
+      +`<div id="qrWrap" style="display:none;text-align:center;margin-top:8px"><img id="qrImg" alt="QR mở trên điện thoại" width="160" height="160" style="width:160px;height:160px;border:2px solid #b8d8f8;border-radius:12px;background:#fff"><br><small style="color:#4a7a9a;font-size:10px">Quét để mở trên điện thoại</small></div>`;
       document.getElementById('copyLinkBtn').onclick=function(){copyPageUrl(pageUrl,this);try{__bm('share');}catch(e){}};
       document.getElementById('qrBtn').onclick=function(){const w=document.getElementById('qrWrap');const im=document.getElementById('qrImg');if(w.style.display==='none'){if(!im.src)im.src='https://api.qrserver.com/v1/create-qr-code/?size=160x160&data='+encodeURIComponent(pageUrl);w.style.display='block';}else{w.style.display='none';}};
       document.getElementById('favBtn').onclick=function(){const on=favToggle(id);this.textContent=favHas(id)?'♥ Đã thích':'♡ Thích';if(on){xpBump('fav');}};
@@ -600,7 +602,7 @@ async function renderDetail(){
   const shots=(g.shots||[]);
   const shotCls=shots.length===1?' count-1':shots.length===2?' count-2':'';
   const shotsHtml=shots.length?`<div class="shot-grid${shotCls}">${shots.map((s,i)=>`<img src="${escHtml(s)}" alt="Ảnh demo ${i+1}" width="240" height="320" loading="lazy" decoding="async" data-idx="${i}" class="shot-img" style="cursor:pointer">`).join('')}</div>`:`<p class="note">Chưa có ảnh demo cho game này.</p>`;
-  document.querySelector('.body-text').innerHTML=`<h3>📝 Giới thiệu</h3><p>${linkify(g.desc||'')}</p><h3>🖼️ Hình ảnh</h3>${shotsHtml}<h3>⚙️ Yêu cầu</h3><p style="font-size:11px">• MIDP 2.0 • Màn hình ${escHtml((g.res||[]).join(', '))} • Trống ≥${escHtml(g.size)} • Opera Mini</p>`;
+  document.querySelector('.body-text').innerHTML=`<h3>📝 Giới thiệu</h3><p>${linkify(g.desc||'')}</p><h3>🖼️ Hình ảnh</h3>${shotsHtml}<h3>⚙️ Yêu cầu</h3><p style="font-size:13px">• <b>MIDP 2.0</b> • Màn hình <b>${escHtml((g.res||[]).join(', '))}</b> • Trống ≥<b>${escHtml(g.size)}</b> • Opera Mini</p>`;
   CURRENT_SHOTS=shots;
   document.querySelectorAll('.shot-img').forEach(img=>{
     img.addEventListener('click',()=>openLightbox(parseInt(img.dataset.idx,10)));
@@ -615,7 +617,7 @@ async function renderDetail(){
   const rel=sameCat.concat(restCat).slice(0,6);
   if(!rel.length) return;
   document.getElementById('relatedBox').style.display='block';
-  document.getElementById('relatedGrid').innerHTML=rel.map(x=>`<a href="${apiRoot()}/game/${escHtml(x.id)}.html" style="background:#fff;border:1.5px solid #ffd0e8;border-radius:10px;padding:6px;text-align:center;text-decoration:none"><img src="${escHtml(x.thumb)}" width="48" height="48" loading="lazy" decoding="async" alt="${escHtml(x.name)}" style="width:48px;height:48px;border-radius:8px;margin:0 auto;object-fit:cover"><span style="font-size:10px;font-weight:700;display:block;color:#4a2a3a">${escHtml(String(x.name||'').split('[')[0].slice(0,14))}</span><small style="font-size:9px;color:#8a6a7a">${escHtml((x.res||[])[0]||'')}</small></a>`).join('');
+  document.getElementById('relatedGrid').innerHTML=rel.map(x=>`<a href="${apiRoot()}/game/${escHtml(x.id)}.html" style="background:#fff;border:1.5px solid #b8d8f8;border-radius:10px;padding:6px;text-align:center;text-decoration:none"><img src="${escHtml(x.thumb)}" width="48" height="48" loading="lazy" decoding="async" alt="${escHtml(x.name)}" style="width:48px;height:48px;border-radius:8px;margin:0 auto;object-fit:cover"><span style="font-size:10px;font-weight:700;display:block;color:#1a3a5c">${escHtml(String(x.name||'').split('[')[0].slice(0,14))}</span><small style="font-size:9px;color:#4a7a9a">${escHtml((x.res||[])[0]||'')}</small></a>`).join('');
   }
   if(!isPreview){try{renderRelatedList();}catch(e){}}
   if(!isPreview){ try{loadComments(id);}catch(e){} }
@@ -639,7 +641,7 @@ function doDownload(name,res){
   const mc0=document.getElementById('modalConfirm');
   if(lock){
     pending={href:'#',name:name,res:res};
-    document.getElementById('modalMsg').innerHTML='🔒 Game bị khóa: <b>'+lock.label+'</b><br><small style="color:#8a6a7a">'+lock.need+'</small><br><a href="'+apiRoot()+'/goc-senpai.html" style="color:#ff4d8d;font-weight:700">→ Sang Góc Senpai làm nhiệm vụ</a>';
+    document.getElementById('modalMsg').innerHTML='🔒 Game bị khóa: <b>'+lock.label+'</b><br><small style="color:#4a7a9a">'+lock.need+'</small><br><a href="'+apiRoot()+'/goc-senpai.html" style="color:#0066cc;font-weight:700">→ Sang Góc Senpai làm nhiệm vụ</a>';
     if(mc0)mc0.style.display='none';
     document.getElementById('dlModal').classList.remove('hidden'); document.body.style.overflow='hidden'; return false;
   }
@@ -692,7 +694,7 @@ async function loadComments(gameId){
     const itemHtml=function(c,reply){
       const st=reply?'':('<div class="stars">'+'★'.repeat(c.stars)+'☆'.repeat(5-c.stars)+'</div>');
       return '<div class="cmt-item"'+(reply?' style="margin:6px 0 0 18px;border-style:dashed"':'')+'>'+st+'<b>'+escHtml(c.name)+'</b> <small>'+escHtml(fmtD(c.created_at))+'</small><div>'+escHtml(c.text)+'</div>'
-      +(reply?'':'<div><button data-reply="'+escHtml(c.id)+'" data-rname="'+escHtml(c.name)+'" style="background:none;border:none;color:#ff4d8d;font-size:11px;cursor:pointer;padding:0">↳ Trả lời</button></div>')+'</div>';
+      +(reply?'':'<div><button data-reply="'+escHtml(c.id)+'" data-rname="'+escHtml(c.name)+'" style="background:none;border:none;color:#0066cc;font-size:11px;cursor:pointer;padding:0">↳ Trả lời</button></div>')+'</div>';
     };
     list.innerHTML=(j.comments||[]).map(function(c){
       return itemHtml(c,false)+((c.replies||[]).map(function(r){return itemHtml(r,true);}).join(''));
@@ -701,8 +703,8 @@ async function loadComments(gameId){
       b.onclick=function(){
         window._cmtReplyTo={id:b.getAttribute('data-reply'),name:b.getAttribute('data-rname')};
         let tag=document.getElementById('replyTag');
-        if(!tag){tag=document.createElement('div');tag.id='replyTag';tag.style.cssText='font-size:11px;color:#ff4d8d';form.insertBefore(tag,form.firstChild);}
-        tag.innerHTML='Đang trả lời <b></b> <a href="#" id="replyCancel" style="color:#8a6a7a">[hủy]</a>';
+        if(!tag){tag=document.createElement('div');tag.id='replyTag';tag.style.cssText='font-size:11px;color:#0066cc';form.insertBefore(tag,form.firstChild);}
+        tag.innerHTML='Đang trả lời <b></b> <a href="#" id="replyCancel" style="color:#4a7a9a">[hủy]</a>';
         tag.querySelector('b').textContent=window._cmtReplyTo.name;
         tag.querySelector('#replyCancel').onclick=function(e){e.preventDefault();window._cmtReplyTo=null;tag.remove();};
         document.getElementById('cmtText').focus();

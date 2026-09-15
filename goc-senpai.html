@@ -4,48 +4,49 @@
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Góc Senpai — Pet & Gacha - J2ME.VERCEL.APP</title>
 <meta name="description" content="Nuôi pet anime, gắp gacha mỗi ngày, gửi pet phiêu lưu nhận quà.">
-<meta name="theme-color" content="#ff4d8d">
+<meta name="theme-color" content="#0066cc">
 <link rel="icon" href="assets/anime-girl.png" type="image/png">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{background:#fff0f6;padding:12px;font-family:"Be Vietnam Pro",system-ui,sans-serif;color:#4a2a3a;min-height:100vh}
+body{background:#e8f4fd;padding:12px;font-family:"Be Vietnam Pro",system-ui,sans-serif;color:#1a3a5c;min-height:100vh}
 body[data-theme="bien"]{background:#f0f9ff}
 body[data-theme="matcha"]{background:#f4f9ec}
-.app{max-width:420px;margin:0 auto;background:#fff;border:2px solid #ff8ec7;border-radius:16px;overflow:hidden;box-shadow:0 6px 20px rgba(255,77,141,.18)}
+.app{max-width:420px;margin:0 auto;background:#fff;border:2px solid #4da6ff;border-radius:16px;overflow:hidden;box-shadow:0 6px 20px rgba(0,102,204,.18)}
 body[data-theme="bien"] .app{border-color:#8ec8ff}
 body[data-theme="matcha"] .app{border-color:#a3c98a}
 .top{display:flex;justify-content:space-between;background:#1a1a2e;color:#7fb1ff;font-family:monospace;font-size:11px;padding:6px 12px}
-.hero{background:linear-gradient(135deg,#ff8ec7,#ff4d8d);color:#fff;text-align:center;padding:16px 12px}
+.hero{background:linear-gradient(135deg,#4da6ff,#0066cc);color:#fff;text-align:center;padding:16px 12px}
 body[data-theme="bien"] .hero{background:linear-gradient(135deg,#8ec8ff,#2b5da8)}
 body[data-theme="matcha"] .hero{background:linear-gradient(135deg,#a3c98a,#4a7c3a)}
 .hero h1{font-family:"Mali",cursive,sans-serif;font-size:18px}
 .hero p{font-size:11px;opacity:.9}
 .wrap{padding:10px;display:grid;gap:12px}
-.card{position:relative;border:2px solid #ff8ec7;border-radius:14px;padding:12px;background:#fff}
-.card::before{content:"";position:absolute;inset:6px;border:1.6px dashed #ffb3d9;border-radius:10px;pointer-events:none}
-.pill{font-family:"Mali",cursive,sans-serif;background:linear-gradient(90deg,#ff4d8d,#ff8ec7);color:#fff;padding:5px 12px;border-radius:20px;font-size:11px;font-weight:700;display:inline-block;border:1.5px solid #fff;margin-bottom:8px}
+.card{position:relative;border:2px solid #4da6ff;border-radius:14px;padding:12px;background:#fff}
+.card::before{content:"";position:absolute;inset:6px;border:1.6px dashed #81c7f0;border-radius:10px;pointer-events:none}
+.pill{font-family:"Mali",cursive,sans-serif;background:linear-gradient(90deg,#0066cc,#4da6ff);color:#fff;padding:5px 12px;border-radius:20px;font-size:11px;font-weight:700;display:inline-block;border:1.5px solid #fff;margin-bottom:8px}
 .petstage{text-align:center}
 #petEmo{font-size:64px;animation:float 2.4s ease-in-out infinite;display:block}
 @keyframes float{50%{transform:translateY(-6px)}}
-.bar{background:#fff0f6;border:1px solid #ffb3d9;border-radius:10px;height:12px;overflow:hidden;margin:4px 0}
-.bar i{display:block;height:100%;background:linear-gradient(90deg,#ff4d8d,#ff8ec7)}
+.bar{background:#e8f4fd;border:1px solid #81c7f0;border-radius:10px;height:12px;overflow:hidden;margin:4px 0}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,#0066cc,#4da6ff)}
 .rowbtns{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
-.btn{border:2px solid #fff;background:linear-gradient(180deg,#ff8ec7,#ff4d8d);color:#fff;border-radius:24px;padding:8px 14px;font-weight:800;font-size:11px;cursor:pointer;font-family:"Mali",cursive,sans-serif;box-shadow:0 4px 0 #d43a6f}
-.btn:active{transform:translateY(2px);box-shadow:0 2px 0 #d43a6f}
-.btn.ghost{background:#fff;color:#ff4d8d;border:1.5px solid #ffb3d9;box-shadow:none}
+.btn{border:2px solid #fff;background:linear-gradient(180deg,#4da6ff,#0066cc);color:#fff;border-radius:24px;padding:8px 14px;font-weight:800;font-size:11px;cursor:pointer;font-family:"Mali",cursive,sans-serif;box-shadow:0 4px 0 #004499}
+.btn:active{transform:translateY(2px);box-shadow:0 2px 0 #004499}
+.btn.ghost{background:#fff;color:#0066cc;border:1.5px solid #81c7f0;box-shadow:none}
 .clawbox{background:#1a1a2e;border-radius:12px;padding:10px;overflow:hidden}
 .clawrail{position:relative;height:44px}
 #clawTrack{position:absolute;top:0;left:0;font-size:30px;transition:none}
 .prizes{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:6px}
 .prizes div{background:#fff;border-radius:8px;text-align:center;font-size:22px;padding:6px}
 #clawWin{margin-top:8px;background:#fffbe6;border:1px dashed #e6c87a;border-radius:10px;padding:8px;text-align:center;font-size:12px}
-#senMsg{font-size:12px;background:#fff0f6;border:1px dashed #ffb3d9;border-radius:10px;padding:8px;text-align:center;min-height:36px}
-small.dim{color:#8a6a7a;font-size:10px}
+#senMsg{font-size:12px;background:#e8f4fd;border:1px dashed #81c7f0;border-radius:10px;padding:8px;text-align:center;min-height:36px}
+small.dim{color:#4a7a9a;font-size:10px}
 #eatList{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
-.foot{background:#4a1a2e;color:#ffd0e8;text-align:center;padding:12px;font-size:11px}
+.foot{background:#1a3a5c;color:#b8d8f8;text-align:center;padding:12px;font-size:11px}
 .foot a{color:#fff}
-select{padding:6px;border:1px solid #ffb3d9;border-radius:8px;font-size:11px;background:#fff}
+select{padding:6px;border:1px solid #81c7f0;border-radius:8px;font-size:11px;background:#fff}
 </style>
+<link rel="stylesheet" href="assets/css/manga.css">
 </head>
 <body data-theme="hong">
 <div class="app">
@@ -65,7 +66,7 @@ select{padding:6px;border:1px solid #ffb3d9;border-radius:8px;font-size:11px;bac
 <div class="clawbox"><div class="clawrail"><div id="clawTrack">🪝</div></div>
 <div class="prizes"><div>🎁</div><div>🍙</div><div>🎖️</div><div>🎨</div><div>🎁</div><div>🍙</div><div>🎖️</div><div>🎁</div><div>🍙</div></div></div>
 <div id="spinBox" style="margin-top:8px"><button class="btn" id="clawBtn">🎰 QUAY MIỄN PHÍ HÔM NAY</button></div>
-<div id="spunBox" style="display:none;font-size:11px;color:#8a6a7a;margin-top:8px"></div>
+<div id="spunBox" style="display:none;font-size:11px;color:#4a7a9a;margin-top:8px"></div>
 <div id="clawWin" style="display:none"></div>
 <small class="dim" id="pityN"></small>
 </section>
@@ -77,7 +78,7 @@ select{padding:6px;border:1px solid #ffb3d9;border-radius:8px;font-size:11px;bac
 <small class="dim">Bảng giống nhau cho mọi người, reset mỗi tuần. Ô tự tick khi bạn làm nhiệm vụ.</small>
 </section>
 
-<section class="card"><span class="pill">✉️ Hộp thư sáng <span id="mailDot" style="display:none;color:#ff4d8d">●</span></span>
+<section class="card"><span class="pill">✉️ Hộp thư sáng <span id="mailDot" style="display:none;color:#0066cc">●</span></span>
 <p style="font-size:11px">Mỗi ngày 1 lá thư + quà. <span id="mailStreak"></span></p>
 <div id="mailLetter" style="display:none;font-size:12px;background:#fffbe6;border:1px dashed #e6c87a;border-radius:10px;padding:8px;margin-top:8px;line-height:1.7"></div>
 <div class="rowbtns"><button class="btn ghost" onclick="SEN.mailOpen()">Mở thư hôm nay</button></div>

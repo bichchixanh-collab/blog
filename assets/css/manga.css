@@ -1,0 +1,17 @@
+/* manga.css — điểm nhấn Doraemon/manga cho theme xanh duy nhất (emoji/CSS, 0 ảnh ngoài) */
+/* Halftone chấm truyện tranh trên nền */
+body::before{background:radial-gradient(circle at 1px 1px,#0066cc 1px,transparent 0) !important;opacity:.05 !important}
+/* Chuông mèo máy trên hộp vải */
+.fabric-box::after{content:"🔔" !important}
+/* Prefix chuông cho tiêu đề */
+.fabric-title::before{content:"🔔 " !important}
+.kawaii-title::before{content:"🔔 " !important}
+/* Speed-line manga dưới header/hero */
+.header::after,.hero::after{content:"" !important;display:block !important;height:6px !important;margin:10px -12px -12px !important;border-radius:0 0 8px 8px !important;background:repeating-linear-gradient(90deg,#ffe066 0 8px,transparent 8px 14px,#ff6b6b 14px 18px,transparent 18px 26px) !important;opacity:.9 !important}
+/* Túi thần kỳ dưới hộp tải */
+.dl-fabric::after{content:"🔔 túi thần kỳ • lấy game là có" !important;display:block !important;text-align:center !important;font-size:10px !important;color:#0066cc !important;padding:4px 8px 8px !important}
+/* Bánh rán trên nút tải */
+.dl-btn::before{background:linear-gradient(180deg,rgba(255,255,255,.75),transparent) !important}
+.dl-btn::after{content:"🥞" !important}
+/* Dải chuông + chuột ở footer */
+.footer::after,.foot::after{content:"🔔 🐭 ── truyện vẫn tiếp ── 🐭 🔔" !important;display:block !important;margin-top:6px !important;font-size:10px !important;letter-spacing:.1em !important;opacity:.8 !important}
