@@ -62,7 +62,10 @@ module.exports = async (req, res) => {
     const set = (tag, inner) => { html = html.replace(new RegExp(`(<!--SLOT:${tag}-->)[\\s\\S]*?(<!--\\/SLOT:${tag}-->)`), `$1${inner}$2`); };
     set('HEAD', R.detailHead(game, siteUrl));
     set('DL', R.detailDl(game, ''));
-    const dataTag = `<script id="__GAME_DATA__" type="application/json">${JSON.stringify(game).replace(/</g, '\\u003c')}</script>`;
+    // Chống soi source: KHÔNG nhúng link file (jar) vào HTML — client tải qua vé + go.html.
+    const pubGame = Object.assign({}, game);
+    delete pubGame.jar;
+    const dataTag = `<script id="__GAME_DATA__" type="application/json">${JSON.stringify(pubGame).replace(/</g, '\\u003c')}</script>`;
     set('BODY', R.detailBody(game) + dataTag);
     set('REL', R.relatedHtml(games, game, siteUrl));
     html = html.replace(/(<b id="bcName">)[\s\S]*?(<\/b>)/, `$1${R.esc(game.name)}$2`);

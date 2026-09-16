@@ -9,6 +9,7 @@
 const fs = require('fs');
 const path = require('path');
 const https = require('https');
+const { bearerToken, verifySbToken } = require('./_sb');
 
 const REPO = process.env.GITHUB_REPO || 'bichchixanh-collab/blog';
 const BRANCH = process.env.GITHUB_BRANCH || 'main';
@@ -72,6 +73,36 @@ async function readLive(token) {
   throw new Error(`GitHub read ${r.code}`);
 }
 
+// Đếm bình luận ĐÃ DUYỆT theo tên hiển thị (phục vụ điều kiện khóa tải).
+// Không tài khoản nên tin ở mức "tên ai người đó giữ"; chống ké tên lạ bằng rate-limit.
+async function loadList() {
+  const token = process.env.GITHUB_TOKEN || '';
+  if (token) {
+    try { return (await readLive(token)).list; } catch (e) { /* rớt xuống bản tĩnh */ }
+  }
+  return readBundledList();
+}
+function normName(s) { return String(s || '').trim().toLowerCase().slice(0, 30); }
+async function countApproved(names, uid) {
+  try {
+    const list = await loadList();
+    // Đã đăng nhập: đếm CHÍNH XÁC theo uid (chống ké tên). Khách: đếm theo tên (mềm).
+    if (uid) {
+      let n = 0;
+      for (const c of list) {
+        if (c && c.status === 'approved' && c.uid === uid) n++;
+      }
+      return n;
+    }
+    const want = (Array.isArray(names) ? names : []).map(normName).filter(Boolean).slice(0, 5);
+    if (!want.length) return 0;
+    let n = 0;
+    for (const c of list) {
+      if (c && c.status === 'approved' && want.indexOf(normName(c.name)) >= 0) n++;
+    }
+    return n;
+  } catch (e) { return 0; }
+}
 function validGameId(id) {
   if (!/^[a-z0-9\-]{1,120}$/i.test(id)) return false;
   try {
@@ -221,6 +252,19 @@ module.exports = async (req, res) => {
 
     if (req.method === 'GET') {
       res.setHeader('Access-Control-Allow-Origin', '*'); // GET public: cho phép đọc chéo
+      // Đếm bình luận đã duyệt của tôi: ?mine=1&names=Ten1,Ten2 (tối đa 5 tên),
+      // hoặc kèm Bearer token để đếm chính xác theo tài khoản.
+      if (String((req.query && req.query.mine) || '') === '1') {
+        const me = verifySbToken(bearerToken(req));
+        if (me) {
+          const n = await countApproved([], me.uid);
+          return send(res, 200, { mine: n, hard: true }, 60);
+        }
+        const names = String((req.query && req.query.names) || '').split(',').map((s) => s.trim()).filter(Boolean).slice(0, 5);
+        if (!names.length || names.some((s) => s.length > 30)) return send(res, 400, { error: 'missing names' });
+        const n = await countApproved(names, null);
+        return send(res, 200, { mine: n }, 60);
+      }
       const game = String((req.query && req.query.game) || '').slice(0, 120);
       if (!game) return send(res, 400, { error: 'missing game' });
       let list;
@@ -245,6 +289,12 @@ module.exports = async (req, res) => {
       const text = String(p.text || '').trim().slice(0, 500);
       const replyTo = String(p.replyTo || '').slice(0, 64);
       const stars = Math.min(5, Math.max(1, parseInt(p.stars, 10) || 0));
+      // Gắn uid nếu gửi kèm access_token hợp lệ (đếm duyệt chính xác cho khóa cứng)
+      let cmtUid = null;
+      try {
+        const tok = String(p.sbt || '');
+        if (tok) { const me = verifySbToken(tok); if (me) cmtUid = me.uid; }
+      } catch (e) {}
       if (!validGameId(game)) return send(res, 400, { error: 'game invalid' });
       if (name.length < 2) return send(res, 400, { error: 'name too short' });
       if (text.length < 2) return send(res, 400, { error: 'text too short' });
@@ -273,6 +323,7 @@ module.exports = async (req, res) => {
           status: 'pending',
           created_at: new Date().toISOString(),
           ...(parentId ? { parentId } : {}),
+          ...(cmtUid ? { uid: cmtUid } : {}),
         });
         const content = Buffer.from(JSON.stringify(list)).toString('base64');
         const put = await gh('PUT', `/repos/${REPO}/contents/${FILE_PATH}`, token, {
@@ -301,3 +352,5 @@ module.exports = async (req, res) => {
     return send(res, 500, { error: 'Lỗi hệ thống, thử lại sau.' });
   }
 };
+module.exports.countApproved = countApproved;
+module.exports.loadList = loadList;

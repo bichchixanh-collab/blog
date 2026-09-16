@@ -25,7 +25,49 @@ function load() {
   return blank();
 }
 var S = load();
-function save() { try { localStorage.setItem('j2me_senpai', JSON.stringify(S)); } catch (e) {} try { if (window.SBSync) window.SBSync.schedule(); } catch (e) {} }
+function save() { try { localStorage.setItem('j2me_senpai', JSON.stringify(S)); } catch (e) {} try { if (window.SBSync) window.SBSync.schedule(); } catch (e) {} try { sbPushStats(); } catch (e) {} }
+// Đẩy bingo/pet lên server cho người đã đăng nhập (server là nguồn duy nhất khi kiểm khóa).
+// localStorage giữ làm cache offline; server hợp nhất (union bingo, max pet exp).
+var _sbStatsT = 0, _sbStatsSig = '';
+function sbPushStats() {
+  try {
+    if (typeof stToken !== 'function' || typeof stApiRoot !== 'function') return;
+    var tk = stToken(); if (!tk) return;
+    var w = bingoWeek(), cells = [], exp = 0;
+    try { cells = Object.keys((bprog()[w] || {})); } catch (e) {}
+    try { exp = (S && S.pet && S.pet.exp) || 0; } catch (e) {}
+    var sig = w + ':' + cells.slice().sort().join(',') + ':' + exp, now = Date.now();
+    if (sig === _sbStatsSig && now - _sbStatsT < 30000) return;
+    _sbStatsSig = sig; _sbStatsT = now;
+    var root = stApiRoot(), hh = { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + tk };
+    fetch(root + '/api/ustats', { method: 'POST', headers: hh, body: JSON.stringify({ t: 'bingo', week: w, ids: cells }), keepalive: true }).catch(function () {});
+    fetch(root + '/api/ustats', { method: 'POST', headers: hh, body: JSON.stringify({ t: 'petxp', exp: exp }), keepalive: true }).catch(function () {});
+  } catch (e) {}
+}
+// Kéo server về hợp nhất lúc mở trang (không mất tiến trình offline)
+function sbPullStats() {
+  try {
+    if (typeof stToken !== 'function' || typeof stApiRoot !== 'function') return;
+    var tk = stToken(); if (!tk) return;
+    fetch(stApiRoot() + '/api/ustats', { headers: { 'Authorization': 'Bearer ' + tk }, cache: 'no-store' }).then(function (r) { return r.json(); }).then(function (j) {
+      if (!j || typeof j.minutes !== 'number') return;
+      var changed = false;
+      try {
+        var srv = j.bingo || {}, k = 'j2me_bingo_prog', o = JSON.parse(localStorage.getItem(k) || '{}');
+        for (var w in srv) {
+          if (!Object.prototype.hasOwnProperty.call(srv, w)) continue;
+          if (!o[w]) o[w] = {};
+          var c = srv[w] || {};
+          for (var id in c) { if (Object.prototype.hasOwnProperty.call(c, id) && !o[w][id]) { o[w][id] = 1; changed = true; } }
+        }
+        var se = +j.petExp || 0, le = 0;
+        try { le = (S && S.pet && S.pet.exp) || 0; } catch (e) {}
+        if (se > le) { S.pet.exp = se; changed = true; }
+        if (changed) { localStorage.setItem(k, JSON.stringify(o)); save(); }
+      } catch (e) {}
+    }).catch(function () {});
+  } catch (e) {}
+}
 function addXp(n) {
   try {
     var o = JSON.parse(localStorage.getItem('j2me_xp') || '{"xp":0}');
@@ -409,6 +451,7 @@ window.SEN = { feed: feed, play: play, clawStart: clawStart, advStart: advStart,
 
 document.addEventListener('DOMContentLoaded', function () {
   applyTheme(); paint();
+  try { sbPullStats(); } catch (e) {}
   var ts = $('themeSel'); if (ts) ts.onchange = function () { window.SEN.setTheme(ts.value); };
   var cb = $('clawBtn'); if (cb) cb.onclick = clawStart;
   var bb = $('battleBtn'); if (bb) bb.onclick = battle;

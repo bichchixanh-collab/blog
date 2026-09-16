@@ -29,6 +29,15 @@ a.btn{flex:1;min-width:140px;text-align:center;background:linear-gradient(180deg
 a.btn:active{transform:translateY(2px);box-shadow:0 2px 0 #004499}
 a.btn.ghost{background:#fff;color:#0066cc;border:1.5px solid #81c7f0;box-shadow:none}
 .safe{margin-top:10px;font-size:10px;color:#4a7a9a}
+#lockBox{margin-top:10px;text-align:left;background:#e8f4fd;border:1px dashed #81c7f0;border-radius:10px;padding:8px 10px}
+.lockrow{display:flex;gap:6px;align-items:center;font-size:12px;padding:4px 0;border-bottom:1px dashed #b8d8f8}
+.lockrow:last-child{border:none}
+.lockrow b{margin-left:auto;white-space:nowrap}
+.lockrow small{color:#4a7a9a}
+.lockrow.ok{color:#0a9c4a}
+.lockrow.bad{color:#c43c64}
+.lockrow a{white-space:nowrap}
+a.btn.off{opacity:.45;pointer-events:none}
 .foot{background:#1a3a5c;color:#b8d8f8;text-align:center;padding:12px;font-size:11px}
 .foot a{color:#fff}
 </style>
@@ -47,8 +56,9 @@ a.btn.ghost{background:#fff;color:#0066cc;border:1.5px solid #81c7f0;box-shadow:
 <h2>Rời khỏi J2ME?</h2>
 <p>Bạn sắp mở link tải ngoài:</p>
 <p class="gamename" id="gname">…</p>
-<p class="hostline" id="host">Đang kiểm tra link…</p>
-<div class="btns"><a class="btn" id="go" href="#">Mở link »</a><a class="btn ghost" href="index.html">Ở lại</a></div>
+<p class="hostline" id="host">Đang kiểm tra vé tải…</p>
+<div id="lockBox" style="display:none"></div>
+<div class="btns"><a class="btn off" id="go" href="#">Mở link »</a><a class="btn ghost" href="index.html">Ở lại</a></div>
 <p class="safe">🔒 Chỉ tiếp tục nếu host quen thuộc (drive.google.com, mediafire.com…). Không nhập mật khẩu ở trang lạ.</p>
 </div>
 <div class="foot"><p>© <span class="js-year">2026</span> J2ME.VERCEL.APP — Anime WAP</p></div>
@@ -56,22 +66,96 @@ a.btn.ghost{background:#fff;color:#0066cc;border:1.5px solid #81c7f0;box-shadow:
 <script>
 var el=document.getElementById('clock');if(el)el.textContent=new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'});
 (function(){
+  // Mọi link tải đều qua đây bằng vé server — KHÔNG đọc URL file từ games.json,
+  // không hiện link thật trong source. Vé hết hạn 15 phút, sai gate là vô hiệu.
   var TRUST=['drive.google.com','www.mediafire.com','mediafire.com','github.com','raw.githubusercontent.com','cdn.jsdelivr.net'];
   function root(){try{var p=location.pathname||'/';var i=p.lastIndexOf('/');return i<=0?'':p.slice(0,i);}catch(e){return '';}}
-  var q=new URLSearchParams(location.search),id=q.get('id'),res=q.get('res');
-  function fail(t){document.getElementById('host').textContent=t;document.getElementById('go').href='#';}
-  fetch(root()+'/data/games.json',{headers:{Accept:'application/json'}}).then(function(r){return r.json();}).then(function(a){
-    var g=null;for(var i=0;i<a.length;i++)if(a[i].id===id)g=a[i];
-    var u=g&&(g.jar||{})[res];
-    if(!u){document.getElementById('gname').textContent='Link không hợp lệ';fail('Không tìm thấy link tải này.');return;}
-    var h='';try{h=new URL(u).hostname;}catch(e){fail('Link lỗi định dạng.');return;}
-    var ok=TRUST.indexOf(h.toLowerCase())>=0;
-    document.getElementById('gname').textContent=(g.name||id)+' ('+res+')';
-    document.getElementById('host').innerHTML='Host: <b class="'+(ok?'':'bad')+'">'+h+'</b>'+(ok?' ✓ tin cậy':' — lạ, cân nhắc kỹ');
-    document.getElementById('go').href=u;
-  }).catch(function(){fail('Không kiểm tra được link lúc này.');});
+  function fail(t){document.getElementById('host').textContent=t;var b=document.getElementById('go');b.href='#';b.classList.add('off');}
+  function rowsHtml(rows){
+    return rows.map(function(r){
+      var ic=r.pending?'…':(r.ok?'✓':'✗'),cls=r.pending?'':(r.ok?'ok':'bad');
+      var pr=r.pending?'đang kiểm tra...':(r.has+'/'+r.need);
+      return '<div class="lockrow '+cls+'"><span>'+ic+'</span><span>'+r.label+'</span><b>'+pr+'</b>'+(r.ok?'':(r.hint||''))+'</div>';
+    }).join('');
+  }
+  function goRows(gate,appr,sv){
+    var rq=(gate&&gate.require)||{},rows=[],mn=0,lk=0,dn=0;
+    if(sv){mn=+sv.minutes||0;lk=+sv.likes||0;dn=+sv.completed||0;}
+    else{try{mn=stMinutes();}catch(e){} try{lk=stLikes();}catch(e){} try{dn=stDone();}catch(e){}}
+    if(rq.minutes!=null)rows.push({need:+rq.minutes,has:mn,ok:mn>=+rq.minutes,pending:false,label:'Online đủ '+rq.minutes+' phút',hint:'<small>mở web là tự tính</small>'});
+    if(rq.likes!=null)rows.push({need:+rq.likes,has:lk,ok:lk>=+rq.likes,pending:false,label:'Thích '+rq.likes+' game',hint:'<a href="'+root()+'/index.html" style="color:#0066cc">→ thích ngay</a>'});
+    if(rq.completed!=null)rows.push({need:+rq.completed,has:dn,ok:dn>=+rq.completed,pending:false,label:'Phá đảo '+rq.completed+' game',hint:'<small>bấm "Phá đảo?" ở trang game</small>'});
+    if(rq.comments!=null){var pend=(appr==null);rows.push({need:+rq.comments,has:pend?-1:appr,ok:!pend&&appr>=+rq.comments,pending:pend,label:'Có '+rq.comments+' bình luận được duyệt',hint:'<small>bình luận ở trang game, chờ duyệt</small>'});}
+    return rows;
+  }
+  function passAll(rows){for(var i=0;i<rows.length;i++)if(!rows[i].ok)return false;return true;}
+  function boot(){
+    var q;
+    try{q=new URLSearchParams(location.search);}catch(e){fail('Trình duyệt quá cũ.');return;}
+    var ticket=q.get('ticket');
+    if(!ticket){document.getElementById('gname').textContent='Thiếu vé tải';fail('Hãy bấm nút Tải ở trang game để lấy vé mới.');return;}
+    fetch(root()+'/api/meta?ticket='+encodeURIComponent(ticket),{cache:'no-store'}).then(function(r){return r.json().then(function(j){return {st:r.status,j:j};});}).then(function(o){
+      if(o.st!==200||!o.j||!o.j.game){fail(o.st===403?'Vé hết hạn hoặc đã đổi điều kiện khóa. Quay lại trang game bấm Tải để lấy vé mới.':'Không kiểm tra được vé lúc này.');return;}
+      var g=o.j.game,hosts=o.j.host||{};
+      document.getElementById('gname').textContent=(g.name||g.id)+' ('+o.j.res+')';
+      var h=hosts[o.j.res]||'';
+      if(!h){fail('Chưa có link cho bản này.');return;}
+      var res=o.j.res,ok=TRUST.indexOf(String(h).toLowerCase())>=0;
+      document.getElementById('host').innerHTML='Host: <b class="'+(ok?'':'bad')+'">'+h+'</b>'+(ok?' ✓ tin cậy':' — lạ, cân nhắc kỹ');
+      var gate=g.gate||{type:'none'};
+      var needLogin=(gate.type==='login'||!!gate.login);
+      var loggedNow=false; try{loggedNow=stLogged();}catch(e){}
+      if(needLogin&&!loggedNow){document.getElementById('gname').textContent=(g.name||g.id)+' ('+o.j.res+')';fail('Bài này chỉ dành cho thành viên. Hãy đăng nhập rồi bấm Tải lại ở trang game.');return;}
+      function open(){var b=document.getElementById('go');b.href=root()+'/api/dl?ticket='+encodeURIComponent(ticket);b.classList.remove('off');}
+      if(!gate.type||gate.type==='none'||gate.type!=='stats'){
+        // Vé đã qua kiểm tra proof ở server lúc cấp → mở luôn
+        open();return;
+      }
+      var box=document.getElementById('lockBox');box.style.display='block';
+      var hardNow=false; try{hardNow=stLogged();}catch(e){}
+      var modeHtml=hardNow?'🔒 <b>Khóa cứng</b> <small>(theo tài khoản)</small><div style="margin-top:4px">':'<div>';
+      var modeFoot=hardNow?'':'<div style="margin-top:4px"><small><a href="'+root()+'/dang-nhap.html" style="color:#0066cc">Đăng nhập</a> để khóa cứng theo tài khoản</small></div>';
+      // Đã đăng nhập: lấy số server-side cho hiển thị (server đã kiểm cứng lúc cấp vé)
+      function withVals(cb){
+        if(!hardNow){cb(null);return;}
+        try{fetch(root()+'/api/ustats',{headers:{'Authorization':'Bearer '+stToken()},cache:'no-store'}).then(function(r){return r.json();}).then(function(j){cb(j&&typeof j.minutes==='number'?j:null);}).catch(function(){cb(null);});}catch(e){cb(null);}
+      }
+      withVals(function(sv){
+        var rows0=goRows(gate,null,sv);
+        var needCmt=rows0.some(function(r){return r.pending;});
+        function show(rows){
+          box.innerHTML=modeHtml+rowsHtml(rows)+'</div>'+modeFoot;
+          if(passAll(rows))open();
+          else fail('Chưa đủ điều kiện khóa — xem tiến độ bên dưới, cày thêm rồi bấm Tải lại ở trang game.');
+        }
+        if(needCmt){box.innerHTML=modeHtml+rowsHtml(rows0)+'</div>'+modeFoot;try{stApprovedCount(function(n){show(goRows(gate,n,sv));});}catch(e){show(rows0);}}
+        else show(rows0);
+      });
+    }).catch(function(){fail('Không kiểm tra được vé lúc này.');});
+  }
+  if(typeof stMinutes==='function')boot();
+  else document.addEventListener('DOMContentLoaded',boot,{once:true});
 })();
 </script>
 <script>try{document.querySelectorAll('.js-year').forEach(function(el){el.textContent=new Date().getFullYear();});}catch(e){}</script>
+<script>
+// Stats local cho khóa tải: phút online + lượt thích + phá đảo + tên bình luận
+function stGet(k,d){try{var v=localStorage.getItem(k);return v==null?d:JSON.parse(v);}catch(e){return d;}}
+function stSet(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+function stMinutes(){return Math.floor((+stGet('j2me_online_ms',0))/60000);}
+function stLikes(){var a=stGet('j2me_favs',[]);return Array.isArray(a)?a.length:0;}
+function stDone(){var a=stGet('j2me_done',[]);return Array.isArray(a)?a.length:0;}
+function stNames(){var a=stGet('j2me_names',[]);return Array.isArray(a)?a.filter(Boolean).slice(0,5):[];}
+function stSaveName(n){n=String(n||'').trim().slice(0,30);if(n.length<2)return;var a=stNames(),l=n.toLowerCase(),has=false;for(var i=0;i<a.length;i++)if(String(a[i]).toLowerCase()===l)has=true;if(!has){a.push(n);stSet('j2me_names',a.slice(-5));}}
+function stApiRoot(){try{var p=location.pathname||'/';var gi=p.indexOf('/game/');return gi>=0?p.slice(0,gi):'';}catch(e){return '';}}
+function stToken(){try{var s=JSON.parse(localStorage.getItem('sb_session')||'null');return (s&&s.access_token)||'';}catch(e){return '';}}
+function stUid(){try{var t=stToken();if(!t)return '';var p=(t.split('.')[1]||'').replace(/-/g,'+').replace(/_/g,'/');while(p.length%4)p+='=';var j=JSON.parse(atob(p));return j.sub||'';}catch(e){return '';}}
+function stLogged(){return !!stToken();}
+function stAuthHeaders(){var t=stToken();return t?{'Authorization':'Bearer '+t}:{};}
+function stEvent(t,id){try{var tk=stToken();if(!tk)return;fetch(stApiRoot()+'/api/ustats',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+tk},body:JSON.stringify({t:t,id:String(id||'').slice(0,120)}),keepalive:true}).catch(function(){});}catch(e){}}
+var _stApprCache={at:0,n:-1};
+function stApprovedCount(cb){var now=Date.now();if(_stApprCache.n>=0&&now-_stApprCache.at<300000){cb(_stApprCache.n);return;}var tk='';try{tk=stToken();}catch(e){}var names=stNames();if(!tk&&!names.length){cb(0);return;}var url=stApiRoot()+'/api/comments?mine=1'+(tk?'':'&names='+encodeURIComponent(names.join(',')));var hh=tk?{'Authorization':'Bearer '+tk}:{};fetch(url,{headers:hh,cache:'no-store'}).then(function(r){return r.json();}).then(function(j){var n=+(j&&j.mine)||0;_stApprCache={at:now,n:n};cb(n);}).catch(function(){cb(_stApprCache.n>=0?_stApprCache.n:0);});}
+(function(){try{setInterval(function(){try{if(document.hidden)return;var ms=+localStorage.getItem('j2me_online_ms')||0;localStorage.setItem('j2me_online_ms',String(ms+60000));}catch(e){}try{var tk=stToken();if(tk)fetch(stApiRoot()+'/api/ustats',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+tk},body:JSON.stringify({t:'heartbeat'}),keepalive:true}).catch(function(){});}catch(e){}},60000);}catch(e){}})();
+</script>
 </body>
 </html>
