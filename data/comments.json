@@ -43,14 +43,5 @@
         "text": "bulul1",
         "status": "pending",
         "created_at": "2026-09-16T23:42:39.543Z"
-    },
-    {
-        "id": "cmu50q1m86km3",
-        "game": "haku-farm",
-        "name": "bakawap",
-        "stars": 5,
-        "text": "test bình luận số 1",
-        "status": "approved",
-        "created_at": "2026-09-17T04:17:06.224Z"
     }
 ]
