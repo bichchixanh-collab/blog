@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Đăng nhập - J2ME.VERCEL.APP</title>
+<meta name="description" content="Đăng nhập tài khoản J2ME để đồng bộ pet, bingo, huy hiệu qua mọi máy.">
+<meta name="theme-color" content="#0066cc">
+<meta name="robots" content="noindex">
+<link rel="icon" href="assets/anime-girl.png" type="image/png">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#e8f4fd;padding:12px;font-family:"Be Vietnam Pro",system-ui,sans-serif;color:#1a3a5c;min-height:100vh}
+.app{max-width:420px;margin:0 auto;background:#fff;border:2px solid #4da6ff;border-radius:16px;overflow:hidden;box-shadow:0 6px 20px rgba(0,102,204,.18)}
+.top{display:flex;justify-content:space-between;background:#1a1a2e;color:#7fb1ff;font-family:monospace;font-size:11px;padding:6px 12px}
+.hero{background:linear-gradient(135deg,#4da6ff,#0066cc);color:#fff;text-align:center;padding:18px 12px 14px}
+.hero .mascot{width:72px;height:72px;border-radius:50%;border:2px solid #fff;background:#fff;object-fit:cover;margin:0 auto 8px;display:block}
+.hero h1{font-family:"Mali",cursive,sans-serif;font-size:18px}
+.hero p{font-size:11px;opacity:.9}
+.body{position:relative;margin:10px;border:2px solid #4da6ff;border-radius:14px;padding:16px 14px;background:#fff}
+.body::before{content:"";position:absolute;inset:6px;border:1.6px dashed #81c7f0;border-radius:10px;pointer-events:none}
+label{font-size:11px;font-weight:700;color:#0066cc;display:block;margin:8px 0 4px}
+input{width:100%;padding:9px 10px;border:1.5px solid #81c7f0;border-radius:10px;font-size:13px;font-family:inherit;background:#fff}
+input:focus{outline:2px solid #4da6ff;border-color:#0066cc}
+#sbMsg{font-size:12px;background:#e8f4fd;border:1px dashed #81c7f0;border-radius:10px;padding:8px;margin-top:10px;line-height:1.6;min-height:36px}
+#sbMsg.ok{border-color:#0a9c4a;background:#e6f9ec}
+#sbMsg.err{border-color:#c43c64;background:#fff0f3}
+.rowbtns{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.btn{flex:1;min-width:130px;background:linear-gradient(180deg,#4da6ff,#0066cc);color:#fff;border:2px solid #fff;border-radius:24px;padding:9px;font-weight:800;font-size:12px;cursor:pointer;font-family:"Mali",cursive,sans-serif;box-shadow:0 4px 0 #004499}
+.btn:active{transform:translateY(2px);box-shadow:0 2px 0 #004499}
+.btn.ghost{background:#fff;color:#0066cc;border:1.5px solid #81c7f0;box-shadow:none}
+.who{display:none;font-size:12px;background:#e6f9ec;border:1px solid #0a9c4a;border-radius:10px;padding:8px;margin-top:10px;line-height:1.7}
+.foot{background:#1a3a5c;color:#b8d8f8;text-align:center;padding:12px;font-size:11px}
+.foot a{color:#fff}
+small.dim{color:#4a7a9a;font-size:10px}
+</style>
+<link rel="stylesheet" href="assets/css/manga.css?v=7">
+</head>
+<body>
+<div class="app">
+<div class="top"><span>◉ TÀI KHOẢN</span><span id="clock">00:00</span><span>♡ J2ME</span></div>
+<div class="hero">
+<img class="site-logo" src="assets/logo.png" alt="J2ME.VERCEL.APP" width="720" height="287" style="display:block;width:100%;max-width:320px;height:auto;margin:0 auto 8px" decoding="async" fetchpriority="high" onerror="this.style.display='none'">
+<img class="mascot" src="assets/anime-girl.png" alt="anime" width="72" height="72" onerror="this.style.display='none'">
+<h1>Đăng nhập Senpai</h1>
+<p>1 tài khoản, đồng bộ pet + bingo mọi máy</p>
+</div>
+<div class="body">
+<div class="who" id="whoBox"></div>
+<div id="formBox">
+<label>Email</label>
+<input id="sbEmail" type="email" placeholder="ban@email.com" autocomplete="email">
+<label>Mật khẩu (≥6 ký tự)</label>
+<input id="sbPass" type="password" placeholder="••••••" autocomplete="current-password">
+<div class="rowbtns"><button class="btn" id="btnIn">Đăng nhập</button><button class="btn ghost" id="btnUp">Đăng ký</button></div>
+<div class="rowbtns"><button class="btn ghost" id="btnMagic" style="flex:1">✉️ Gửi link đăng nhập ma thuật</button></div>
+</div>
+<div id="sbMsg">Chưa đăng nhập — pet và bingo vẫn lưu trên máy này, đăng nhập để giữ khi đổi máy.</div>
+<p style="margin-top:8px"><a href="index.html" style="font-size:11px">‹ Về trang chủ</a></p>
+</div>
+<div class="foot"><p>© <span class="js-year">2026</span> J2ME.VERCEL.APP</p></div>
+</div>
+<script>var el=document.getElementById('clock');if(el)el.textContent=new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'});try{document.querySelectorAll('.js-year').forEach(function(x){x.textContent=new Date().getFullYear();});}catch(e){}</script>
+<script src="assets/js/sb-config.js"></script>
+<script src="assets/js/sb-auth.js"></script>
+<script src="assets/js/sb-sync.js"></script>
+<script src="assets/js/sb-board.js"></script>
+<script>
+(function(){
+  var $=function(id){return document.getElementById(id);};
+  function say(t,cls){var m=$('sbMsg');m.className=cls||'';m.innerHTML=t;}
+  async function paint(){
+    console.log('[dangnhap] paint start, SBAuth=', typeof window.SBAuth, 'SBSync=', typeof window.SBSync);
+    try{await window.SBAuth.fromUrl();}catch(e){console.log('[dangnhap] fromUrl err', e);}
+    var u=null; try{u=await window.SBAuth.me();}catch(e){console.log('[dangnhap] me err', e);}
+    console.log('[dangnhap] user=', u && (u.email || u.id));
+    if(u&&(u.email||u.id)){
+      $('whoBox').style.display='block';
+      $('whoBox').innerHTML='Đã đăng nhập: <b>'+String(u.email||u.id).replace(/[<>&"]/g,'')+'</b><br><small id="syncState" style="color:#4a7a9a">Đang đồng bộ…</small><div class="rowbtns"><button class="btn ghost" id="btnSync">🔄 Đồng bộ ngay</button><button class="btn ghost" id="btnOut">Đăng xuất</button></div>';
+      $('formBox').style.display='none';
+      say('Xin chào Senpai~ Tài khoản đã sẵn sàng đồng bộ.','ok');
+      const doSync=function(){var st=$('syncState');if(st)st.textContent='Đang đồng bộ…';window.SBSync.syncNow().then(function(r){if(st)st.textContent='Đã đồng bộ ✓ XP '+r.xp+(r.fromCloud?' (đã kéo bản mới từ cloud)':'');}).catch(function(e){if(st)st.textContent='Đồng bộ lỗi: '+e.message+' (cần chạy SQL tạo bảng senpai)';});};
+      $('btnSync').onclick=doSync;
+      try{if(window.SBSync)doSync();}catch(e){}
+      try{if(window.SBBoard)window.SBBoard.ensureProfile().catch(function(){});}catch(e){}
+      $('btnOut').onclick=function(){window.SBAuth.signOut().then(function(){location.reload();});};
+    }
+  }
+  function val(){return {e:$('sbEmail').value.trim(),p:$('sbPass').value};}
+  $('btnIn').onclick=function(){var v=val();if(!v.e||v.p.length<6)return say('Nhập email + mật khẩu ≥6 ký tự.','err');say('Đang đăng nhập…');window.SBAuth.signIn(v.e,v.p).then(function(){location.reload();}).catch(function(e){say('Lỗi: '+e.message,'err');});};
+  $('btnUp').onclick=function(){var v=val();if(!v.e||v.p.length<6)return say('Nhập email + mật khẩu ≥6 ký tự.','err');say('Đang tạo tài khoản…');window.SBAuth.signUp(v.e,v.p).then(function(r){if(r.session)location.reload();else say('Đã tạo! Check mail bấm link xác nhận rồi đăng nhập.','ok');}).catch(function(e){say('Lỗi: '+e.message,'err');});};
+  $('btnMagic').onclick=function(){var v=val();if(!v.e)return say('Nhập email trước đã.','err');say('Đang gửi link…');window.SBAuth.magic(v.e).then(function(){say('Đã gửi! Mở mail bấm link để vào.','ok');}).catch(function(e){say('Lỗi: '+e.message,'err');});};
+  paint();
+})();
+</script>
+</body>
+</html>
