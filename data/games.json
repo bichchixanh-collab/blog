@@ -1,5 +1,39 @@
 [
     {
+        "id": "phong-van-huyen-hoa",
+        "name": "Phong Vân Huyễn Hóa",
+        "cat": "Nhập vai",
+        "size": "1.04 MB",
+        "res": [
+            "240x320"
+        ],
+        "hot": false,
+        "vi": false,
+        "new": false,
+        "gate": {
+            "type": "stats",
+            "require": {
+                "minutes": 10,
+                "comments": 2
+            }
+        },
+        "desc": "Trải nghiệm hành động cực nhanh, những trận chiến bùng nổ, kỹ năng mãn nhãn, cốt truyện hấp dẫn và điều khiển mượt mà, trực quan. Đây chắc chắn là một game hành động đỉnh cao sẽ mang đến cho bạn cảm giác hồi hộp tột đỉnh! Bạn còn chờ gì nữa? Bước vào thế giới **Phong Vân Huyễn Hóa** và trải nghiệm những trận chiến chưa từng có!",
+        "thumb": "https:\/\/i.ibb.co\/9HVF8QbH\/wm-1789821407809.jpg",
+        "shots": [
+            "https:\/\/i.ibb.co\/9HVF8QbH\/wm-1789821407809.jpg",
+            "https:\/\/i.ibb.co\/wFGbyZbR\/wm-1789821409159.jpg",
+            "https:\/\/i.ibb.co\/zT7RqBks\/wm-1789821409568.jpg",
+            "https:\/\/i.ibb.co\/Mxb5dYgw\/wm-1789821410220.jpg",
+            "https:\/\/i.ibb.co\/Y7wM7RmB\/wm-1789821410897.jpg"
+        ],
+        "jar": {
+            "240x320": "https:\/\/www.mediafire.com\/file\/7ge7b34nmyn0dn7\/pvhh-vn-vh_bakawap.jar\/file"
+        },
+        "downloads": 0,
+        "created_at": "2026-09-19T14:48:21+02:00",
+        "updated_at": "2026-09-19T14:48:21+02:00"
+    },
+    {
         "id": "phuc-ma-doat-hon-nhan",
         "name": "Phục Ma Đoạt Hồn Nhận",
         "cat": "Nhập vai",
