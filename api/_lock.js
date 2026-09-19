@@ -1,8 +1,9 @@
 // api/_lock.js — dùng chung cho khóa tải: vé HMAC, mã hóa URL, proof mở rộng.
-// Không tài khoản nên stats local (phút online/like/phá đảo) chỉ tin ở mức
-// "khóa mềm" như bingo line hiện tại; riêng bình luận duyệt được server đếm chéo.
-// Cần LOCK_SECRET (Vercel env + local admin) để vé/URL mã hóa chống giả thật sự;
-// thiếu secret vẫn chạy ở chế độ mềm (vé ký khóa mặc định, URL plaintext).
+// Phút online của khách được chứng minh bằng presence chain (HMAC, stateless):
+// mỗi link cách nhau ≥50s nên không thể bịa số phút mà không chờ thời gian thật.
+// Like/phá đảo vẫn là số local (khóa mềm); bình luận duyệt được server đếm chéo.
+// Cần LOCK_SECRET (Vercel env + local admin) để vé/URL/presence chống giả thật sự;
+// thiếu secret thì phút online rớt về chế độ mềm cũ (tin st.min tự khai).
 const crypto = require('crypto');
 
 function lockSecret() {
@@ -85,11 +86,74 @@ function resolveJarUrl(jar, resName, gameId) {
   if (stored.startsWith('ENC:')) return decryptUrl(stored, gameId);
   return /^https?:\/\//i.test(stored) ? stored : null;
 }
+// --- Presence chain: chứng minh phút online của khách, không tài khoản, không DB ---
+// Token = {v,n,iat,iph} + HMAC(LOCK_SECRET). Mỗi link nối tiếp yêu cầu link trước
+// hợp lệ và cách nhau ≥50s (thời gian lấy từ iat đã ký — client không bịa được).
+// Song song bao nhiêu tab cũng không tăng nhanh hơn 1 link/50s vì iat neo theo link mới nhất.
+// iph = hash IP: share token sang IP khác thì rớt (chấp nhận phần dư cùng NAT).
+const PRESENCE_MIN_MS = 50 * 1000;
+const PRESENCE_MAX_AGE_MS = 48 * 3600 * 1000; // khớp cửa sổ proof day (±2 ngày)
+function presenceIpHash(ip) {
+  try { return crypto.createHash('sha256').update(String(ip || ''), 'utf8').digest('hex').slice(0, 16); }
+  catch { return ''; }
+}
+function signPresence(o) {
+  const body = b64uEncode(JSON.stringify(o));
+  const sig = crypto.createHmac('sha256', hkey('presence')).update(body, 'utf8').digest('hex');
+  return `${body}.${sig}`;
+}
+function readPresence(tok) {
+  try {
+    if (!tok || typeof tok !== 'string') return null;
+    const parts = tok.split('.');
+    if (parts.length !== 2) return null;
+    const [body, sig] = parts;
+    const want = crypto.createHmac('sha256', hkey('presence')).update(body, 'utf8').digest('hex');
+    const a = Buffer.from(String(sig).toLowerCase(), 'utf8');
+    const b = Buffer.from(want, 'utf8');
+    if (a.length !== b.length || !crypto.timingSafeEqual(a, b)) return null;
+    const raw = b64uDecode(body);
+    if (!raw) return null;
+    const o = JSON.parse(raw.toString('utf8'));
+    if (!o || o.v !== 1 || typeof o.n !== 'number' || typeof o.iat !== 'number') return null;
+    return o;
+  } catch { return null; }
+}
+// Đổi link mới. Trả về token (mới hoặc giữ nguyên nếu gọi quá sớm — idempotent).
+function mintPresence(prevTok, ip) {
+  try {
+    const now = Date.now();
+    const iph = presenceIpHash(ip);
+    const prev = readPresence(prevTok);
+    if (!prev || prev.iph !== iph || prev.iat > now + 120 * 1000) {
+      return signPresence({ v: 1, n: 0, iat: now, iph });
+    }
+    if (now - prev.iat < PRESENCE_MIN_MS) return prevTok; // quá sớm: giữ nguyên, không lỗi
+    const n = Math.min(99999, Math.max(0, Math.floor(prev.n) || 0) + 1);
+    return signPresence({ v: 1, n, iat: now, iph });
+  } catch { return null; }
+}
+// Verify token nộp kèm proof. Trả về {n} hoặc null.
+function verifyPresence(tok, ip) {
+  try {
+    const o = readPresence(tok);
+    if (!o) return null;
+    const now = Date.now();
+    if (o.iph !== presenceIpHash(ip)) return null;
+    if (o.iat > now + 120 * 1000) return null;
+    if (now - o.iat > PRESENCE_MAX_AGE_MS) return null;
+    const n = Math.floor(o.n);
+    if (!Number.isFinite(n) || n < 0 || n > 99999) return null;
+    return { n };
+  } catch { return null; }
+}
 // Kiểm tra proof client ký (tương thích proof cũ {id,day,lines} + proof mới có st).
 // Trả về {ok, reason}.
 // - serverStats != null: KHÓA CỨNG — dùng số server-side theo tài khoản, bỏ qua tự khai.
-// - serverStats == null: khóa mềm (số local + đếm bình luận chéo theo tên).
-async function checkProofExtended(p, id, gate, countApproved, serverStats, authed) {
+// - serverStats == null: phút online ƯU TIÊN presence chain đã ký (fail-closed khi có
+//   LOCK_SECRET); chỉ rớt về st.min tự khai khi thiếu secret (chế độ dev).
+//   Like/phá đảo vẫn mềm; bình luận duyệt đếm chéo theo tên.
+async function checkProofExtended(p, id, gate, countApproved, serverStats, authed, clientIp) {
   try {
     if (!p) return { ok: false, reason: 'missing proof' };
     const raw = b64uDecode(p);
@@ -139,7 +203,17 @@ async function checkProofExtended(p, id, gate, countApproved, serverStats, authe
       }
       const st = (o && o.st) || {};
       const num = (v) => (typeof v === 'number' && Number.isFinite(v) ? v : -1);
-      if (rq.minutes != null && !(num(st.min) >= rq.minutes)) return { ok: false, reason: 'minutes' };
+      if (rq.minutes != null) {
+        // Ưu tiên presence chain đã ký — không bịa được nếu không có LOCK_SECRET
+        const pv = verifyPresence(o.presence, clientIp);
+        if (pv) {
+          if (!(pv.n >= rq.minutes)) return { ok: false, reason: 'minutes' };
+        } else if (lockSecret()) {
+          return { ok: false, reason: 'minutes' }; // siết: có secret mà không có chain hợp lệ
+        } else if (!(num(st.min) >= rq.minutes)) {
+          return { ok: false, reason: 'minutes' }; // thiếu secret: giữ chế độ mềm cũ
+        }
+      }
       if (rq.likes != null && !(num(st.likes) >= rq.likes)) return { ok: false, reason: 'likes' };
       if (rq.completed != null && !(num(st.done) >= rq.completed)) return { ok: false, reason: 'completed' };
       if (rq.comments != null) {
@@ -153,4 +227,4 @@ async function checkProofExtended(p, id, gate, countApproved, serverStats, authe
     return { ok: true };
   } catch { return { ok: false, reason: 'bad proof' }; }
 }
-module.exports = { lockSecret, hkey, b64uEncode, b64uDecode, gateHash, stableGate, mintTicket, verifyTicket, decryptUrl, resolveJarUrl, checkProofExtended, TICKET_TTL_MS };
+module.exports = { lockSecret, hkey, b64uEncode, b64uDecode, gateHash, stableGate, mintTicket, verifyTicket, decryptUrl, resolveJarUrl, checkProofExtended, mintPresence, verifyPresence, readPresence, presenceIpHash, TICKET_TTL_MS };

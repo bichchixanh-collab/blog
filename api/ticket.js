@@ -61,7 +61,7 @@ module.exports = async (req, res) => {
         if (!serverStats) { send(res, 503, { error: 'stats unavailable' }); return; }
       }
       const proof = req.query && req.query.proof;
-      const chk = await checkProofExtended(proof, id, gate, countApproved, serverStats, !!me);
+      const chk = await checkProofExtended(proof, id, gate, countApproved, serverStats, !!me, ipOf(req));
       if (!chk.ok) { send(res, 403, { error: 'locked', reason: chk.reason, hard: serverStats ? 1 : 0 }); return; }
       hard = chk.hard ? 1 : 0;
     }

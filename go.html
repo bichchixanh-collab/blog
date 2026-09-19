@@ -82,7 +82,7 @@ var el=document.getElementById('clock');if(el)el.textContent=new Date().toLocale
   function goRows(gate,appr,sv){
     var rq=(gate&&gate.require)||{},rows=[],mn=0,lk=0,dn=0;
     if(sv){mn=+sv.minutes||0;lk=+sv.likes||0;dn=+sv.completed||0;}
-    else{try{mn=stMinutes();}catch(e){} try{lk=stLikes();}catch(e){} try{dn=stDone();}catch(e){}}
+    else{try{mn=stVerifiedMin();}catch(e){} try{lk=stLikes();}catch(e){} try{dn=stDone();}catch(e){}}
     if(rq.minutes!=null)rows.push({need:+rq.minutes,has:mn,ok:mn>=+rq.minutes,pending:false,label:'Online đủ '+rq.minutes+' phút',hint:'<small>mở web là tự tính</small>'});
     if(rq.likes!=null)rows.push({need:+rq.likes,has:lk,ok:lk>=+rq.likes,pending:false,label:'Thích '+rq.likes+' game',hint:'<a href="'+root()+'/index.html" style="color:#0066cc">→ thích ngay</a>'});
     if(rq.completed!=null)rows.push({need:+rq.completed,has:dn,ok:dn>=+rq.completed,pending:false,label:'Phá đảo '+rq.completed+' game',hint:'<small>bấm "Phá đảo?" ở trang game</small>'});
@@ -145,6 +145,8 @@ var el=document.getElementById('clock');if(el)el.textContent=new Date().toLocale
 function stGet(k,d){try{var v=localStorage.getItem(k);return v==null?d:JSON.parse(v);}catch(e){return d;}}
 function stSet(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
 function stMinutes(){return Math.floor((+stGet('j2me_online_ms',0))/60000);}
+function stPresence(){try{var p=JSON.parse(localStorage.getItem('j2me_presence')||'null');if(p&&typeof p.tok==='string'&&p.tok)return {tok:p.tok,n:Math.max(0,parseInt(p.n||0,10)||0)};}catch(e){}return null;}
+function stVerifiedMin(){var pr=stPresence();return pr?pr.n:stMinutes();}
 function stLikes(){var a=stGet('j2me_favs',[]);return Array.isArray(a)?a.length:0;}
 function stDone(){var a=stGet('j2me_done',[]);return Array.isArray(a)?a.length:0;}
 function stNames(){var a=stGet('j2me_names',[]);return Array.isArray(a)?a.filter(Boolean).slice(0,5):[];}
@@ -157,7 +159,7 @@ function stAuthHeaders(){var t=stToken();return t?{'Authorization':'Bearer '+t}:
 function stEvent(t,id){try{var tk=stToken();if(!tk)return;fetch(stApiRoot()+'/api/ustats',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+tk},body:JSON.stringify({t:t,id:String(id||'').slice(0,120)}),keepalive:true}).catch(function(){});}catch(e){}}
 var _stApprCache={at:0,n:-1};
 function stApprovedCount(cb){var now=Date.now();if(_stApprCache.n>=0&&now-_stApprCache.at<60000){cb(_stApprCache.n);return;}var tk='';try{tk=stToken();}catch(e){}var names=stNames();if(!tk&&!names.length){cb(0);return;}var url=stApiRoot()+'/api/comments?mine=1'+(names.length?'&names='+encodeURIComponent(names.join(',')):'');var hh=tk?{'Authorization':'Bearer '+tk}:{};fetch(url,{headers:hh,cache:'no-store'}).then(function(r){return r.json();}).then(function(j){var n=+(j&&j.mine)||0;_stApprCache={at:now,n:n};cb(n);}).catch(function(){cb(_stApprCache.n>=0?_stApprCache.n:0);});}
-(function(){try{setInterval(function(){try{if(document.hidden)return;var ms=+localStorage.getItem('j2me_online_ms')||0;localStorage.setItem('j2me_online_ms',String(ms+60000));}catch(e){}try{var tk=stToken();if(tk)fetch(stApiRoot()+'/api/ustats',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+tk},body:JSON.stringify({t:'heartbeat'}),keepalive:true}).catch(function(){});}catch(e){}},60000);}catch(e){}})();
+(function(){try{setInterval(function(){try{if(document.hidden)return;var ms=+localStorage.getItem('j2me_online_ms')||0;localStorage.setItem('j2me_online_ms',String(ms+60000));}catch(e){}try{var tk=stToken();if(tk)fetch(stApiRoot()+'/api/ustats',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+tk},body:JSON.stringify({t:'heartbeat'}),keepalive:true}).catch(function(){});}catch(e){}try{var pr=null;try{pr=JSON.parse(localStorage.getItem('j2me_presence')||'null');}catch(e){}fetch(stApiRoot()+'/api/presence',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({tok:(pr&&pr.tok)||''}),keepalive:true}).then(function(r){return r.json();}).then(function(j){if(j&&j.tok)try{localStorage.setItem('j2me_presence',JSON.stringify({tok:j.tok,n:j.n||0}));}catch(e){}}).catch(function(){});}catch(e){}},60000);}catch(e){}})();
 </script>
 </body>
 </html>

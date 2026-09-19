@@ -17,11 +17,10 @@ function loadGames() {
 function siteOf(req) {
   return `${req.headers['x-forwarded-proto'] || 'https'}://${req.headers['x-forwarded-host'] || req.headers.host}`;
 }
-// Khóa mềm: game có gate yêu cầu proof (client tự ký khi local đủ điều kiện).
-// Server kiểm được: đúng game + ngày tươi + bingo lines + số bình luận duyệt (đếm chéo DB).
-// Phút online/like/phá đảo là số local, tin ở mức khóa mềm như bingo trước nay.
-// Muốn khóa cứng thật sự phải có tài khoản — đã ghi rõ, không hứa quá.
-async function checkProofLegacy(p, id, gate) {
+// Game có gate yêu cầu proof: server kiểm đúng game + ngày tươi + bingo lines +
+// số bình luận duyệt (đếm chéo DB) + phút online qua presence chain đã ký.
+// Like/phá đảo vẫn là số local (khóa mềm); chỉ phút online là siết cứng cho cả khách.
+async function checkProofLegacy(p, id, gate, req) {
   try {
     if (!p) return false;
     const { b64uDecode } = require('./_lock');
@@ -37,7 +36,7 @@ async function checkProofLegacy(p, id, gate) {
       if (!(o.lines >= need)) return false;
     }
     if (gate.type === 'stats') {
-      const chk = await checkProofExtended(p, id, gate, countApproved);
+      const chk = await checkProofExtended(p, id, gate, countApproved, null, false, req ? ipOf(req) : '');
       if (!chk.ok) return false;
     }
     return true;
@@ -82,7 +81,7 @@ module.exports = async (req, res) => {
     res.end();
     return;
   }
-  if (gate && !await checkProofLegacy(q.proof, id, gate)) {
+  if (gate && !await checkProofLegacy(q.proof, id, gate, req)) {
     res.statusCode = 302;
     res.setHeader('Location', `${siteOf(req)}/game/${encodeURIComponent(id)}.html?locked=1`);
     res.end();

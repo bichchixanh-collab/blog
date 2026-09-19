@@ -511,7 +511,8 @@ let deferredPrompt=null;
 window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();deferredPrompt=e;try{document.querySelectorAll('.pwa-install').forEach(function(b){b.style.display='';});}catch(err){}});
 function installApp(){if(deferredPrompt){try{deferredPrompt.prompt();deferredPrompt=null;}catch(e){}}else{alert('Mở menu trình duyệt → "Thêm vào màn hình chính" để cài app.');}}
 // Bingo tuần + khóa tải: bảng Deterministic theo tuần (KHỚP senpai.js), helper đánh dấu tiến trình.
-// Lưu ý: khóa tải là khóa mềm (không tài khoản thì server không xác minh được) — đủ chặn link copy tay qua proof.
+// Lưu ý: phút online của khách được server xác minh qua presence chain đã ký;
+// like/phá đảo vẫn là số local (khóa mềm) — đủ chặn link copy tay qua proof.
 function __bm(a){try{var W=__bw();var k='j2me_bingo_prog',o=JSON.parse(localStorage.getItem(k)||'{}');if(!o[W])o[W]={};if(!o[W][a]){o[W][a]=1;localStorage.setItem(k,JSON.stringify(o));}try{stEvent('bingo',a);}catch(_e){}}catch(e){}}
 function __bw(d){d=d||new Date();var t=new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()));var day=(t.getUTCDay()+6)%7;t.setUTCDate(t.getUTCDate()-day+3);var f=new Date(Date.UTC(t.getUTCFullYear(),0,4));var fd=(f.getUTCDay()+6)%7;f.setUTCDate(f.getUTCDate()-fd+3);var w=1+Math.round((t-f)/6048e5);return t.getUTCFullYear()+'-W'+('0'+w).slice(-2);}
 function __bboard(){
@@ -550,11 +551,12 @@ function __proof(g){
     try{st.done=stDone();}catch(e){}
     try{st.names=stNames();}catch(e){}
     var o={id:g.id,day:new Date().toISOString().slice(0,10),lines:__blines(),st:st};
+    try{var pr=stPresence();if(pr)o.presence=pr.tok;}catch(e){}
     return btoa(unescape(encodeURIComponent(JSON.stringify(o)))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
   }catch(e){return '';}
 }
 // --- Khóa tải kiểu stats: phút online / bình luận duyệt / like / phá đảo (gộp AND) ---
-function __statVals(){var o={min:0,likes:0,done:0};try{o.min=stMinutes();}catch(e){}try{o.likes=stLikes();}catch(e){}try{o.done=stDone();}catch(e){}return o;}
+function __statVals(){var o={min:0,likes:0,done:0};try{o.min=stVerifiedMin();}catch(e){}try{o.likes=stLikes();}catch(e){}try{o.done=stDone();}catch(e){}return o;}
 function __statsRows(g,apprN){
   var rq=(g.gate&&g.gate.require)||{},rows=[],v=__statVals();
   if(rq.minutes!=null)rows.push({k:'m',need:+rq.minutes,has:v.min,ok:v.min>=+rq.minutes,label:'Online đủ '+rq.minutes+' phút',hint:'<small>mở web là tự tính</small>'});
@@ -846,6 +848,10 @@ renderDetail();
 function stGet(k,d){try{var v=localStorage.getItem(k);return v==null?d:JSON.parse(v);}catch(e){return d;}}
 function stSet(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
 function stMinutes(){return Math.floor((+stGet('j2me_online_ms',0))/60000);}
+// Số phút đã ký bởi server (presence chain) — đây mới là số được chấp nhận khi xin vé.
+// Chưa có chain thì rớt về số local để hiển thị; server siết: thiếu chain hợp lệ là rớt vé.
+function stPresence(){try{var p=JSON.parse(localStorage.getItem('j2me_presence')||'null');if(p&&typeof p.tok==='string'&&p.tok)return {tok:p.tok,n:Math.max(0,parseInt(p.n||0,10)||0)};}catch(e){}return null;}
+function stVerifiedMin(){var pr=stPresence();return pr?pr.n:stMinutes();}
 function stLikes(){var a=stGet('j2me_favs',[]);return Array.isArray(a)?a.length:0;}
 function stDone(){var a=stGet('j2me_done',[]);return Array.isArray(a)?a.length:0;}
 function stNames(){var a=stGet('j2me_names',[]);return Array.isArray(a)?a.filter(Boolean).slice(0,5):[];}
@@ -858,7 +864,7 @@ function stAuthHeaders(){var t=stToken();return t?{'Authorization':'Bearer '+t}:
 function stEvent(t,id){try{var tk=stToken();if(!tk)return;fetch(stApiRoot()+'/api/ustats',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+tk},body:JSON.stringify({t:t,id:String(id||'').slice(0,120)}),keepalive:true}).catch(function(){});}catch(e){}}
 var _stApprCache={at:0,n:-1};
 function stApprovedCount(cb){var now=Date.now();if(_stApprCache.n>=0&&now-_stApprCache.at<60000){cb(_stApprCache.n);return;}var tk='';try{tk=stToken();}catch(e){}var names=stNames();if(!tk&&!names.length){cb(0);return;}var url=stApiRoot()+'/api/comments?mine=1'+(names.length?'&names='+encodeURIComponent(names.join(',')):'');var hh=tk?{'Authorization':'Bearer '+tk}:{};fetch(url,{headers:hh,cache:'no-store'}).then(function(r){return r.json();}).then(function(j){var n=+(j&&j.mine)||0;_stApprCache={at:now,n:n};cb(n);}).catch(function(){cb(_stApprCache.n>=0?_stApprCache.n:0);});}
-(function(){try{setInterval(function(){try{if(document.hidden)return;var ms=+localStorage.getItem('j2me_online_ms')||0;localStorage.setItem('j2me_online_ms',String(ms+60000));}catch(e){}try{var tk=stToken();if(tk)fetch(stApiRoot()+'/api/ustats',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+tk},body:JSON.stringify({t:'heartbeat'}),keepalive:true}).catch(function(){});}catch(e){}},60000);}catch(e){}})();
+(function(){try{setInterval(function(){try{if(document.hidden)return;var ms=+localStorage.getItem('j2me_online_ms')||0;localStorage.setItem('j2me_online_ms',String(ms+60000));}catch(e){}try{var tk=stToken();if(tk)fetch(stApiRoot()+'/api/ustats',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+tk},body:JSON.stringify({t:'heartbeat'}),keepalive:true}).catch(function(){});}catch(e){}try{var pr=null;try{pr=JSON.parse(localStorage.getItem('j2me_presence')||'null');}catch(e){}fetch(stApiRoot()+'/api/presence',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({tok:(pr&&pr.tok)||''}),keepalive:true}).then(function(r){return r.json();}).then(function(j){if(j&&j.tok)try{localStorage.setItem('j2me_presence',JSON.stringify({tok:j.tok,n:j.n||0}));}catch(e){}}).catch(function(){});}catch(e){}},60000);}catch(e){}})();
 </script>
 </body>
 </html>
