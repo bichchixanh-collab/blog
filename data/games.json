@@ -1,5 +1,40 @@
 [
     {
+        "id": "moba-vuong-gia-vinh-dieu",
+        "name": "MOBA Vương Giả Vinh Diệu",
+        "cat": "Trí tuệ",
+        "size": "1.0 MB",
+        "res": [
+            "240x320"
+        ],
+        "hot": false,
+        "vi": false,
+        "new": false,
+        "gate": {
+            "type": "stats",
+            "require": {
+                "comments": 1
+            }
+        },
+        "desc": "🔥 AI NGỜ… “VƯƠNG GIẢ VINH DIỆU” LẠI CÓ BẢN JAVA OFFLINE?! 😱\r\nKhông cần server. Không cần mạng. Không cần máy cấu hình cao… chỉ cần một chiếc điện thoại Java! 📱\r\nMột tựa game fanmade lấy cảm hứng từ Vương Giả Vinh Diệu đã được tạo lại theo phong cách game Java ngày xưa — bản đồ, nhân vật, chiến đấu… tất cả được “thu nhỏ” vào một game offline cực kỳ hoài niệm. 👀\r\n⚔️ Java đời cũ + MOBA kiểu Vương Giả Vinh Diệu = chuyện gì sẽ xảy ra?\r\nĐiều thú vị nhất là… đây không phải game chính thức của Vương Giả Vinh Diệu. Đây là một sản phẩm fanmade mang đậm dấu ấn của thời kỳ game Java.\r\n👉 Ai từng mê game Java chắc chắn sẽ muốn thử!\r\nThêm cheat speed cho game: vào shop nhấn 2 lần phím 2 hoặc phím lên.\r\n\r\n[credit]Game java hay - vào ngay https:\/\/J2ME.VERCEL.APP\r\nVui lòng ghi thêm 2 dòng này khi chia sê lại bài viết.[\/credit]",
+        "thumb": "https:\/\/i.ibb.co\/Q73bMQPb\/wm-1789826990806.jpg",
+        "shots": [
+            "https:\/\/i.ibb.co\/Q73bMQPb\/wm-1789826990806.jpg",
+            "https:\/\/i.ibb.co\/HfpsKCfL\/wm-1789826991203.jpg",
+            "https:\/\/i.ibb.co\/23BmSgHg\/wm-1789826991659.jpg",
+            "https:\/\/i.ibb.co\/20ms3DL7\/wm-1789826992143.jpg",
+            "https:\/\/i.ibb.co\/Pvnx5NT5\/wm-1789826992582.jpg",
+            "https:\/\/i.ibb.co\/YBy8pjRV\/wm-1789826993220.jpg",
+            "https:\/\/i.ibb.co\/SwcRVWKv\/wm-1789826993824.jpg"
+        ],
+        "jar": {
+            "240x320": "https:\/\/www.mediafire.com\/file\/124sj0qw0fkdcfm\/VGVD-VN-Bakawap.jar\/file"
+        },
+        "downloads": 0,
+        "created_at": "2026-09-19T16:18:26+02:00",
+        "updated_at": "2026-09-19T16:18:26+02:00"
+    },
+    {
         "id": "phong-van-huyen-hoa",
         "name": "Phong Vân Huyễn Hóa",
         "cat": "Nhập vai",
