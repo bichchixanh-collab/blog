@@ -451,19 +451,35 @@ function escHtml(s){return String(s==null?'':s).replace(/[&<>"']/g,function(m){r
 function linkify(s){return escHtml(s).replace(/\*\*([^*<>]+)\*\*/g,'<b>$1</b>').replace(/(https?:\/\/[^\s<>"']+)/g,'<a href="$1" target="_blank" rel="noopener">$1</a>');}
 // Thẻ [credit]...[/credit] trong mô tả: hộp chủ quyền nổi bật, link tuyệt đối + nút chép
 // để khi bài bị copy đi nơi khác vẫn mang theo nguồn. Không có thẻ thì render như cũ.
-function renderCreditBox(inner){
+// Dòng © NGUỒN đứng ngay trước [credit] được gộp làm tiêu đề hộp (không render 2 lần).
+function creditHeaderHtml(h){
+  var t=escHtml(String(h||'').trim());
+  if(!t) t='© NGUỒN: J2ME.VERCEL.APP';
+  t=t.replace(/(https?:\/\/[^\s<>"']+)/g,'<a href="$1" target="_blank" rel="noopener" style="color:#7a5a00">$1</a>');
+  if(t.indexOf('J2ME.VERCEL.APP')<0) t+=' — <a href="https://J2ME.VERCEL.APP" target="_blank" rel="noopener" style="color:#7a5a00">J2ME.VERCEL.APP</a>';
+  return t;
+}
+function renderCreditBox(inner,headerHtml){
   var body=String(inner).replace(/(https?:\/\/[^\s<>"']+)/g,'<a href="$1" target="_blank" rel="noopener">$1</a>');
   return '<div class="credit-box" style="margin:10px 0;padding:10px 12px;background:linear-gradient(180deg,#fffbe6,#fff3c4);border:2px dashed #e6a800;border-radius:10px;box-shadow:0 2px 8px rgba(230,168,0,.25)">'
-  +'<div style="font-weight:800;color:#7a5a00;font-size:12px;margin-bottom:6px">🔒 © NGUỒN: <a href="https://J2ME.VERCEL.APP" target="_blank" rel="noopener" style="color:#7a5a00">J2ME.VERCEL.APP</a> — GIỮ NGUYÊN KHUNG NÀY KHI CHIA SẺ</div>'
+  +'<div style="font-weight:800;color:#7a5a00;font-size:12px;margin-bottom:6px">'+headerHtml+'</div>'
   +'<div style="font-size:12.5px;color:#1a3a5c;white-space:pre-line">'+body+'</div>'
   +'<div style="margin-top:8px"><button type="button" onclick="try{navigator.clipboard.writeText(this.parentNode.parentNode.innerText);this.textContent=\'✓ Đã chép!\';}catch(e){}" style="background:#7a5a00;color:#fff;border:none;border-radius:6px;padding:5px 12px;font-size:11px;font-weight:700;cursor:pointer">📋 Chép credit</button></div></div>';
 }
 function renderDesc(s){
-  var parts=[];
-  var t=escHtml(String(s||''));
+  var parts=[],heads=[];
+  var raw=String(s||'');
+  raw=raw.replace(/([^\n]*©[^\n]*)\r?\n\s*\[credit\]/gi,function(m,h){heads.push(h);return '[credit]@@HDR'+(heads.length-1)+'@@\n';});
+  var t=escHtml(raw);
   t=t.replace(/\[credit\]([\s\S]*?)\[\/credit\]/gi,function(m,inner){parts.push(inner);return 'CREDITBOX'+(parts.length-1)+'X';});
   t=t.replace(/\*\*([^*<>]+)\*\*/g,'<b>$1</b>').replace(/(https?:\/\/[^\s<>"']+)/g,'<a href="$1" target="_blank" rel="noopener">$1</a>');
-  for(var i=0;i<parts.length;i++){t=t.split('CREDITBOX'+i+'X').join(renderCreditBox(parts[i]));}
+  for(var i=0;i<parts.length;i++){
+    (function(idx){
+      var inner=parts[idx],h='';
+      inner=inner.replace(/@@HDR(\d+)@@/,function(mm,k){h=creditHeaderHtml(heads[+k]||'');return '';});
+      t=t.split('CREDITBOX'+idx+'X').join(renderCreditBox(inner,h||creditHeaderHtml('')));
+    })(i);
+  }
   return t;
 }
 function apiRoot(){try{const p=location.pathname||'/';const gi=p.indexOf('/game/');return gi>=0?p.slice(0,gi):'';}catch(e){return '';}}
@@ -675,7 +691,7 @@ async function renderDetail(){
   const shots=(g.shots||[]);
   const shotCls=shots.length===1?' count-1':shots.length===2?' count-2':'';
   const shotsHtml=shots.length?`<div class="shot-grid${shotCls}">${shots.map((s,i)=>`<img src="${escHtml(s)}" alt="Ảnh demo ${i+1}" width="240" height="320" loading="lazy" decoding="async" data-idx="${i}" class="shot-img" style="cursor:pointer">`).join('')}</div>`:`<p class="note">Chưa có ảnh demo cho game này.</p>`;
-  document.querySelector('.body-text').innerHTML=`<h3>📝 Giới thiệu</h3><div>${renderDesc(g.desc||'')}</div><h3>🖼️ Hình ảnh</h3>${shotsHtml}<h3>⚙️ Yêu cầu</h3><p style="font-size:13px">• <b>MIDP 2.0</b> • Màn hình <b>${escHtml((g.res||[]).join(', '))}</b> • Trống ≥<b>${escHtml(g.size)}</b> • Opera Mini</p>`;
+  document.querySelector('.body-text').innerHTML=`<h3>📝 Giới thiệu</h3><div style="white-space:pre-line">${renderDesc(g.desc||'')}</div><h3>🖼️ Hình ảnh</h3>${shotsHtml}<h3>⚙️ Yêu cầu</h3><p style="font-size:13px">• <b>MIDP 2.0</b> • Màn hình <b>${escHtml((g.res||[]).join(', '))}</b> • Trống ≥<b>${escHtml(g.size)}</b> • Opera Mini</p>`;
   CURRENT_SHOTS=shots;
   document.querySelectorAll('.shot-img').forEach(img=>{
     img.addEventListener('click',()=>openLightbox(parseInt(img.dataset.idx,10)));
