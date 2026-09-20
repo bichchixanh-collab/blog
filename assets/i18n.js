@@ -15,6 +15,7 @@
       foot_home:'Trang chủ',foot_cat:'Thể loại',foot_profile:'Hồ sơ',foot_contact:'Liên hệ / DMCA',back_home:'‹ Về trang chủ',
       foot_mem:'+ Kỷ Niệm Một Thời Đã Qua +',
       install:'Cài app về máy',install_msg:'Mở menu trình duyệt → "Thêm vào màn hình chính" để cài app.',
+      lang_btn_vi:'🌐 Ngôn ngữ: VI',lang_btn_id:'🌐 Bahasa: ID',
       lite_light:'📴 Nhẹ',lite_full:'📶 Đủ',
       dl:'⬇ Tải JAR',detail:'Chi tiết »',
       trend:'Game đang nổi',
@@ -135,6 +136,7 @@
       foot_home:'Beranda',foot_cat:'Kategori',foot_profile:'Profil',foot_contact:'Kontak / DMCA',back_home:'‹ Kembali ke beranda',
       foot_mem:'+ Kenangan Masa Lalu +',
       install:'Instal aplikasi',install_msg:'Buka menu browser → "Tambah ke layar utama" untuk instal app.',
+      lang_btn_vi:'🌐 Ngôn ngữ: VI',lang_btn_id:'🌐 Bahasa: ID',
       lite_light:'📴 Hemat',lite_full:'📶 Penuh',
       dl:'⬇ Unduh JAR',detail:'Detail »',
       trend:'Game Trending',
@@ -258,7 +260,7 @@
     document.querySelectorAll('[data-i18n]').forEach(el=>{ const v=t(el.getAttribute('data-i18n')); if(v&&v!==el.getAttribute('data-i18n')) el.textContent=v; });
     document.querySelectorAll('[data-i18n-html]').forEach(el=>{ const v=t(el.getAttribute('data-i18n-html')); if(v&&v!==el.getAttribute('data-i18n-html')) el.innerHTML=v; });
     document.querySelectorAll('[data-i18n-ph]').forEach(el=>{ const v=t(el.getAttribute('data-i18n-ph')); if(v&&v!==el.getAttribute('data-i18n-ph')) el.placeholder=v; });
-    const sw=document.getElementById('langSwitch'); if(sw) sw.textContent=(l==='vi')?'🇮🇩 ID':'🇻🇳 VI';
+    const sw=document.getElementById('langSwitch'); if(sw) sw.textContent=(l==='vi')?t('lang_btn_vi'):t('lang_btn_id');
     try{
       const lt=document.getElementById('liteToggle');
       if(lt){ const on=document.documentElement.classList.contains('lite'); lt.textContent=on?t('lite_full'):t('lite_light'); }
@@ -266,9 +268,14 @@
   }
   function setLang(v){ if(v!=='vi'&&v!=='id') return; try{ localStorage.setItem('j2me_lang',v); }catch(e){} apply(); try{ document.dispatchEvent(new CustomEvent('i18n-ready')); }catch(e){} try{ if(typeof loadComments==='function'&&window.CMT_GAME){ loadComments(window.CMT_GAME, window.CMT_PAGE||1); } }catch(e){} }
   function inject(){
-    if(document.getElementById('langSwitch')) return;
-    const b=document.createElement('button'); b.id='langSwitch'; b.title='VI / ID';
-    b.style.cssText='position:fixed;left:10px;bottom:10px;z-index:9998;background:#fff;border:1.5px solid #81c7f0;border-radius:20px;padding:6px 10px;font-size:11px;font-weight:700;color:#0066cc;cursor:pointer;box-shadow:0 4px 12px rgba(0,102,204,.25)';
+    if(document.getElementById('langSwitch')){ apply(); return; }
+    try{
+      const st=document.createElement('style');
+      st.textContent='@keyframes langGlow{0%,100%{box-shadow:0 4px 14px rgba(0,102,204,.45),0 0 0 0 rgba(77,166,255,.55)}50%{box-shadow:0 4px 18px rgba(0,102,204,.6),0 0 0 7px rgba(77,166,255,0)}}';
+      document.head.appendChild(st);
+    }catch(e){}
+    const b=document.createElement('button'); b.id='langSwitch'; b.title='Đổi ngôn ngữ / Ganti bahasa';
+    b.style.cssText='position:fixed;left:10px;bottom:10px;z-index:9998;background:linear-gradient(135deg,#4da6ff,#0066cc);color:#fff;border:2px solid #fff;border-radius:24px;padding:9px 16px;font-size:13px;font-weight:800;cursor:pointer;animation:langGlow 2.2s infinite;font-family:inherit';
     b.onclick=function(){ setLang(lang()==='vi'?'id':'vi'); };
     document.body.appendChild(b); apply();
     // Nút Nhẹ vẽ lại text cứng sau mỗi lần bấm → apply lại để giữ đúng ngôn ngữ

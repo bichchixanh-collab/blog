@@ -78,6 +78,7 @@ body{background:#e8f4fd;padding:12px}
 .res-btn.active{background:#0066cc;color:#fff}
 </style>
 <link rel="stylesheet" href="assets/css/manga.css?v=7">
+<script src="assets/i18n.js?v=2"></script>
 </head>
 <body>
 <div class="app">
@@ -299,8 +300,8 @@ function T(k,fb){ try{ if(window.I18N&&window.I18N.T) return window.I18N.T(k,fb)
 function card(g, idx=0){
   const hot=g.hot?'<span style="background:#0066cc;color:#fff;font-size:8px;padding:2px 4px;border-radius:8px">HOT</span>':''; const vi=g.vi?'<span style="background:#0a9c4a;color:#fff;font-size:8px;padding:2px 4px;border-radius:8px">VIỆT HÓA</span>':''; const lock=(g.gate&&g.gate.type&&g.gate.type!=='none')?'<span style="background:#7a5a00;color:#fff;font-size:8px;padding:2px 4px;border-radius:8px" title="'+T('idx_lock','Cần đủ điều kiện mới tải được')+'">🔒</span>':'';
   const eager = idx < 3 ? 'loading="eager" fetchpriority="high"' : 'loading="lazy"';
-  const gid=escHtml(g.id||''), gname=escHtml(g.name||''), gcat=escHtml(g.cat||''), gsize=escHtml(g.size||''), gthumb=escHtml(g.thumb||'');
-  return `<div class="game-item" data-name="${(gname+' '+gcat).toLowerCase()}"><img src="${gthumb}" class="game-thumb" width="48" height="48" decoding="async" ${eager} alt="${gname}"><div style="flex:1"><h3><a href="game/${gid}.html">${gname}</a> ${hot} ${vi} ${lock}</h3><div class="game-meta">${gcat} • ${gsize}</div></div><div style="display:grid;gap:4px;justify-items:center"><a href="game/${gid}.html" class="dl-btn">${T('dl','⬇ Tải JAR')}</a><button data-fav="${gid}" title="${T('idx_fav','Yêu thích')}" style="background:none;border:none;color:#0066cc;font-size:15px;cursor:pointer;line-height:1">${favHas(g.id)?'♥':'♡'}</button></div></div>`;
+  const gid=escHtml(g.id||''), gname=escHtml(g.name||''), gcat=escHtml(g.cat||''), gsize=escHtml(g.size||''), gthumb=escHtml(g.thumb||''), gres=(g.res||[]).map(escHtml).join(' ');
+  return `<div class="game-item" data-res="${gres}" data-name="${(gname+' '+gcat).toLowerCase()}"><img src="${gthumb}" class="game-thumb" width="48" height="48" decoding="async" ${eager} alt="${gname}"><div style="flex:1"><h3><a href="game/${gid}.html">${gname}</a> ${hot} ${vi} ${lock}</h3><div class="game-meta">${gcat} • ${gsize}</div></div><div style="display:grid;gap:4px;justify-items:center"><a href="game/${gid}.html" class="dl-btn">${T('dl','⬇ Tải JAR')}</a><button data-fav="${gid}" title="${T('idx_fav','Yêu thích')}" style="background:none;border:none;color:#0066cc;font-size:15px;cursor:pointer;line-height:1">${favHas(g.id)?'♥':'♡'}</button></div></div>`;
 }
 function lockBadge(g){return (g&&g.gate&&g.gate.type&&g.gate.type!=='none')?'<span style="background:#7a5a00;color:#fff;font-size:8px;padding:1px 4px;border-radius:4px" title="'+T('idx_lock','Cần đủ điều kiện mới tải được')+'">🔒</span>':'';}
 // Hộp thông báo ghim (admin sửa 1 dòng, đóng thì nhớ tới khi có tin mới)
@@ -449,8 +450,8 @@ function bindIndexOnce(){
     document.querySelectorAll('.res-btn').forEach(x=>x.classList.remove('active')); b.classList.add('active');
     const res=b.dataset.res;
     document.querySelectorAll('.game-item').forEach(it=>{
-      const meta=it.textContent;
-      it.style.display=(res==='all'||meta.includes(res))?'flex':'none';
+      const rr=it.dataset.res||'';
+      it.style.display=(res==='all'||(' '+rr+' ').includes(res))?'flex':'none';
     });
   }));
 }
@@ -493,6 +494,5 @@ var _stApprCache={at:0,n:-1};
 function stApprovedCount(cb){var now=Date.now();if(_stApprCache.n>=0&&now-_stApprCache.at<60000){cb(_stApprCache.n);return;}var tk='';try{tk=stToken();}catch(e){}var names=stNames();if(!tk&&!names.length){cb(0);return;}var url=stApiRoot()+'/api/comments?mine=1'+(names.length?'&names='+encodeURIComponent(names.join(',')):'');var hh=tk?{'Authorization':'Bearer '+tk}:{};fetch(url,{headers:hh,cache:'no-store'}).then(function(r){return r.json();}).then(function(j){var n=+(j&&j.mine)||0;_stApprCache={at:now,n:n};cb(n);}).catch(function(){cb(_stApprCache.n>=0?_stApprCache.n:0);});}
 (function(){try{setInterval(function(){try{if(document.hidden)return;var ms=+localStorage.getItem('j2me_online_ms')||0;localStorage.setItem('j2me_online_ms',String(ms+60000));}catch(e){}try{var tk=stToken();if(tk)fetch(stApiRoot()+'/api/ustats',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+tk},body:JSON.stringify({t:'heartbeat'}),keepalive:true}).catch(function(){});}catch(e){}try{var pr=null;try{pr=JSON.parse(localStorage.getItem('j2me_presence')||'null');}catch(e){}fetch(stApiRoot()+'/api/presence',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({tok:(pr&&pr.tok)||''}),keepalive:true}).then(function(r){return r.json();}).then(function(j){if(j&&j.tok)try{localStorage.setItem('j2me_presence',JSON.stringify({tok:j.tok,n:j.n||0}));}catch(e){}}).catch(function(){});}catch(e){}},60000);}catch(e){}})();
 </script>
-<script src="assets/i18n.js"></script>
 </body>
 </html>
