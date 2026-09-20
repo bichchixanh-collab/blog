@@ -215,19 +215,21 @@ span.skel{display:block}
     <div class="game-grid" id="relatedGrid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px"><!--SLOT:REL--><!--/SLOT:REL--></div>
   </div>
   <div id="cmtBox" class="kawaii-f" style="display:none">
-    <div class="kawaii-title">★ Đánh giá & Bình luận</div>
+    <div class="kawaii-title" data-i18n="cmt_title">★ Đánh giá & Bình luận</div>
     <div id="cmtSummary" style="font-size:11px;color:#4a7a9a;margin-bottom:8px"></div>
+    <div id="cmtNewHint" style="display:none;margin-bottom:8px"><button id="cmtReloadBtn" data-i18n="cmt_new" style="width:100%;background:#e8f4fd;border:1.5px dashed #4da6ff;border-radius:10px;padding:6px;font-size:11px;color:#0066cc;cursor:pointer">Có bình luận mới — bấm để tải lại</button></div>
     <div id="cmtList" style="display:grid;gap:8px"></div>
+    <div id="cmtPager" style="display:flex;gap:6px;align-items:center;justify-content:center;margin-top:10px;font-size:11px"></div>
     <form id="cmtForm" style="display:grid;gap:8px;margin-top:10px">
       <div style="display:flex;gap:8px">
-        <input id="cmtName" maxlength="30" placeholder="Tên của bạn *" style="flex:1;min-width:0;padding:7px 8px;border:1px solid #81c7f0;border-radius:8px;font-size:12px">
+        <input id="cmtName" maxlength="30" data-i18n-ph="cmt_name" placeholder="Tên của bạn *" style="flex:1;min-width:0;padding:7px 8px;border:1px solid #81c7f0;border-radius:8px;font-size:12px">
         <select id="cmtStars" style="padding:7px;border:1px solid #81c7f0;border-radius:8px;font-size:12px;background:#fff">
           <option value="5">★★★★★</option><option value="4">★★★★</option><option value="3">★★★</option><option value="2">★★</option><option value="1">★</option>
         </select>
       </div>
-      <textarea id="cmtText" rows="2" maxlength="500" placeholder="Nhận xét về game... (hiện sau khi duyệt) *" style="padding:7px 8px;border:1px solid #81c7f0;border-radius:8px;font-size:12px;font-family:inherit"></textarea>
+      <textarea id="cmtText" rows="2" maxlength="500" data-i18n-ph="cmt_text" placeholder="Nhận xét về game... (hiện sau khi duyệt) *" style="padding:7px 8px;border:1px solid #81c7f0;border-radius:8px;font-size:12px;font-family:inherit"></textarea>
       <input id="cmtWeb" type="text" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;top:-9999px">
-      <button type="submit" class="dl-btn" style="justify-content:center">Gửi bình luận</button>
+      <button type="submit" class="dl-btn" data-i18n="cmt_send" style="justify-content:center">Gửi bình luận</button>
       <p id="cmtMsg" style="font-size:11px;color:#4a7a9a;margin:0"></p>
     </form>
   </div>
@@ -796,40 +798,60 @@ document.addEventListener('click',function(e){const b=e.target&&e.target.closest
     __ticketAndGo(p.gid,p.res,document.getElementById('modalMsg'));
   });
 })();
-// Bình luận + đánh giá sao (lưu qua api/comments, hiện sau khi admin duyệt)
-async function loadComments(gameId){
+// Bình luận + đánh giá sao (phân trang 5/trang + realtime polling, giữ nguyên trang đang xem)
+let CMT_PAGE=1; const CMT_LIMIT=5; let CMT_GAME=''; let CMT_TOTAL=0, CMT_PAGES=1, CMT_TIMER=null, CMT_KNOWN=0;
+function cmtT(k,fb){ try{ if(window.I18N&&window.I18N.t){const v=window.I18N.t(k); if(v&&v!==k) return v;} }catch(e){} return fb; }
+// Hiển thị rõ ngày/tháng/năm - giờ:phút (vd: 20/09/2026 - 14:05)
+function fmtDT(iso){ try{ const dt=new Date(iso); if(isNaN(dt)) return ''; const p=function(n){return String(n).padStart(2,'0');}; return p(dt.getDate())+'/'+p(dt.getMonth()+1)+'/'+dt.getFullYear()+' - '+p(dt.getHours())+':'+p(dt.getMinutes()); }catch(e){ return ''; } }
+async function loadComments(gameId, page){
   const box=document.getElementById('cmtBox'); if(!box) return;
   box.style.display='block';
+  CMT_GAME=gameId; if(page) CMT_PAGE=page;
+  try{ window.CMT_GAME=CMT_GAME; window.CMT_PAGE=CMT_PAGE; }catch(e){}
   try{var _cn=document.getElementById('cmtName');if(_cn&&!_cn.value){var _nm=stNames();if(_nm.length)_cn.value=_nm[_nm.length-1];}}catch(e){}
   const sum=document.getElementById('cmtSummary'), list=document.getElementById('cmtList'), msg=document.getElementById('cmtMsg');
-  sum.textContent='Đang tải bình luận...'; list.innerHTML=''; msg.textContent='';
+  const pager=document.getElementById('cmtPager');
+  sum.textContent=cmtT('cmt_loading','Đang tải bình luận...'); list.innerHTML=''; msg.textContent='';
+  if(pager) pager.innerHTML='';
   try{
-    const r=await fetch(apiRoot()+'/api/comments?game='+encodeURIComponent(gameId),{cache:'no-store'});
+    const r=await fetch(apiRoot()+'/api/comments?game='+encodeURIComponent(gameId)+'&page='+CMT_PAGE+'&limit='+CMT_LIMIT,{cache:'no-store'});
     if(!r.ok) throw new Error(r.status);
     const j=await r.json();
-    sum.innerHTML=j.total?('★ <b>'+escHtml(String(j.avg))+'</b> — '+j.total+' đánh giá'):'Chưa có đánh giá nào. Hãy là người đầu tiên!';
+    CMT_TOTAL=j.total||0; CMT_PAGES=j.pages||1; CMT_PAGE=j.page||1;
+    if(CMT_KNOWN===0) CMT_KNOWN=CMT_TOTAL;
+    sum.innerHTML=CMT_TOTAL?('★ <b>'+escHtml(String(j.avg))+'</b> — '+CMT_TOTAL+' '+cmtT('cmt_reviews','đánh giá')+' — '+cmtT('cmt_page','trang')+' '+CMT_PAGE+'/'+CMT_PAGES):cmtT('cmt_empty','Chưa có đánh giá nào. Hãy là người đầu tiên!');
     window._cmtReplyTo=null;
-    const fmtD=function(iso){try{const dt=new Date(iso); if(!isNaN(dt))return dt.toLocaleDateString('vi-VN');}catch(e){} return '';};
+    const replyLbl=cmtT('cmt_reply','↳ Trả lời');
     const itemHtml=function(c,reply){
       const st=reply?'':('<div class="stars">'+'★'.repeat(c.stars)+'☆'.repeat(5-c.stars)+'</div>');
-      return '<div class="cmt-item"'+(reply?' style="margin:6px 0 0 18px;border-style:dashed"':'')+'>'+st+'<b>'+escHtml(c.name)+'</b> <small>'+escHtml(fmtD(c.created_at))+'</small><div>'+escHtml(c.text)+'</div>'
-      +(reply?'':'<div><button data-reply="'+escHtml(c.id)+'" data-rname="'+escHtml(c.name)+'" style="background:none;border:none;color:#0066cc;font-size:11px;cursor:pointer;padding:0">↳ Trả lời</button></div>')+'</div>';
+      return '<div class="cmt-item"'+(reply?' style="margin:6px 0 0 18px;border-style:dashed"':'')+'>'+st+'<b>'+escHtml(c.name)+'</b> <small>'+escHtml(fmtDT(c.created_at))+'</small><div>'+escHtml(c.text)+'</div>'
+      +(reply?'':'<div><button data-reply="'+escHtml(c.id)+'" data-rname="'+escHtml(c.name)+'" style="background:none;border:none;color:#0066cc;font-size:11px;cursor:pointer;padding:0">'+escHtml(replyLbl)+'</button></div>')+'</div>';
     };
     list.innerHTML=(j.comments||[]).map(function(c){
-      return itemHtml(c,false)+((c.replies||[]).map(function(r){return itemHtml(r,true);}).join(''));
-    }).join('');
+      return itemHtml(c,false)+((c.replies||[]).map(function(x){return itemHtml(x,true);}).join(''));
+    }).join('') || ('<p class="note">'+escHtml(cmtT('cmt_empty_page','Trang này chưa có bình luận.'))+'</p>');
     list.querySelectorAll('[data-reply]').forEach(function(b){
       b.onclick=function(){
         window._cmtReplyTo={id:b.getAttribute('data-reply'),name:b.getAttribute('data-rname')};
         let tag=document.getElementById('replyTag');
         if(!tag){tag=document.createElement('div');tag.id='replyTag';tag.style.cssText='font-size:11px;color:#0066cc';form.insertBefore(tag,form.firstChild);}
-        tag.innerHTML='Đang trả lời <b></b> <a href="#" id="replyCancel" style="color:#4a7a9a">[hủy]</a>';
+        tag.innerHTML=cmtT('cmt_replying','Đang trả lời')+' <b></b> <a href="#" id="replyCancel" style="color:#4a7a9a">[hủy]</a>';
         tag.querySelector('b').textContent=window._cmtReplyTo.name;
         tag.querySelector('#replyCancel').onclick=function(e){e.preventDefault();window._cmtReplyTo=null;tag.remove();};
         document.getElementById('cmtText').focus();
       };
     });
-  }catch(e){ sum.textContent=String((e&&e.message)||'').indexOf('403')>=0?'Không tải được bình luận (bị chặn 403 — báo admin kiểm tra Vercel Deployment Protection).':'Không tải được bình luận lúc này.'; }
+    if(pager&&CMT_PAGES>1){
+      const btn=function(label,pg,dis){return '<button data-pg="'+pg+'" '+(dis?'disabled':'')+' style="background:'+(String(pg)===String(CMT_PAGE)?'#0066cc':'#fff')+';color:'+(String(pg)===String(CMT_PAGE)?'#fff':'#0066cc')+';border:1.5px solid #81c7f0;border-radius:14px;padding:4px 10px;font-size:11px;font-weight:700;cursor:'+(dis?'default':'pointer')+';opacity:'+(dis?'.5':'1')+'">'+label+'</button>';};
+      let h=btn('«',CMT_PAGE-1,CMT_PAGE<=1);
+      for(let p=1;p<=CMT_PAGES;p++){ if(CMT_PAGES>7&&Math.abs(p-CMT_PAGE)>2&&(p!==1&&p!==CMT_PAGES)) continue; h+=btn(String(p),p,false); }
+      h+=btn('»',CMT_PAGE+1,CMT_PAGE>=CMT_PAGES);
+      pager.innerHTML=h;
+      pager.querySelectorAll('[data-pg]').forEach(function(b){ b.onclick=function(){ const pg=parseInt(b.getAttribute('data-pg'),10); if(pg>=1&&pg<=CMT_PAGES&&pg!==CMT_PAGE){ CMT_PAGE=pg; try{window.CMT_PAGE=pg;}catch(e){} loadComments(CMT_GAME,pg); } }; });
+    }
+    const hint=document.getElementById('cmtNewHint'); if(hint) hint.style.display='none';
+    startCmtPolling();
+  }catch(e){ sum.textContent=String((e&&e.message)||'').indexOf('403')>=0?'Không tải được bình luận (bị chặn 403 — báo admin kiểm tra Vercel Deployment Protection).':cmtT('cmt_err','Không tải được bình luận lúc này.'); }
   const form=document.getElementById('cmtForm');
   form.onsubmit=function(ev){
     ev.preventDefault();
@@ -848,6 +870,22 @@ async function loadComments(gameId){
       })
       .catch(function(){msg.textContent='Không gửi được. Kiểm tra mạng rồi thử lại.';});
   };
+}
+function startCmtPolling(){
+  try{ if(CMT_TIMER) clearInterval(CMT_TIMER); }catch(e){}
+  CMT_TIMER=setInterval(async function(){
+    try{
+      if(document.hidden||!CMT_GAME) return;
+      const r=await fetch(apiRoot()+'/api/comments?game='+encodeURIComponent(CMT_GAME)+'&page=1&limit=1',{cache:'no-store'});
+      if(!r.ok) return;
+      const j=await r.json();
+      if(typeof j.total==='number'&&j.total!==CMT_KNOWN){
+        if(CMT_PAGE===1){ CMT_KNOWN=j.total; loadComments(CMT_GAME,1); }
+        else{ const h=document.getElementById('cmtNewHint'); if(h) h.style.display=''; }
+      }
+    }catch(e){}
+  },15000);
+  try{ document.getElementById('cmtReloadBtn').onclick=function(){ CMT_KNOWN=0; CMT_PAGE=1; loadComments(CMT_GAME,1); }; }catch(e){}
 }
 // Cảnh báo trước khi mở link ngoài trong mô tả
 document.addEventListener('click',function(e){
@@ -899,5 +937,6 @@ var _stApprCache={at:0,n:-1};
 function stApprovedCount(cb){var now=Date.now();if(_stApprCache.n>=0&&now-_stApprCache.at<60000){cb(_stApprCache.n);return;}var tk='';try{tk=stToken();}catch(e){}var names=stNames();if(!tk&&!names.length){cb(0);return;}var url=stApiRoot()+'/api/comments?mine=1'+(names.length?'&names='+encodeURIComponent(names.join(',')):'');var hh=tk?{'Authorization':'Bearer '+tk}:{};fetch(url,{headers:hh,cache:'no-store'}).then(function(r){return r.json();}).then(function(j){var n=+(j&&j.mine)||0;_stApprCache={at:now,n:n};cb(n);}).catch(function(){cb(_stApprCache.n>=0?_stApprCache.n:0);});}
 (function(){try{setInterval(function(){try{if(document.hidden)return;var ms=+localStorage.getItem('j2me_online_ms')||0;localStorage.setItem('j2me_online_ms',String(ms+60000));}catch(e){}try{var tk=stToken();if(tk)fetch(stApiRoot()+'/api/ustats',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+tk},body:JSON.stringify({t:'heartbeat'}),keepalive:true}).catch(function(){});}catch(e){}try{var pr=null;try{pr=JSON.parse(localStorage.getItem('j2me_presence')||'null');}catch(e){}fetch(stApiRoot()+'/api/presence',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({tok:(pr&&pr.tok)||''}),keepalive:true}).then(function(r){return r.json();}).then(function(j){if(j&&j.tok)try{localStorage.setItem('j2me_presence',JSON.stringify({tok:j.tok,n:j.n||0}));}catch(e){}}).catch(function(){});}catch(e){}},60000);}catch(e){}})();
 </script>
+<script>(function(){try{var s=document.createElement('script');s.src=apiRoot()+'/assets/i18n.js';s.defer=true;document.body.appendChild(s);}catch(e){}})();</script>
 </body>
 </html>

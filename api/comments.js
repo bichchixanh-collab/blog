@@ -124,7 +124,7 @@ function pubComment(c) {
   };
 }
 
-function summarize(list, game) {
+function summarize(list, game, page, limit) {
   const approved = list.filter((c) => c && c.game === game && c.status === 'approved');
   const tops = approved
     .filter((c) => !c.parentId)
@@ -140,15 +140,24 @@ function summarize(list, game) {
   const avg = total
     ? Math.round((tops.reduce((s, c) => s + (c.stars || 0), 0) / total) * 10) / 10
     : 0;
+  // Phân trang: mỗi trang `limit` bình luận gốc (mặc định 5). Replies luôn kèm theo cha.
+  const pg = Math.max(1, parseInt(page, 10) || 1);
+  const lm = Math.min(20, Math.max(1, parseInt(limit, 10) || 5));
+  const pages = Math.max(1, Math.ceil(total / lm));
+  const cur = Math.min(pg, pages);
+  const slice = tops.slice((cur - 1) * lm, cur * lm).map((c) => {
+    const o = pubComment(c);
+    o.replies = (byParent[c.id] || []).slice(0, 20).map(pubComment);
+    return o;
+  });
   return {
     game,
     avg,
     total,
-    comments: tops.slice(0, 50).map((c) => {
-      const o = pubComment(c);
-      o.replies = (byParent[c.id] || []).slice(0, 20).map(pubComment);
-      return o;
-    }),
+    page: cur,
+    limit: lm,
+    pages,
+    comments: slice,
   };
 }
 
@@ -264,6 +273,8 @@ module.exports = async (req, res) => {
       }
       const game = String((req.query && req.query.game) || '').slice(0, 120);
       if (!game) return send(res, 400, { error: 'missing game' });
+      const page = (req.query && req.query.page) || 1;
+      const limit = (req.query && req.query.limit) || 5;
       let list;
       if (token) {
         try {
@@ -274,7 +285,7 @@ module.exports = async (req, res) => {
       } else {
         list = readBundledList();
       }
-      return send(res, 200, summarize(list, game));
+      return send(res, 200, summarize(list, game, page, limit));
     }
 
     if (req.method === 'POST') {

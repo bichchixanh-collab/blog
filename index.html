@@ -87,15 +87,15 @@ body{background:#e8f4fd;padding:12px}
   <div class="logo-icon">🔔</div>
   <h1>J2ME.VERCEL.APP</h1>
   <p>Kho game Java .JAR • Anime </p>
-  <form class="search-bar" id="searchForm" onsubmit="return false"><input type="text" id="searchInput" placeholder="Tìm game: asphalt, avatar..."><button type="submit">Tìm</button></form>
+  <form class="search-bar" id="searchForm" onsubmit="return false"><input type="text" id="searchInput" data-i18n-ph="search_ph" placeholder="Tìm game: asphalt, avatar..."><button type="submit" data-i18n="search_btn">Tìm</button></form>
 </header>
 <nav class="wap-nav" id="wapNav">
-  <a href="index.html" class="active">⌂ Trang chủ</a>
-  <a href="category.html">≡ Thể loại</a>
-  <a href="#hot" id="navHotLink">★ Hot</a>
-  <a href="#new">Mới nhất</a>
-  <a href="#viethoa">Việt Hóa</a>
-  <a href="profile.html">♡ Hồ sơ</a>
+  <a href="index.html" class="active" data-i18n="nav_home">⌂ Trang chủ</a>
+  <a href="category.html" data-i18n="nav_cat">≡ Thể loại</a>
+  <a href="#hot" id="navHotLink" data-i18n="nav_hot">★ Hot</a>
+  <a href="#new" data-i18n="nav_new">Mới nhất</a>
+  <a href="#viethoa" data-i18n="nav_vi">Việt Hóa</a>
+  <a href="profile.html" data-i18n="nav_profile">♡ Hồ sơ</a>
 </nav>
 <div class="wap-banner" id="wapBannerWrap"><a href="#"><img id="wapBannerImg" src="assets/banners/banner1.png" alt="Banner game Java anime 2172x724" width="2172" height="724" decoding="async" fetchpriority="high"></a></div>
 
@@ -103,8 +103,8 @@ body{background:#e8f4fd;padding:12px}
   <div id="noticeBox" style="display:none;font-size:11px;line-height:1.6;color:#1a3a5c;background:#fff;border:1.5px dashed #81c7f0;border-radius:10px;padding:8px 10px"></div>
   <div id="statsBox" style="display:none;font-size:11px;color:#4a7a9a;background:#fff;border:1.5px solid #b8d8f8;border-radius:10px;padding:8px 10px;text-align:center"></div>
   <div class="res-filter">
-    <span style="font-weight:700;color:#0066cc;font-size:11px">📱 Màn hình:</span>
-    <button class="res-btn active" data-res="all">Tất cả</button>
+    <span style="font-weight:700;color:#0066cc;font-size:11px" data-i18n="screen">📱 Màn hình:</span>
+    <button class="res-btn active" data-res="all" data-i18n="all">Tất cả</button>
     <button class="res-btn" data-res="240x320">240x320</button>
     <button class="res-btn" data-res="128x160">128x160</button>
   </div>
@@ -504,5 +504,6 @@ var _stApprCache={at:0,n:-1};
 function stApprovedCount(cb){var now=Date.now();if(_stApprCache.n>=0&&now-_stApprCache.at<60000){cb(_stApprCache.n);return;}var tk='';try{tk=stToken();}catch(e){}var names=stNames();if(!tk&&!names.length){cb(0);return;}var url=stApiRoot()+'/api/comments?mine=1'+(names.length?'&names='+encodeURIComponent(names.join(',')):'');var hh=tk?{'Authorization':'Bearer '+tk}:{};fetch(url,{headers:hh,cache:'no-store'}).then(function(r){return r.json();}).then(function(j){var n=+(j&&j.mine)||0;_stApprCache={at:now,n:n};cb(n);}).catch(function(){cb(_stApprCache.n>=0?_stApprCache.n:0);});}
 (function(){try{setInterval(function(){try{if(document.hidden)return;var ms=+localStorage.getItem('j2me_online_ms')||0;localStorage.setItem('j2me_online_ms',String(ms+60000));}catch(e){}try{var tk=stToken();if(tk)fetch(stApiRoot()+'/api/ustats',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+tk},body:JSON.stringify({t:'heartbeat'}),keepalive:true}).catch(function(){});}catch(e){}try{var pr=null;try{pr=JSON.parse(localStorage.getItem('j2me_presence')||'null');}catch(e){}fetch(stApiRoot()+'/api/presence',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({tok:(pr&&pr.tok)||''}),keepalive:true}).then(function(r){return r.json();}).then(function(j){if(j&&j.tok)try{localStorage.setItem('j2me_presence',JSON.stringify({tok:j.tok,n:j.n||0}));}catch(e){}}).catch(function(){});}catch(e){}},60000);}catch(e){}})();
 </script>
+<script src="assets/i18n.js"></script>
 </body>
 </html>
