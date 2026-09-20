@@ -150,7 +150,7 @@ span.skel{display:block}
       <div style="width:44px;height:44px;background:#fff;color:#0066cc;border-radius:50%;display:grid;place-items:center;font-size:22px;border:2px solid #fff;flex-shrink:0">🔔</div>
       <div style="text-align:left">
         <h1 style="margin:0">J2ME.VERCEL.APP</h1>
-        <p style="margin:0">Kho game Java .JAR • WAP Anime </p>
+        <p style="margin:0" data-i18n="site_tag_game">Kho game Java .JAR • WAP Anime </p>
       </div>
     </div>
   </div>
@@ -457,7 +457,7 @@ function linkify(s){return escHtml(s).replace(/\*\*([^*<>]+)\*\*/g,'<b>$1</b>').
 // Dòng © NGUỒN đứng ngay trước [credit] được gộp làm tiêu đề hộp (không render 2 lần).
 function creditHeaderHtml(h){
   var t=escHtml(String(h||'').trim());
-  if(!t) t='© NGUỒN: J2ME.VERCEL.APP';
+  if(!t) t=cmtT('g_creditSrc','© NGUỒN: J2ME.VERCEL.APP');
   t=t.replace(/(https?:\/\/[^\s<>"']+)/g,'<a href="$1" target="_blank" rel="noopener" style="color:#7a5a00">$1</a>');
   if(t.indexOf('J2ME.VERCEL.APP')<0) t+=' — <a href="https://J2ME.VERCEL.APP" target="_blank" rel="noopener" style="color:#7a5a00">J2ME.VERCEL.APP</a>';
   return t;
@@ -467,8 +467,9 @@ function renderCreditBox(inner,headerHtml){
   return '<div class="credit-box" style="margin:10px 0;padding:10px 12px;background:linear-gradient(180deg,#fffbe6,#fff3c4);border:2px dashed #e6a800;border-radius:10px;box-shadow:0 2px 8px rgba(230,168,0,.25)">'
   +'<div style="font-weight:800;color:#7a5a00;font-size:12px;margin-bottom:6px">'+headerHtml+'</div>'
   +'<div style="font-size:12.5px;color:#1a3a5c;white-space:pre-line">'+body+'</div>'
-  +'<div style="margin-top:8px"><button type="button" onclick="try{navigator.clipboard.writeText(this.parentNode.parentNode.innerText);this.textContent=\'✓ Đã chép!\';}catch(e){}" style="background:#7a5a00;color:#fff;border:none;border-radius:6px;padding:5px 12px;font-size:11px;font-weight:700;cursor:pointer">📋 Chép credit</button></div></div>';
+  +'<div style="margin-top:8px"><button type="button" data-credit-copy="1" style="background:#7a5a00;color:#fff;border:none;border-radius:6px;padding:5px 12px;font-size:11px;font-weight:700;cursor:pointer">'+cmtT('g_creditCopy','📋 Chép credit')+'</button></div></div>';
 }
+document.addEventListener('click',function(e){var b=e.target&&e.target.closest?e.target.closest('[data-credit-copy]'):null;if(!b)return;try{navigator.clipboard.writeText(b.parentNode.parentNode.innerText).then(function(){b.textContent=cmtT('g_creditCopied','✓ Đã chép!');}).catch(function(){});}catch(err){}});
 function renderDesc(s){
   var parts=[],heads=[];
   var raw=String(s||'');
@@ -601,14 +602,42 @@ function __statsRowsHtml(rows){
     return '<div class="lockrow '+cls+'"><span>'+ic+'</span><span>'+r.label+'</span><b>'+pr+'</b>'+(r.ok?'':(r.hint||''))+'</div>';
   }).join('');
 }
+// Live refresh hộp khóa trong modal: cập nhật số phút realtime (10s/lần),
+// tự xin vé + sang trang tải ngay khi đủ điều kiện. Dừng khi đóng modal.
+let __lockTimer=null, __lockAppr=null, __lockTick=0;
+function __lockStop(){ try{ if(__lockTimer){ clearInterval(__lockTimer); __lockTimer=null; } }catch(e){} }
+function __lockHead(){
+  var hardNow=false; try{hardNow=stLogged();}catch(e){}
+  return '🔒 <b>'+cmtT('g_cond','Chưa đủ điều kiện')+'</b>'
+    +(hardNow?'':'<br><small><a href="'+apiRoot()+'/dang-nhap.html" style="color:#0066cc">'+cmtT('li_in','Đăng nhập')+'</a> '+cmtT('go_saveProg','để lưu tiến độ theo tài khoản')+'</small>');
+}
+function __lockPaint(msg,rows,head,foot){ try{ msg.innerHTML=(head||__lockHead())+'<div style="margin-top:6px;text-align:left">'+__statsRowsHtml(rows)+'</div>'+(foot||''); }catch(e){} }
+function __lockLive(gid,gm,msg,res,head,foot){
+  __lockStop(); __lockTick=0;
+  __lockTimer=setInterval(function(){
+    try{
+      if(!document.body.contains(msg)||document.getElementById('dlModal').classList.contains('hidden')){ __lockStop(); return; }
+      __lockTick++;
+      var rows=__statsRows(gm,__lockAppr);
+      var needCmt=rows.some(function(r){return r.k==='c';});
+      var paint=function(rr){
+        __lockPaint(msg,rr,head,foot);
+        if(__statsPass(rr)){ __lockStop(); msg.textContent=cmtT('g_getting','Đủ điều kiện! Đang lấy vé...'); __ticketAndGo(gid,res,msg); }
+      };
+      if(needCmt&&(__lockTick%3===0)){ try{stApprovedCount(function(n){__lockAppr=n;paint(__statsRows(gm,n));});}catch(e){paint(rows);} }
+      else paint(rows);
+    }catch(e){}
+  },10000);
+}
 function __ticketAndGo(gid,res,msgEl){
+  __lockStop();
   msgEl.textContent=cmtT('g_ticket','Đang lấy vé tải...');
   var gm=(GAMES_MAP||{})[gid]||{id:gid};
   fetch(apiRoot()+'/api/ticket?id='+encodeURIComponent(gid)+'&res='+encodeURIComponent(res)+'&proof='+encodeURIComponent(__proof(gm)),{cache:'no-store',headers:stAuthHeaders()})
     .then(function(r){return r.json().then(function(j){return {st:r.status,j:j};});})
     .then(function(o){
       if(o.st===200&&o.j&&o.j.ticket){try{countDownload(gid);}catch(e2){}location.href=apiRoot()+'/go.html?ticket='+encodeURIComponent(o.j.ticket);}
-      else if(o.st===403){var rs0=__statsRows(gm,null);var needC0=rs0.some(function(r){return r.k==='c';});var hd='🔒 <b>'+cmtT('g_cond','Chưa đủ điều kiện')+'</b>'+(o.j&&o.j.reason?' (<b>'+escHtml(o.j.reason)+'</b>)':'')+'. '+cmtT('g_srv','Server vừa kiểm tra — số bên dưới là mới nhất:');var ft='<div style="margin-top:6px"><small>'+cmtT('g_hang','Treo trang thêm cho đủ rồi bấm Tải lại (không cần F5).')+'</small></div>';var paint=function(rr){msgEl.innerHTML=hd+'<div style="margin-top:6px;text-align:left">'+__statsRowsHtml(rr)+'</div>'+ft;};paint(rs0);if(needC0){try{stApprovedCount(function(n){paint(__statsRows(gm,n));});}catch(e){}}}
+      else if(o.st===403){var rs0=__statsRows(gm,null);var needC0=rs0.some(function(r){return r.k==='c';});var hd='🔒 <b>'+cmtT('g_cond','Chưa đủ điều kiện')+'</b>'+(o.j&&o.j.reason?' (<b>'+escHtml(o.j.reason)+'</b>)':'')+'. '+cmtT('g_srv','Server vừa kiểm tra — số bên dưới là mới nhất:');var ft='<div style="margin-top:6px"><small>'+cmtT('g_hang','Treo trang thêm cho đủ rồi bấm Tải lại (không cần F5).')+'</small></div>';var paint=function(rr){__lockPaint(msgEl,rr,hd,ft);};paint(rs0);if(needC0){try{stApprovedCount(function(n){__lockAppr=n;paint(__statsRows(gm,n));__lockLive(gid,gm,msgEl,res,hd,ft);});}catch(e){__lockLive(gid,gm,msgEl,res,hd,ft);}}else{__lockLive(gid,gm,msgEl,res,hd,ft);}}
       else{msgEl.textContent=cmtT('g_noTicket2','Không lấy được vé (')+o.st+'), thử lại sau.';}
     }).catch(function(){msgEl.textContent=cmtT('g_offline','Mất mạng, thử lại sau.');});
 }
@@ -717,41 +746,42 @@ function doDownload(name,res){
   const gt=gm&&gm.gate&&gm.gate.type;
   const mc0=document.getElementById('modalConfirm');
   const msg=document.getElementById('modalMsg');
-  if(!hasRes){pending={href:'#',gid:'',name:name,res:res};if(mc0)mc0.style.display='none';msg.textContent='⚠ Link demo - vào admin.php nhập link thật nhé!';document.getElementById('dlModal').classList.remove('hidden');document.body.style.overflow='hidden';return false;}
+  if(!hasRes){pending={href:'#',gid:'',name:name,res:res};if(mc0)mc0.style.display='none';msg.textContent=cmtT('g_modalDemo','⚠ Link demo - vào admin.php nhập link thật nhé!');document.getElementById('dlModal').classList.remove('hidden');document.body.style.overflow='hidden';return false;}
   // Bài bắt đăng nhập (type login hoặc cờ login): chưa login thì chặn ngay ở modal
   var needLogin=!!(gm&&gm.gate&&(gt==='login'||gm.gate.login));
   var loggedNow=false; try{loggedNow=stLogged();}catch(e){}
   if(needLogin&&!loggedNow){
     pending={href:'#',gid:gid,name:name,res:res};
     if(mc0)mc0.style.display='none';
-    msg.innerHTML='🔒 Bài này <b>chỉ dành cho thành viên</b><br><a href="'+apiRoot()+'/dang-nhap.html" style="color:#0066cc;font-weight:700">→ Đăng nhập ngay</a><br><small style="color:#4a7a9a">1 tài khoản, mở khóa theo đúng cày của bạn (chống ké máy)</small>';
+    msg.innerHTML=cmtT('g_memOnly','🔒 Bài này <b>chỉ dành cho thành viên</b>')+'<br><a href="'+apiRoot()+'/dang-nhap.html" style="color:#0066cc;font-weight:700">'+cmtT('g_loginNow','→ Đăng nhập ngay')+'</a><br><small style="color:#4a7a9a">'+cmtT('g_lockNote','1 tài khoản, mở khóa theo đúng cày của bạn (chống ké máy)')+'</small>';
     document.getElementById('dlModal').classList.remove('hidden');document.body.style.overflow='hidden';return false;
   }
   // Mọi link tải đều đi qua go.html bằng vé server (chống soi source/crack link)
   if(gt==='stats'){
     pending={href:'#',gid:gid,name:name,res:res};
+    __lockAppr=null;
     if(mc0)mc0.style.display='none';
-    msg.textContent='Đang kiểm tra điều kiện...';
+    msg.textContent=cmtT('go_checking2','Đang kiểm tra điều kiện...');
     document.getElementById('dlModal').classList.remove('hidden');document.body.style.overflow='hidden';
     var rows0=__statsRows(gm,null);
     var needCmt=rows0.some(function(r){return r.k==='c';});
     var show=function(rows){
-      var hardNow=false; try{hardNow=stLogged();}catch(e){}
-      if(__statsPass(rows)){msg.textContent='Đủ điều kiện! Đang lấy vé...';__ticketAndGo(gid,res,msg);}
-      else{msg.innerHTML='🔒 <b>Chưa đủ điều kiện để tải</b>'+(hardNow?'':'<br><small><a href="'+apiRoot()+'/dang-nhap.html" style="color:#0066cc">Đăng nhập</a> để lưu tiến độ theo tài khoản</small>')+'<div style="margin-top:6px;text-align:left">'+__statsRowsHtml(rows)+'</div>';}
+      if(__statsPass(rows)){msg.textContent=cmtT('g_getting','Đủ điều kiện! Đang lấy vé...');__ticketAndGo(gid,res,msg);}
+      else{__lockPaint(msg,rows);}
+      __lockLive(gid,gm,msg,res);
     };
-    if(needCmt){msg.innerHTML='<div style="text-align:left">'+__statsRowsHtml(rows0)+'</div>';try{stApprovedCount(function(n){show(__statsRows(gm,n));});}catch(e){show(rows0);}}
+    if(needCmt){msg.innerHTML='<div style="text-align:left">'+__statsRowsHtml(rows0)+'</div>';try{stApprovedCount(function(n){__lockAppr=n;show(__statsRows(gm,n));});}catch(e){show(rows0);}}
     else show(rows0);
     return false;
   }
   const lock=gm?__gate(gm):null;
   if(lock){
     pending={href:'#',gid:gid,name:name,res:res};
-    msg.innerHTML='🔒 Game bị khóa: <b>'+lock.label+'</b><br><small style="color:#4a7a9a">'+lock.need+'</small><br><a href="'+apiRoot()+'/goc-senpai.html" style="color:#0066cc;font-weight:700">→ Sang Góc Senpai làm nhiệm vụ</a>';
+    msg.innerHTML=cmtT('g_locked','🔒 Game bị khóa: ')+'<b>'+lock.label+'</b><br><small style="color:#4a7a9a">'+lock.need+'</small><br><a href="'+apiRoot()+'/goc-senpai.html" style="color:#0066cc;font-weight:700">'+cmtT('g_senpaiGo','→ Sang Góc Senpai làm nhiệm vụ')+'</a>';
     if(mc0)mc0.style.display='none';
     document.getElementById('dlModal').classList.remove('hidden'); document.body.style.overflow='hidden'; return false;
   }
-  pending={href:'#',gid:gid,name:name,res:res}; if(mc0)mc0.style.display=''; msg.textContent=`Bạn sắp tải ${name} (${res}) — bấm xác nhận để sang trang tải an toàn`;
+  pending={href:'#',gid:gid,name:name,res:res}; if(mc0)mc0.style.display=''; msg.textContent=cmtT('g_confirmA','Bạn sắp tải ')+name+' ('+res+')'+cmtT('g_confirmB',' — bấm xác nhận để sang trang tải an toàn');
   const img=document.querySelector('.modal-anime-img'); if(img){const ch=ANIME_POOL[Math.floor(Math.random()*ANIME_POOL.length)]; img.style.display='block'; img.src=apiRoot()+ch;}
   const banner=document.querySelector('.modal-banner img'); if(banner){try{banner.src=(window.pickRandomBanner?window.pickRandomBanner():window.__BANNER_FALLBACK[Math.floor(Math.random()*window.__BANNER_FALLBACK.length)]);}catch(e){} if(window.getBannerList)window.getBannerList().then(function(list){try{banner.src=window.pickRandomBanner(list);}catch(e){}}).catch(function(){});}
   document.getElementById('modalConfirm').href='#'; document.getElementById('dlModal').classList.remove('hidden'); document.body.style.overflow='hidden'; return false;
@@ -762,6 +792,7 @@ document.addEventListener('click',function(e){const b=e.target&&e.target.closest
   const modal=document.getElementById('dlModal');
   const close=()=>{
     try{ playClick(520,0.1,0.15); }catch(e){}
+    try{ if(typeof __lockStop==='function') __lockStop(); }catch(e){}
     modal.classList.add('hidden');
     document.body.style.overflow='';
   };
@@ -774,7 +805,7 @@ document.addEventListener('click',function(e){const b=e.target&&e.target.closest
     e.preventDefault();
     const p=pending;
     if(!p||!p.gid||!p.res){
-      document.getElementById('modalMsg').textContent='⚠ Link demo - vào admin.php nhập link thật nhé!';
+      document.getElementById('modalMsg').textContent=cmtT('g_modalDemo','⚠ Link demo - vào admin.php nhập link thật nhé!');
       setTimeout(close,1400);
       return;
     }
@@ -836,24 +867,24 @@ async function loadComments(gameId, page){
     }
     const hint=document.getElementById('cmtNewHint'); if(hint) hint.style.display='none';
     startCmtPolling();
-  }catch(e){ sum.textContent=String((e&&e.message)||'').indexOf('403')>=0?'Không tải được bình luận (bị chặn 403 — báo admin kiểm tra Vercel Deployment Protection).':cmtT('cmt_err','Không tải được bình luận lúc này.'); }
+  }catch(e){ sum.textContent=String((e&&e.message)||'').indexOf('403')>=0?cmtT('cmt_403','Không tải được bình luận (bị chặn 403).'):cmtT('cmt_err','Không tải được bình luận lúc này.'); }
   const form=document.getElementById('cmtForm');
   form.onsubmit=function(ev){
     ev.preventDefault();
-    msg.textContent='Đang gửi...';
-    try{const last=+localStorage.getItem('cmt_last')||0; if(Date.now()-last<5*60*1000){msg.textContent='Bạn gửi quá nhanh, thử lại sau vài phút.';return;}}catch(e){}
+    msg.textContent=cmtT('cmt_sending','Đang gửi...');
+    try{const last=+localStorage.getItem('cmt_last')||0; if(Date.now()-last<5*60*1000){msg.textContent=cmtT('cmt_fast','Bạn gửi quá nhanh, thử lại sau vài phút.');return;}}catch(e){}
     const payload={game:gameId,name:document.getElementById('cmtName').value,stars:document.getElementById('cmtStars').value,text:document.getElementById('cmtText').value,website:document.getElementById('cmtWeb').value,sbt:stToken()};
     if(window._cmtReplyTo&&window._cmtReplyTo.id)payload.replyTo=window._cmtReplyTo.id;
     fetch(apiRoot()+'/api/comments',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)})
       .then(function(r){return r.text().then(function(t){let j={};try{j=JSON.parse(t);}catch(e){}return {st:r.status,j:j};});})
       .then(function(o){
-        if(o.st===200&&o.j.ok){msg.textContent='Đã gửi! Bình luận hiện sau khi admin duyệt.';document.getElementById('cmtText').value='';window._cmtReplyTo=null;const tg=document.getElementById('replyTag');if(tg)tg.remove();try{localStorage.setItem('cmt_last',String(Date.now()));}catch(e){}try{xpBump('comment');}catch(e){}try{__bm('comment');}catch(e){}try{stSaveName(document.getElementById('cmtName').value);}catch(e){}try{_stApprCache={at:0,n:-1};}catch(e){}}
-        else if(o.st===503){msg.textContent='Chức năng bình luận chưa được bật trên hosting này.';}
-        else if(o.st===429){msg.textContent='Bạn gửi quá nhanh, thử lại sau vài phút.';}
-        else if(o.st===403){msg.textContent='Bị chặn (403): tải lại trang rồi gửi lại. Nếu vẫn lỗi, báo admin kiểm tra Vercel Deployment Protection / Firewall.';}
-        else{var _e=(o.j&&o.j.error)||'';if(_e==='cross-origin denied')_e='bị chặn cross-origin, tải lại trang rồi thử lại';msg.textContent='Lỗi: '+(_e||('mã '+o.st+', thử lại sau'));}
+        if(o.st===200&&o.j.ok){msg.textContent=cmtT('cmt_sent','Đã gửi! Bình luận hiện sau khi admin duyệt.');document.getElementById('cmtText').value='';window._cmtReplyTo=null;const tg=document.getElementById('replyTag');if(tg)tg.remove();try{localStorage.setItem('cmt_last',String(Date.now()));}catch(e){}try{xpBump('comment');}catch(e){}try{__bm('comment');}catch(e){}try{stSaveName(document.getElementById('cmtName').value);}catch(e){}try{_stApprCache={at:0,n:-1};}catch(e){}}
+        else if(o.st===503){msg.textContent=cmtT('cmt_nohost','Chức năng bình luận chưa được bật trên hosting này.');}
+        else if(o.st===429){msg.textContent=cmtT('cmt_fast','Bạn gửi quá nhanh, thử lại sau vài phút.');}
+        else if(o.st===403){msg.textContent=cmtT('cmt_403post','Bị chặn (403): tải lại trang rồi gửi lại.');}
+        else{var _e=(o.j&&o.j.error)||'';if(_e==='cross-origin denied')_e=cmtT('cmt_cross','bị chặn cross-origin, tải lại trang rồi thử lại');msg.textContent=cmtT('cmt_errPre','Lỗi: ')+(_e||cmtT('cmt_code','mã {s}, thử lại sau').replace('{s}',o.st));}
       })
-      .catch(function(){msg.textContent='Không gửi được. Kiểm tra mạng rồi thử lại.';});
+      .catch(function(){msg.textContent=cmtT('cmt_neterr','Không gửi được. Kiểm tra mạng rồi thử lại.');});
   };
 }
 function startCmtPolling(){

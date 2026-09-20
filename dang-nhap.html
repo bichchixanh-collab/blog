@@ -79,7 +79,7 @@ small.dim{color:#4a7a9a;font-size:10px}
       $('whoBox').innerHTML=T('li_logged','Đã đăng nhập: ')+'<b>'+String(u.email||u.id).replace(/[<>&"]/g,'')+'</b><br><small id="syncState" style="color:#4a7a9a">'+T('li_syncing','Đang đồng bộ…')+'</small><div class="rowbtns"><button class="btn ghost" id="btnSync">'+T('li_syncnow','🔄 Đồng bộ ngay')+'</button><button class="btn ghost" id="btnOut">'+T('li_out','Đăng xuất')+'</button></div>';
       $('formBox').style.display='none';
       say(T('li_hi','Xin chào Senpai~ Tài khoản đã sẵn sàng đồng bộ.'),'ok');
-      const doSync=function(){var st=$('syncState');if(st)st.textContent=T('li_syncing','Đang đồng bộ…');window.SBSync.syncNow().then(function(r){if(st)st.textContent=T('li_synced','Đã đồng bộ ✓ XP ')+r.xp+(r.fromCloud?' (đã kéo bản mới từ cloud)':'');}).catch(function(e){if(st)st.textContent=T('li_syncerr','Đồng bộ lỗi: ')+e.message+' (cần chạy SQL tạo bảng senpai)';});};
+      const doSync=function(){var st=$('syncState');if(st)st.textContent=T('li_syncing','Đang đồng bộ…');window.SBSync.syncNow().then(function(r){if(st)st.textContent=T('li_synced','Đã đồng bộ ✓ XP ')+r.xp+(r.fromCloud?T('li_cloud',' (đã kéo bản mới từ cloud)'):'');}).catch(function(e){if(st)st.textContent=T('li_syncerr','Đồng bộ lỗi: ')+e.message+' '+T('li_sql','(cần chạy SQL tạo bảng senpai)');});};
       $('btnSync').onclick=doSync;
       try{if(window.SBSync)doSync();}catch(e){}
       try{if(window.SBBoard)window.SBBoard.ensureProfile().catch(function(){});}catch(e){}

@@ -311,7 +311,7 @@ function lockBadge(g){return (g&&g.gate&&g.gate.type&&g.gate.type!=='none')?'<sp
     const t=j&&String(j.text||'').trim(); if(!t) return;
     const key='notice_seen_'+(j.updated_at||'x');
     try{if(localStorage.getItem(key)) return;}catch(e){}
-    box.innerHTML='<b>📢 Thông báo:</b> <span id="noticeText"></span> <a href="#" id="noticeHide" style="color:#0066cc;white-space:nowrap">[đóng]</a>';
+    box.innerHTML='<b>'+T('idx_notice','📢 Thông báo:')+'</b> <span id="noticeText"></span> <a href="#" id="noticeHide" style="color:#0066cc;white-space:nowrap">'+T('idx_close','[đóng]')+'</a>';
     box.querySelector('#noticeText').textContent=t;
     box.style.display='';
     box.querySelector('#noticeHide').onclick=function(e){e.preventDefault();box.style.display='none';try{localStorage.setItem(key,'1');}catch(err){}};

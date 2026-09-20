@@ -8,7 +8,7 @@
     vi:{
       nav_home:'⌂ Trang chủ',nav_cat:'≡ Thể loại',nav_hot:'★ Hot',nav_new:'Mới nhất',nav_vi:'Việt Hóa',nav_profile:'♡ Hồ sơ',
       search_ph:'Tìm game: asphalt, avatar...',search_btn:'Tìm',screen:'📱 Màn hình:',all:'Tất cả',
-      site_tag:'Kho game Java .JAR • Anime',
+      site_tag:'Kho game Java .JAR • Anime',site_tag_game:'Kho game Java .JAR • WAP Anime',
       hot_week:'♡ Game Hot Nhất Tuần',new_update:'★ Mới Cập Nhật',guide:'❓ Hướng dẫn',
       guide_text:'Chọn đúng độ phân giải → Bấm <b>⬇ Tải JAR</b> → Copy vào thẻ nhớ → Cài đặt. Không cần giải nén.',
       cookie_hot:'🍪 Bánh Quy Hot',milk_rec:'🥛 Hộp Sữa Đề Xuất',cat_sec:'≡ Thể loại',candy_rand:'🍭 Kẹo Mút Ngẫu Nhiên',fav_sec:'♥ Game Yêu Thích',
@@ -22,6 +22,7 @@
       st_total:'Tổng lượt tải:',st_top:'Top:',st_cmt:'Bình luận:',
       idx_empty:'Chưa có game nào — vào admin.php để đăng bài đầu tiên ♡',
       idx_fav:'Yêu thích',idx_lock:'Cần đủ điều kiện mới tải được',idx_unfav:'Bỏ thích',
+      idx_notice:'📢 Thông báo:',idx_close:'[đóng]',
       modal_title:'Khoan đã Senpai~ ⚠️',modal_msg:'Bạn sắp tải JAR đó!',modal_yes:'✓ Có, tải ngay',modal_no:'✕ Không',
       cmt_title:'★ Đánh giá & Bình luận',cmt_new:'Có bình luận mới — bấm để tải lại',
       cmt_name:'Tên của bạn *',cmt_text:'Nhận xét về game... (hiện sau khi duyệt) *',cmt_send:'Gửi bình luận',
@@ -34,7 +35,7 @@
       cmt_neterr:'Không gửi được. Kiểm tra mạng rồi thử lại.',
       cmt_403:'Không tải được bình luận (bị chặn 403 — báo admin kiểm tra Vercel Deployment Protection).',
       cmt_403post:'Bị chặn (403): tải lại trang rồi gửi lại. Nếu vẫn lỗi, báo admin kiểm tra Vercel Deployment Protection / Firewall.',
-      cmt_cross:'bị chặn cross-origin, tải lại trang rồi thử lại',cmt_code:'mã {s}, thử lại sau',
+      cmt_cross:'bị chặn cross-origin, tải lại trang rồi thử lại',cmt_code:'mã {s}, thử lại sau',cmt_errPre:'Lỗi: ',
       g_detail:'🍓 Chi Tiết Game',g_secIntro:'📒 Giới thiệu',
       g_ticket:'Đang lấy vé tải...',g_cond:'Chưa đủ điều kiện',
       g_srv:'Server vừa kiểm tra — số bên dưới là mới nhất:',
@@ -56,6 +57,12 @@
       g_notfound:'Không tìm thấy game!',
       g_dlTitle:'🍬 TẢI GAME — Chọn đúng màn hình nha ♡',
       g_modalGo:'✓ Có, tải ngay »',g_modalDemo:'⚠ Link demo - vào admin.php nhập link thật nhé!',
+      g_memOnly:'🔒 Bài này <b>chỉ dành cho thành viên</b>',g_loginNow:'→ Đăng nhập ngay',
+      g_lockNote:'1 tài khoản, mở khóa theo đúng cày của bạn (chống ké máy)',
+      g_getting:'Đủ điều kiện! Đang lấy vé...',
+      g_locked:'🔒 Game bị khóa: ',g_senpaiGo:'→ Sang Góc Senpai làm nhiệm vụ',
+      g_confirmA:'Bạn sắp tải ',g_confirmB:' — bấm xác nhận để sang trang tải an toàn',
+      g_creditSrc:'© NGUỒN: J2ME.VERCEL.APP',g_creditCopy:'📋 Chép credit',g_creditCopied:'✓ Đã chép!',
       ext_title:'Rời khỏi J2ME?',ext_desc:'Bạn sắp mở link ngoài, cẩn thận link lạ:',ext_go:'Mở link »',ext_stay:'Ở lại',
       e404_title:'Lạc đường rồi Senpai~',
       e404_desc:'Trang này không tồn tại hoặc đã bị xóa.<br>Về trang chủ tìm game khác nha!',
@@ -82,6 +89,7 @@
       li_hi:'Xin chào Senpai~ Tài khoản đã sẵn sàng đồng bộ.',li_syncing:'Đang đồng bộ…',
       li_synced:'Đã đồng bộ ✓ XP ',li_syncerr:'Đồng bộ lỗi: ',li_logged:'Đã đăng nhập: ',
       li_syncnow:'🔄 Đồng bộ ngay',li_out:'Đăng xuất',
+      li_cloud:' (đã kéo bản mới từ cloud)',li_sql:'(cần chạy SQL tạo bảng senpai)',
       rk_title:'Bảng Xếp Hạng',rk_sub:'Top XP toàn web • 1 tài khoản 1 phiếu',
       rk_loading:'Đang tải…',rk_empty:'Chưa có ai lên bảng — đăng nhập + cày XP để làm người đầu tiên!',
       rk_err:'Không tải được bảng lúc này.',rk_login:'Đăng nhập để lên bảng',
@@ -129,7 +137,7 @@
     id:{
       nav_home:'⌂ Beranda',nav_cat:'≡ Kategori',nav_hot:'★ Populer',nav_new:'Terbaru',nav_vi:'Vietnam',nav_profile:'♡ Profil',
       search_ph:'Cari game: asphalt, avatar...',search_btn:'Cari',screen:'📱 Layar:',all:'Semua',
-      site_tag:'Koleksi game Java .JAR • Anime',
+      site_tag:'Koleksi game Java .JAR • Anime',site_tag_game:'Koleksi game Java .JAR • WAP Anime',
       hot_week:'♡ Game Terpopuler Minggu Ini',new_update:'★ Baru Diperbarui',guide:'❓ Panduan',
       guide_text:'Pilih resolusi yang benar → Tekan <b>⬇ Unduh JAR</b> → Salin ke kartu memori → Instal. Tanpa ekstrak.',
       cookie_hot:'🍪 Kue Kering Populer',milk_rec:'🥛 Susu Rekomendasi',cat_sec:'≡ Kategori',candy_rand:'🍭 Permen Acak',fav_sec:'♥ Game Favorit',
@@ -143,6 +151,7 @@
       st_total:'Total unduhan:',st_top:'Top:',st_cmt:'Komentar:',
       idx_empty:'Belum ada game — buka admin.php untuk posting pertama ♡',
       idx_fav:'Favorit',idx_lock:'Perlu memenuhi syarat untuk mengunduh',idx_unfav:'Batal suka',
+      idx_notice:'📢 Pengumuman:',idx_close:'[tutup]',
       modal_title:'Tunggu dulu Senpai~ ⚠️',modal_msg:'Anda akan mengunduh JAR itu!',modal_yes:'✓ Ya, unduh sekarang',modal_no:'✕ Tidak',
       cmt_title:'★ Ulasan & Komentar',cmt_new:'Ada komentar baru — ketuk untuk muat ulang',
       cmt_name:'Nama Anda *',cmt_text:'Ulasan tentang game... (tampil setelah disetujui) *',cmt_send:'Kirim komentar',
@@ -155,7 +164,7 @@
       cmt_neterr:'Gagal kirim. Periksa koneksi lalu coba lagi.',
       cmt_403:'Gagal memuat komentar (diblokir 403 — minta admin cek Vercel Deployment Protection).',
       cmt_403post:'Diblokir (403): muat ulang lalu kirim lagi. Jika masih gagal, minta admin cek Vercel Deployment Protection / Firewall.',
-      cmt_cross:'diblokir cross-origin, muat ulang lalu coba lagi',cmt_code:'kode {s}, coba lagi',
+      cmt_cross:'diblokir cross-origin, muat ulang lalu coba lagi',cmt_code:'kode {s}, coba lagi',cmt_errPre:'Error: ',
       g_detail:'🍓 Detail Game',g_secIntro:'📒 Deskripsi',
       g_ticket:'Mengambil tiket unduhan…',g_cond:'Belum memenuhi syarat',
       g_srv:'Server baru saja memeriksa — angka di bawah terbaru:',
@@ -177,6 +186,12 @@
       g_notfound:'Game tidak ditemukan!',
       g_dlTitle:'🍬 UNDUH GAME — Pilih layar yang benar ya ♡',
       g_modalGo:'✓ Ya, unduh »',g_modalDemo:'⚠ Link demo - buka admin.php untuk isi link asli!',
+      g_memOnly:'🔒 Konten ini <b>khusus anggota</b>',g_loginNow:'→ Masuk sekarang',
+      g_lockNote:'1 akun, terbuka sesuai progresmu (anti nebeng)',
+      g_getting:'Memenuhi syarat! Mengambil tiket…',
+      g_locked:'🔒 Game terkunci: ',g_senpaiGo:'→ Ke Góc Senpai untuk misi',
+      g_confirmA:'Anda akan mengunduh ',g_confirmB:' — tekan konfirmasi ke halaman unduh aman',
+      g_creditSrc:'© SUMBER: J2ME.VERCEL.APP',g_creditCopy:'📋 Salin kredit',g_creditCopied:'✓ Tersalin!',
       ext_title:'Keluar dari J2ME?',ext_desc:'Anda akan membuka link luar, hati-hati link asing:',ext_go:'Buka link »',ext_stay:'Tetap di sini',
       e404_title:'Nyasar ya Senpai~',
       e404_desc:'Halaman ini tidak ada atau sudah dihapus.<br>Kembali ke beranda untuk cari game lain!',
@@ -203,6 +218,7 @@
       li_hi:'Halo Senpai~ Akun siap disinkron.',li_syncing:'Menyinkron…',
       li_synced:'Tersinkron ✓ XP ',li_syncerr:'Sinkron gagal: ',li_logged:'Masuk sebagai: ',
       li_syncnow:'🔄 Sinkron sekarang',li_out:'Keluar',
+      li_cloud:' (menarik versi baru dari cloud)',li_sql:'(perlu jalankan SQL buat tabel senpai)',
       rk_title:'Papan Peringkat',rk_sub:'Top XP seluruh web • 1 akun 1 suara',
       rk_loading:'Memuat…',rk_empty:'Belum ada yang masuk papan — masuk + kumpulkan XP untuk jadi yang pertama!',
       rk_err:'Gagal memuat papan saat ini.',rk_login:'Masuk untuk naik papan',
@@ -260,7 +276,7 @@
     document.querySelectorAll('[data-i18n]').forEach(el=>{ const v=t(el.getAttribute('data-i18n')); if(v&&v!==el.getAttribute('data-i18n')) el.textContent=v; });
     document.querySelectorAll('[data-i18n-html]').forEach(el=>{ const v=t(el.getAttribute('data-i18n-html')); if(v&&v!==el.getAttribute('data-i18n-html')) el.innerHTML=v; });
     document.querySelectorAll('[data-i18n-ph]').forEach(el=>{ const v=t(el.getAttribute('data-i18n-ph')); if(v&&v!==el.getAttribute('data-i18n-ph')) el.placeholder=v; });
-    const sw=document.getElementById('langSwitch'); if(sw) sw.textContent=(l==='vi')?t('lang_btn_vi'):t('lang_btn_id');
+    const sw=document.getElementById('langSwitch'); if(sw) sw.textContent=(l==='vi')?t('lang_btn_id'):t('lang_btn_vi');
     try{
       const lt=document.getElementById('liteToggle');
       if(lt){ const on=document.documentElement.classList.contains('lite'); lt.textContent=on?t('lite_full'):t('lite_light'); }

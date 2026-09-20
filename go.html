@@ -133,6 +133,21 @@ var el=document.getElementById('clock');if(el)el.textContent=new Date().toLocale
         }
         if(needCmt){box.innerHTML=headCheck+rowsHtml(rows0)+'</div>';try{stApprovedCount(function(n){show(goRows(gate,n,sv));});}catch(e){show(rows0);}}
         else show(rows0);
+        // Live refresh tiến độ (phút online tăng realtime, không cần reload trang)
+        try{
+          if(window.__goLockTimer) clearInterval(window.__goLockTimer);
+          window.__goLockTimer=setInterval(function(){
+            try{
+              if(document.hidden) return;
+              withVals(function(sv2){
+                var rows=goRows(gate,null,sv2);
+                var nc=rows.some(function(r){return r.pending;});
+                if(nc){ try{stApprovedCount(function(n){show(goRows(gate,n,sv2));});}catch(e){show(rows);} }
+                else show(rows);
+              });
+            }catch(e){}
+          },15000);
+        }catch(e){}
       });
     }).catch(function(){fail(T('go_nocheck','Không kiểm tra được vé lúc này.'));});
   }
