@@ -156,12 +156,12 @@ span.skel{display:block}
   <div class="wap-banner" style="margin:0 0 10px">
     <a href="#"><img id="wapBannerImg" src="/assets/banners/banner1.png" data-root-src="assets/banners/banner1.png" alt="Banner game Java anime 2172x724" width="2172" height="724" decoding="async" fetchpriority="high" style="width:100%;height:100%;object-fit:cover;object-position:center;border-radius:12px;border:2px solid #4da6ff;display:block"></a>
   </div>
-  <div class="breadcrumb" id="breadcrumb"><a href="index.html" data-root-link="index.html">Trang chủ</a> › <a href="index.html" data-root-link="index.html">Game Java</a> › <b id="bcName">…</b></div>
+  <div class="breadcrumb" id="breadcrumb"><a href="index.html" data-root-link="index.html" data-i18n="foot_home">Trang chủ</a> › <a href="index.html" data-root-link="index.html">Game Java</a> › <b id="bcName">…</b></div>
 
   <!-- Chi tiết vải - Bánh Dâu -->
   <div class="kawaii-d">
     <div class="dripping"></div>
-    <div class="kawaii-title" style="background:linear-gradient(90deg,#ff6b6b,#ffd93d);color:#1a3a5c">🍓 Chi Tiết Game</div>
+    <div class="kawaii-title" data-i18n="g_detail" style="background:linear-gradient(90deg,#ff6b6b,#ffd93d);color:#1a3a5c">🍓 Chi Tiết Game</div>
     <div class="detail-head">
 <!--SLOT:HEAD-->
       <div class="skel skel-thumb"></div>
@@ -176,7 +176,7 @@ span.skel{display:block}
   <!-- Tải vải - Kẹo Dẻo -->
   <div class="kawaii-e">
     <div class="gummy">gummy ♡</div>
-    <div class="kawaii-title" style="background:linear-gradient(90deg,#a78bfa,#4da6ff)">🍬 TẢI GAME — Chọn đúng màn hình nha ♡</div>
+    <div class="kawaii-title" data-i18n="g_dlTitle" style="background:linear-gradient(90deg,#a78bfa,#4da6ff)">🍬 TẢI GAME — Chọn đúng màn hình nha ♡</div>
     <div class="dl-grid" style="background:transparent">
 <!--SLOT:DL-->
       <div class="dl-option">
@@ -192,7 +192,7 @@ span.skel{display:block}
   <!-- Giới thiệu vải - Sổ Tay -->
   <div class="kawaii-f">
     <div class="holes"><div class="hole"></div><div class="hole"></div><div class="hole"></div><div class="hole"></div></div><div class="clip"></div>
-    <div class="kawaii-title" style="background:linear-gradient(90deg,#34d399,#8ec8ff)">📒 Giới thiệu</div>
+    <div class="kawaii-title" data-i18n="g_secIntro" style="background:linear-gradient(90deg,#34d399,#8ec8ff)">📒 Giới thiệu</div>
     <div class="body-text">
 <!--SLOT:BODY-->
       <h3 style="color:#059669">📝 Giới thiệu</h3>
@@ -211,7 +211,7 @@ span.skel{display:block}
 
   <div id="relatedBox" class="kawaii-i" style="display:none">
     <div class="clouds">☁️ ☁️ ☁️</div>
-    <div class="kawaii-title" style="background:linear-gradient(90deg,#0ea5e9,#7dd3fc)">☁️ Game Liên Quan</div>
+    <div class="kawaii-title" data-i18n="g_related" style="background:linear-gradient(90deg,#0ea5e9,#7dd3fc)">☁️ Game Liên Quan</div>
     <div class="game-grid" id="relatedGrid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px"><!--SLOT:REL--><!--/SLOT:REL--></div>
   </div>
   <div id="cmtBox" class="kawaii-f" style="display:none">
@@ -235,8 +235,8 @@ span.skel{display:block}
   </div>
   <footer style="background:#1a3a5c;color:#b8d8f8;text-align:center;padding:14px;font-size:11px;border-radius:12px;margin-top:4px">
     <p style="margin:0">© <span class="js-year">2026</span> J2ME.VERCEL.APP — Anime WAP</p>
-    <p style="margin:6px 0 0;font-size:10px;opacity:.7"><a href="index.html" data-root-link="index.html" style="color:#fff">Trang chủ</a> · <a href="category.html" data-root-link="category.html" style="color:#fff">Thể loại</a> · <a href="profile.html" data-root-link="profile.html" style="color:#fff">Hồ sơ</a> · <a href="lien-he.html" data-root-link="lien-he.html" style="color:#fff">Liên hệ / DMCA</a></p>
-    <p style="margin:6px 0 0"><button class="dl-btn pwa-install" style="display:none;font-size:10px" onclick="installApp()">Cài app về máy</button></p>
+    <p style="margin:6px 0 0;font-size:10px;opacity:.7"><a href="index.html" data-root-link="index.html" style="color:#fff" data-i18n="foot_home">Trang chủ</a> · <a href="category.html" data-root-link="category.html" style="color:#fff" data-i18n="foot_cat">Thể loại</a> · <a href="profile.html" data-root-link="profile.html" style="color:#fff" data-i18n="foot_profile">♡ Hồ sơ</a> · <a href="lien-he.html" data-root-link="lien-he.html" style="color:#fff" data-i18n="foot_contact">Liên hệ / DMCA</a></p>
+    <p style="margin:6px 0 0"><button class="dl-btn pwa-install" style="display:none;font-size:10px" data-i18n="install" onclick="installApp()">Cài app về máy</button></p>
   </footer>
 </div>
 
@@ -258,7 +258,7 @@ span.skel{display:block}
     <div class="modal-banner" style="height:72px;border-radius:14px 14px 0 0;overflow:hidden;border-bottom:2px solid #4da6ff;position:relative;flex-shrink:0"><img src="/assets/banners/banner1.png" data-root-src="assets/banners/banner1.png" alt="SOS banner" width="720" height="120" style="width:100%;height:100%;object-fit:cover;display:block" loading="lazy"><div style="position:absolute;top:8px;left:50%;transform:translateX(-50%);background:#0066cc;color:#fff;font-weight:800;font-size:10px;padding:4px 14px;border-radius:20px;border:2px solid #fff;box-shadow:0 3px 8px rgba(0,102,204,.35);letter-spacing:.08em;white-space:nowrap">SOS</div></div>
     <div class="modal-body" style="display:flex;width:100%;flex:1;min-height:0">
       <div class="modal-anime"><img src="/assets/anime-girl.png" data-root-src="assets/anime-girl.png" class="modal-anime-img" alt="anime girl 128x168" width="128" height="168" decoding="async" loading="eager" onerror="this.style.display='none'"><svg viewBox="0 0 120 148" style="display:none"><text x="60" y="70" text-anchor="middle" fill="#0066cc">✿</text></svg></div>
-      <div class="modal-content"><h3>Khoan đã Senpai~ ⚠️</h3><p id="modalMsg">Bạn sắp tải JAR đó!</p><div style="display:flex;gap:8px;margin-top:12px"><a id="modalConfirm" href="#" style="flex:1;background:#0066cc;color:#fff;padding:8px;text-align:center;border-radius:20px;font-weight:700;text-decoration:none">✓ Có, tải ngay »</a><button id="modalCancel" style="flex:1;background:#fff;border:1.5px solid #81c7f0;padding:8px;border-radius:20px">✕ Không</button></div></div>
+      <div class="modal-content"><h3 data-i18n="modal_title">Khoan đã Senpai~ ⚠️</h3><p id="modalMsg">Bạn sắp tải JAR đó!</p><div style="display:flex;gap:8px;margin-top:12px"><a id="modalConfirm" href="#" style="flex:1;background:#0066cc;color:#fff;padding:8px;text-align:center;border-radius:20px;font-weight:700;text-decoration:none" data-i18n="g_modalGo">✓ Có, tải ngay »</a><button id="modalCancel" style="flex:1;background:#fff;border:1.5px solid #81c7f0;padding:8px;border-radius:20px" data-i18n="modal_no">✕ Không</button></div></div>
     </div>
     <button id="modalClose" style="position:absolute;top:8px;right:8px;width:28px;height:28px;border-radius:50%;border:1px solid #b8d8f8;background:#fff;z-index:2">×</button>
   </div>
@@ -267,10 +267,10 @@ span.skel{display:block}
 <!-- Cảnh báo link ngoài -->
 <div id="extModal" class="modal-overlay hidden" style="position:fixed;inset:0;background:rgba(10,18,36,.62);z-index:10001;padding:16px">
   <div class="modal-card" style="flex-direction:column;max-width:360px;padding:16px;gap:8px">
-    <h3 style="font-size:13px;color:#1a3a5c;margin:0">Rời khỏi J2ME?</h3>
-    <p style="font-size:11px;color:#4a7a9a;margin:0">Bạn sắp mở link ngoài, cẩn thận link lạ:</p>
+    <h3 style="font-size:13px;color:#1a3a5c;margin:0" data-i18n="ext_title">Rời khỏi J2ME?</h3>
+    <p style="font-size:11px;color:#4a7a9a;margin:0" data-i18n="ext_desc">Bạn sắp mở link ngoài, cẩn thận link lạ:</p>
     <p id="extUrl" style="font-size:11px;color:#0066cc;overflow-wrap:anywhere;margin:0"></p>
-    <div style="display:flex;gap:8px"><a id="extGo" href="#" target="_blank" rel="noopener" style="flex:1;background:#0066cc;color:#fff;padding:8px;text-align:center;border-radius:20px;font-weight:700;text-decoration:none;font-size:12px">Mở link »</a><button id="extBack" style="flex:1;background:#fff;border:1.5px solid #81c7f0;padding:8px;border-radius:20px;font-size:12px">Ở lại</button></div>
+    <div style="display:flex;gap:8px"><a id="extGo" href="#" target="_blank" rel="noopener" style="flex:1;background:#0066cc;color:#fff;padding:8px;text-align:center;border-radius:20px;font-weight:700;text-decoration:none;font-size:12px" data-i18n="ext_go">Mở link »</a><button id="extBack" style="flex:1;background:#fff;border:1.5px solid #81c7f0;padding:8px;border-radius:20px;font-size:12px" data-i18n="ext_stay">Ở lại</button></div>
   </div>
 </div>
 
@@ -503,7 +503,7 @@ function countDownload(gameId){
 function favGet(){try{const a=JSON.parse(localStorage.getItem('j2me_favs')||'[]');return Array.isArray(a)?a:[];}catch(e){return [];}}
 function favHas(id){try{return favGet().indexOf(id)>=0;}catch(e){return false;}}
 function favToggle(id){try{let a=favGet();a=a.indexOf(id)>=0?a.filter(function(x){return x!==id;}):a.concat([id]);localStorage.setItem('j2me_favs',JSON.stringify(a.slice(0,200)));var _fr=a.indexOf(id)>=0;try{__bm('fav');}catch(e){}try{stEvent(_fr?'like':'unlike',id);}catch(e){}return _fr;}catch(e){return false;}}
-function copyPageUrl(url,btn){function done(t){if(btn){btn.textContent=t;setTimeout(function(){btn.textContent='Copy link';},1500);}}if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(url).then(function(){done('Đã copy!');}).catch(function(){done('Copy lỗi');});}else{try{const ta=document.createElement('textarea');ta.value=url;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);done('Đã copy!');}catch(e){done('Copy lỗi');}}}
+function copyPageUrl(url,btn){function done(t){if(btn){btn.textContent=t;setTimeout(function(){btn.textContent=cmtT('g_copy','Copy link');},1500);}}if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(url).then(function(){done(cmtT('g_copied','Đã copy!'));}).catch(function(){done(cmtT('g_copyerr','Copy lỗi'));});}else{try{const ta=document.createElement('textarea');ta.value=url;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);done(cmtT('g_copied','Đã copy!'));}catch(e){done(cmtT('g_copyerr','Copy lỗi'));}}}
 // XP + nhiệm vụ hằng ngày (xem 3 game / thích 1 / bình luận 1, mỗi cái +10)
 function xpAdd(n){try{const o=JSON.parse(localStorage.getItem('j2me_xp')||'{"xp":0}')||{xp:0};o.xp=(o.xp||0)+n;localStorage.setItem('j2me_xp',JSON.stringify(o));}catch(e){}}
 function xpBump(kind,gameId){
@@ -525,26 +525,10 @@ function qInc(kind){
   }catch(e){}
 }
 function xpLevel(xp){const L=[[0,'Tân thủ'],[30,'Mới chơi'],[80,'Game thủ'],[150,'Cao thủ'],[300,'Lão làng WAP'],[600,'Huyền thoại WAP']];let t=L[0];for(const lv of L){if(xp>=lv[0])t=lv;}const i=L.indexOf(t);return {name:t[1],xp:xp,next:i+1<L.length?L[i+1]:null};}
-// Nhạc nền 8-bit (WebAudio, tắt mặc định, dùng chung AudioContext)
-const MUS={timer:null,step:0,
-  lead:[523,659,784,659,880,784,659,523,587,659,587,523,440,523,0,0,523,659,784,880,784,659,587,659,523,587,440,523,392,440,0,0],
-  bass:[131,131,196,196,175,175,147,147,131,131,196,196,175,175,147,147,131,131,196,196,175,175,147,147,196,196,147,147,131,131,98,98]};
-function musNote(f,t,dur,type,vol){try{const c=getAC();if(!c||!f)return;const o=c.createOscillator(),gn=c.createGain();o.type=type;o.frequency.value=f;gn.gain.setValueAtTime(vol,c.currentTime);gn.gain.exponentialRampToValueAtTime(0.0001,c.currentTime+dur);o.connect(gn);gn.connect(c.destination);o.start(t);o.stop(t+dur);}catch(e){}}
-function musTick(){try{const c=getAC();if(!c)return;const t=c.currentTime+0.02;const i=MUS.step%32;musNote(MUS.lead[i],t,0.16,'square',0.035);musNote(MUS.bass[i]/2,t,0.2,'triangle',0.05);MUS.step++;}catch(e){}}
-function musToggle(btn){
-  try{
-    if(MUS.timer){clearInterval(MUS.timer);MUS.timer=null;localStorage.setItem('j2me_music','0');if(btn)btn.textContent='🎵 Nhạc';return;}
-    const c=getAC(); if(c&&c.resume)c.resume().catch(function(){});
-    MUS.step=0; MUS.timer=setInterval(musTick,165);
-    localStorage.setItem('j2me_music','1');if(btn)btn.textContent='🎵 Tắt';
-  }catch(e){}
-}
-addEventListener('pagehide',function(){try{if(MUS.timer){clearInterval(MUS.timer);MUS.timer=null;}}catch(e){}});
-document.addEventListener('visibilitychange',function(){if(document.hidden&&MUS.timer){clearInterval(MUS.timer);MUS.timer=null;}});
 // Nút cài app PWA (hiện khi trình duyệt cho phép)
 let deferredPrompt=null;
 window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();deferredPrompt=e;try{document.querySelectorAll('.pwa-install').forEach(function(b){b.style.display='';});}catch(err){}});
-function installApp(){if(deferredPrompt){try{deferredPrompt.prompt();deferredPrompt=null;}catch(e){}}else{alert('Mở menu trình duyệt → "Thêm vào màn hình chính" để cài app.');}}
+function installApp(){if(deferredPrompt){try{deferredPrompt.prompt();deferredPrompt=null;}catch(e){}}else{alert(cmtT('install_msg','Mở menu trình duyệt → "Thêm vào màn hình chính" để cài app.'));}}
 // Bingo tuần + khóa tải: bảng Deterministic theo tuần (KHỚP senpai.js), helper đánh dấu tiến trình.
 // Lưu ý: phút online của khách được server xác minh qua presence chain đã ký;
 // like/phá đảo vẫn là số local (khóa mềm) — đủ chặn link copy tay qua proof.
@@ -572,10 +556,10 @@ function __petLv(){try{var s=JSON.parse(localStorage.getItem('j2me_senpai')||'nu
 function __gate(g){
   var gt=g&&g.gate&&g.gate.type;
   if(!gt||gt==='none')return null;
-  if(gt==='bingo'){var n=Math.max(1,parseInt((g.gate.lines||1),10)||1),has=__blines();return has>=n?null:{label:'Bingo tuần này',need:'cần '+n+' line (đang có '+has+')'};}
-  if(gt==='pet'){var nl=Math.max(1,parseInt(g.gate.level||3,10)||3),lv=__petLv();return lv>=nl?null:{label:'Pet đạt Lv'+nl,need:'pet đang Lv'+lv};}
-  if(gt==='badge'){try{var s2=JSON.parse(localStorage.getItem('j2me_senpai')||'null');if(s2&&s2.gacha&&s2.gacha.badges&&s2.gacha.badges.length)return null;}catch(e){}return{label:'Huy hiệu gacha hiếm',need:'quay gacha ra huy hiệu đã'};}
-  if(gt==='xp'){var x=0;try{var o=JSON.parse(localStorage.getItem('j2me_xp')||'{"xp":0}');x=o.xp||0;}catch(e){}var nx=Math.max(1,parseInt(g.gate.xp||100,10)||100);return x>=nx?null:{label:'Tổng '+nx+' XP',need:'đang có '+x+' XP'};}
+  if(gt==='bingo'){var n=Math.max(1,parseInt((g.gate.lines||1),10)||1),has=__blines();return has>=n?null:{label:cmtT('g_gateBingo','Bingo tuần này'),need:cmtT('g_gateNeed','cần {n} line (đang có {h})').replace('{n}',n).replace('{h}',has)};}
+  if(gt==='pet'){var nl=Math.max(1,parseInt(g.gate.level||3,10)||3),lv=__petLv();return lv>=nl?null:{label:cmtT('g_gatePet','Pet đạt Lv{n}').replace('{n}',nl),need:cmtT('g_gatePetHas','pet đang Lv{h}').replace('{h}',lv)};}
+  if(gt==='badge'){try{var s2=JSON.parse(localStorage.getItem('j2me_senpai')||'null');if(s2&&s2.gacha&&s2.gacha.badges&&s2.gacha.badges.length)return null;}catch(e){}return{label:cmtT('g_gateBadge','Huy hiệu gacha hiếm'),need:cmtT('g_gateBadgeNeed','quay gacha ra huy hiệu đã')};}
+  if(gt==='xp'){var x=0;try{var o=JSON.parse(localStorage.getItem('j2me_xp')||'{"xp":0}');x=o.xp||0;}catch(e){}var nx=Math.max(1,parseInt(g.gate.xp||100,10)||100);return x>=nx?null:{label:cmtT('g_gateXp','Tổng {n} XP').replace('{n}',nx),need:cmtT('g_gateXpHas','đang có {x} XP').replace('{x}',x)};}
   return null;
 }
 function __proof(g){
@@ -594,17 +578,17 @@ function __proof(g){
 function __statVals(){var o={min:0,likes:0,done:0};try{o.min=stVerifiedMin();}catch(e){}try{o.likes=stLikes();}catch(e){}try{o.done=stDone();}catch(e){}return o;}
 function __statsRows(g,apprN){
   var rq=(g.gate&&g.gate.require)||{},rows=[],v=__statVals();
-  if(rq.minutes!=null)rows.push({k:'m',need:+rq.minutes,has:v.min,ok:v.min>=+rq.minutes,label:'Online đủ '+rq.minutes+' phút',hint:'<small>mở web là tự tính</small>'});
-  if(rq.likes!=null)rows.push({k:'l',need:+rq.likes,has:v.likes,ok:v.likes>=+rq.likes,label:'Thích '+rq.likes+' game',hint:'<a href="'+apiRoot()+'/index.html" style="color:#0066cc">→ thích ngay</a>'});
-  if(rq.completed!=null)rows.push({k:'d',need:+rq.completed,has:v.done,ok:v.done>=+rq.completed,label:'Phá đảo '+rq.completed+' game',hint:'<small>bấm "Phá đảo?" ở trang game</small>'});
+  if(rq.minutes!=null)rows.push({k:'m',need:+rq.minutes,has:v.min,ok:v.min>=+rq.minutes,label:cmtT('go_req_min','Online đủ {n} phút').replace('{n}',rq.minutes),hint:'<small>'+cmtT('go_auto','mở web là tự tính')+'</small>'});
+  if(rq.likes!=null)rows.push({k:'l',need:+rq.likes,has:v.likes,ok:v.likes>=+rq.likes,label:cmtT('go_req_like','Thích {n} game').replace('{n}',rq.likes),hint:'<a href="'+apiRoot()+'/index.html" style="color:#0066cc">'+cmtT('go_likeNow','→ thích ngay')+'</a>'});
+  if(rq.completed!=null)rows.push({k:'d',need:+rq.completed,has:v.done,ok:v.done>=+rq.completed,label:cmtT('go_req_done','Phá đảo {n} game').replace('{n}',rq.completed),hint:'<small>'+cmtT('go_doneHint','bấm "Phá đảo?" ở trang game')+'</small>'});
   if(rq.comments!=null){
     var pend=(apprN==null);
     var who='';
     try{
-      if(stLogged()){who='theo tài khoản';}
-      else{var _nm=stNames();who=_nm.length?('theo tên: '+_nm.map(function(x){return escHtml(x);}).join(', ')):'chưa thấy tên nào — hãy bình luận 1 cái';}
+      if(stLogged()){who=cmtT('g_whoAcc','theo tài khoản');}
+      else{var _nm=stNames();who=_nm.length?(cmtT('g_whoNames','theo tên: ')+_nm.map(function(x){return escHtml(x);}).join(', ')):cmtT('g_whoNone','chưa thấy tên nào — hãy bình luận 1 cái');}
     }catch(e){}
-    rows.push({k:'c',need:+rq.comments,has:pend?-1:apprN,ok:!pend&&apprN>=+rq.comments,pending:pend,label:'Có '+rq.comments+' bình luận được duyệt',hint:'<small>bình luận bên dưới, chờ duyệt ('+who+')</small>'});
+    rows.push({k:'c',need:+rq.comments,has:pend?-1:apprN,ok:!pend&&apprN>=+rq.comments,pending:pend,label:cmtT('go_req_cmt','Có {n} bình luận được duyệt').replace('{n}',rq.comments),hint:'<small>'+cmtT('g_cmtBelow','bình luận bên dưới, chờ duyệt (')+who+')</small>'});
   }
   return rows;
 }
@@ -612,46 +596,46 @@ function __statsPass(rows){for(var i=0;i<rows.length;i++)if(!rows[i].ok)return f
 function __statsRowsHtml(rows){
   return rows.map(function(r){
     var ic=r.pending?'…':(r.ok?'✓':'✗'),cls=r.pending?'':(r.ok?'ok':'bad');
-    var pr=r.pending?'đang kiểm tra...':(r.has+'/'+r.need);
+    var pr=r.pending?cmtT('go_checking2','đang kiểm tra...'):(r.has+'/'+r.need);
     return '<div class="lockrow '+cls+'"><span>'+ic+'</span><span>'+r.label+'</span><b>'+pr+'</b>'+(r.ok?'':(r.hint||''))+'</div>';
   }).join('');
 }
 function __ticketAndGo(gid,res,msgEl){
-  msgEl.textContent='Đang lấy vé tải...';
+  msgEl.textContent=cmtT('g_ticket','Đang lấy vé tải...');
   var gm=(GAMES_MAP||{})[gid]||{id:gid};
   fetch(apiRoot()+'/api/ticket?id='+encodeURIComponent(gid)+'&res='+encodeURIComponent(res)+'&proof='+encodeURIComponent(__proof(gm)),{cache:'no-store',headers:stAuthHeaders()})
     .then(function(r){return r.json().then(function(j){return {st:r.status,j:j};});})
     .then(function(o){
       if(o.st===200&&o.j&&o.j.ticket){try{countDownload(gid);}catch(e2){}location.href=apiRoot()+'/go.html?ticket='+encodeURIComponent(o.j.ticket);}
-      else if(o.st===403){var rs0=__statsRows(gm,null);var needC0=rs0.some(function(r){return r.k==='c';});var hd='🔒 <b>Chưa đủ điều kiện</b>'+(o.j&&o.j.reason?' (<b>'+escHtml(o.j.reason)+'</b>)':'')+'. Server vừa kiểm tra — số bên dưới là mới nhất:';var ft='<div style="margin-top:6px"><small>Treo trang thêm cho đủ rồi bấm Tải lại (không cần F5).</small></div>';var paint=function(rr){msgEl.innerHTML=hd+'<div style="margin-top:6px;text-align:left">'+__statsRowsHtml(rr)+'</div>'+ft;};paint(rs0);if(needC0){try{stApprovedCount(function(n){paint(__statsRows(gm,n));});}catch(e){}}}
-      else{msgEl.textContent='Không lấy được vé ('+o.st+'), thử lại sau.';}
-    }).catch(function(){msgEl.textContent='Mất mạng, thử lại sau.';});
+      else if(o.st===403){var rs0=__statsRows(gm,null);var needC0=rs0.some(function(r){return r.k==='c';});var hd='🔒 <b>'+cmtT('g_cond','Chưa đủ điều kiện')+'</b>'+(o.j&&o.j.reason?' (<b>'+escHtml(o.j.reason)+'</b>)':'')+'. '+cmtT('g_srv','Server vừa kiểm tra — số bên dưới là mới nhất:');var ft='<div style="margin-top:6px"><small>'+cmtT('g_hang','Treo trang thêm cho đủ rồi bấm Tải lại (không cần F5).')+'</small></div>';var paint=function(rr){msgEl.innerHTML=hd+'<div style="margin-top:6px;text-align:left">'+__statsRowsHtml(rr)+'</div>'+ft;};paint(rs0);if(needC0){try{stApprovedCount(function(n){paint(__statsRows(gm,n));});}catch(e){}}}
+      else{msgEl.textContent=cmtT('g_noTicket2','Không lấy được vé (')+o.st+'), thử lại sau.';}
+    }).catch(function(){msgEl.textContent=cmtT('g_offline','Mất mạng, thử lại sau.');});
 }
 async function renderDetail(){
   const qs=new URLSearchParams(location.search);
   let GAMES=null,id='',g=null,isPreview=false;
   if(qs.get('preview')==='1'){
     try{ g=JSON.parse(sessionStorage.getItem('game_preview')||'null'); }catch(e){ g=null; }
-    if(!g||!g.name){ document.querySelector('.body-text').innerHTML='<p class="note">Không có dữ liệu xem trước. Hãy bấm nút "Xem trước" trong trang admin.</p>'; return; }
+    if(!g||!g.name){ document.querySelector('.body-text').innerHTML='<p class="note">'+escHtml(cmtT('g_noPreview','Không có dữ liệu xem trước. Hãy bấm nút "Xem trước" trong trang admin.'))+'</p>'; return; }
     isPreview=true; id=g.id||'preview';
   }else{
     id=getId();
     try{const _em=document.getElementById('__GAME_DATA__');if(_em){const _g=JSON.parse(_em.textContent);if(_g&&_g.id===id){g=_g;GAMES={};GAMES[id]=_g;/* KHÔNG seed GAMES_MAP bằng 1 game: loadMap(force) phải tải full danh mục, nếu không related luôn rỗng và ghi đè HTML do server render */loadMap(true).then(function(m){GAMES=m;try{Object.assign(GAMES_MAP||{},m);}catch(e){}try{if(!isPreview)renderRelatedList();}catch(e){}}).catch(function(){});}}}catch(e){}
     if(!g){GAMES=await loadMap();g=GAMES[id];}
   }
-  if(!g){const nf=document.querySelector('.kawaii-d')||document.querySelector('.wrap'); if(nf)nf.innerHTML=`<div style="padding:20px;text-align:center"><h2>Không tìm thấy game!</h2><p><a href="${apiRoot()}/index.html">‹ Về trang chủ</a></p></div>`; return;}
+  if(!g){const nf=document.querySelector('.kawaii-d')||document.querySelector('.wrap'); if(nf)nf.innerHTML=`<div style="padding:20px;text-align:center"><h2>${cmtT('g_notfound','Không tìm thấy game!')}</h2><p><a href="${apiRoot()}/index.html">${cmtT('back_home','‹ Về trang chủ')}</a></p></div>`; return;}
   if(!isPreview){try{xpBump('visit',id);}catch(e){}}
   if(!isPreview){try{if(g&&g.vi)__bm('open_vi');}catch(e){}}
-  document.title=g.name+' - Tải Game Java '+g.res[0]+' | J2ME.VERCEL.APP';
+  document.title=g.name+cmtT('g_titleMid',' - Tải Game Java ')+g.res[0]+' | J2ME.VERCEL.APP';
   const bc2=document.getElementById('bcName'); if(bc2) bc2.textContent=g.name;
   const can=document.querySelector('link[rel="canonical"]'); if(can) can.href=location.origin+`/game/${id}.html`;
   const ogUrl=document.querySelector('meta[property="og:url"]'); if(ogUrl) ogUrl.content=location.origin+`/game/${id}.html`;
   const ogTitle=document.querySelector('meta[property="og:title"]'); if(ogTitle) ogTitle.content=g.name+' - Game Java';
   const ogImg=document.querySelector('meta[property="og:image"]'); if(ogImg&&g.thumb) ogImg.content=g.thumb;
-  const metaDesc=document.querySelector('meta[name="description"]');   if(metaDesc) metaDesc.content=`Tải ${g.name} cho Java J2ME. ${String(g.desc||'').replace(/\[credit\][\s\S]*?\[\/credit\]/gi,' ').slice(0,120)} Hỗ trợ ${(g.res||[]).join(', ')}.`;
+  const metaDesc=document.querySelector('meta[name="description"]');   if(metaDesc) metaDesc.content=cmtT('g_metaA','Tải ')+g.name+cmtT('g_metaB',' cho Java J2ME. ')+`${String(g.desc||'').replace(/\[credit\][\s\S]*?\[\/credit\]/gi,' ').slice(0,120)}`+cmtT('g_metaC',' Hỗ trợ ')+`${(g.res||[]).join(', ')}.`;
   if(!isPreview&&location.search.includes('id=')){ history.replaceState(null,'',apiRoot()+`/game/${id}.html`); }
   const bc=document.getElementById('bcName'); if(bc) bc.textContent=g.name;
-  if(isPreview){document.getElementById('breadcrumb').insertAdjacentHTML('afterend','<p class="note">ĐANG XEM TRƯỚC — bấm Lưu trong admin để đăng thật.</p>');}
+  if(isPreview){document.getElementById('breadcrumb').insertAdjacentHTML('afterend','<p class="note">'+escHtml(cmtT('g_preview','ĐANG XEM TRƯỚC — bấm Lưu trong admin để đăng thật.'))+'</p>');}
   // detail-head (kèm ngày đăng nếu bài có lưu created_at)
   let dateStr='';
   try{ if(g.created_at){ const dd=new Date(g.created_at); if(!isNaN(dd)) dateStr=dd.toLocaleDateString('vi-VN',{day:'2-digit',month:'2-digit',year:'numeric'}); } }catch(e){}
@@ -664,9 +648,9 @@ async function renderDetail(){
     }catch(e){}
   }
   const head=document.querySelector('.detail-head');
-  head.innerHTML=`<img src="${escHtml(g.thumb)}" alt="${escHtml(g.name)} thumb" width="84" height="84" decoding="async" fetchpriority="high"><div><h2>${escHtml(g.name)} ${g.hot?'<span style="background:#0066cc;color:#fff;font-size:8px;padding:2px 5px;border-radius:8px">HOT</span>':''} ${g.vi?'<span style="background:#0a9c4a;color:#fff;font-size:8px;padding:2px 5px;border-radius:8px">VIỆT HÓA</span>':''}</h2><table class="info-table"><tr><th>Thể loại</th><td><a href="${apiRoot()}/category.html?cat=${encodeURIComponent(g.cat||'')}" style="color:#0066cc">${escHtml(g.cat)}</a></td></tr><tr><th>Dung lượng</th><td>${escHtml(g.size)}</td></tr><tr><th>Màn hình</th><td>${(g.res||[]).map(r=>`<span class="res-tag">${escHtml(r)}</span>`).join(' ')}</td></tr>${dateStr?`<tr><th>Ngày đăng</th><td>${dateStr}</td></tr>`:''}${dlCount!=null?`<tr><th>Lượt tải</th><td>${Number(dlCount).toLocaleString('vi-VN')}</td></tr>`:''}</table></div>`;
+  head.innerHTML=`<img src="${escHtml(g.thumb)}" alt="${escHtml(g.name)} thumb" width="84" height="84" decoding="async" fetchpriority="high"><div><h2>${escHtml(g.name)} ${g.hot?'<span style="background:#0066cc;color:#fff;font-size:8px;padding:2px 5px;border-radius:8px">HOT</span>':''} ${g.vi?'<span style="background:#0a9c4a;color:#fff;font-size:8px;padding:2px 5px;border-radius:8px">VIỆT HÓA</span>':''}</h2><table class="info-table"><tr><th>${cmtT('g_thr_genre','Thể loại')}</th><td><a href="${apiRoot()}/category.html?cat=${encodeURIComponent(g.cat||'')}" style="color:#0066cc">${escHtml(g.cat)}</a></td></tr><tr><th>${cmtT('g_thr_size','Dung lượng')}</th><td>${escHtml(g.size)}</td></tr><tr><th>${cmtT('g_thr_res','Màn hình')}</th><td>${(g.res||[]).map(r=>`<span class="res-tag">${escHtml(r)}</span>`).join(' ')}</td></tr>${dateStr?`<tr><th>${cmtT('g_thr_date','Ngày đăng')}</th><td>${dateStr}</td></tr>`:''}${dlCount!=null?`<tr><th>${cmtT('g_thr_dl','Lượt tải')}</th><td>${Number(dlCount).toLocaleString('vi-VN')}</td></tr>`:''}</table></div>`;
   // dl
-  document.querySelector('.dl-grid').innerHTML=(g.res||[]).map(r=>`<div class="dl-option"><b>${escHtml(r)}</b><br><small style="color:#4a7a9a;font-size:10px">${escHtml(g.size)} • ${String(r).includes('240')?'QVGA':'QCIF'}</small><br><a href="${escHtml(apiRoot()+'/api/dl?id='+encodeURIComponent(g.id)+'&res='+encodeURIComponent(r))}" class="dl-btn" data-dl-btn="1" data-name="${escHtml(g.name)}" data-res="${escHtml(r)}">⬇ Tải JAR</a></div>`).join('');
+  document.querySelector('.dl-grid').innerHTML=(g.res||[]).map(r=>`<div class="dl-option"><b>${escHtml(r)}</b><br><small style="color:#4a7a9a;font-size:10px">${escHtml(g.size)} • ${String(r).includes('240')?'QVGA':'QCIF'}</small><br><a href="${escHtml(apiRoot()+'/api/dl?id='+encodeURIComponent(g.id)+'&res='+encodeURIComponent(r))}" class="dl-btn" data-dl-btn="1" data-name="${escHtml(g.name)}" data-res="${escHtml(r)}">${cmtT('dl','⬇ Tải JAR')}</a></div>`).join('');
   // Chia sẻ + QR + yêu thích
   try{
     const pageUrl=isPreview?location.href:('https://J2ME.VERCEL.APP/game/'+id+'.html');
@@ -674,26 +658,26 @@ async function renderDetail(){
     if(!shareBox){const de=document.querySelector('.kawaii-e'); if(de){shareBox=document.createElement('div');shareBox.id='shareBox';shareBox.className='kawaii-f';de.after(shareBox);}}
     if(shareBox){
       const favOn=favHas(id);
-      shareBox.innerHTML=`<div class="kawaii-title">Chia sẻ</div><div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">`
+      shareBox.innerHTML=`<div class="kawaii-title">${cmtT('g_share','Chia sẻ')}</div><div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">`
       +`<a href="https://zalo.me/share?url=${encodeURIComponent(pageUrl)}" target="_blank" rel="noopener" class="dl-btn" style="font-size:11px">Zalo</a>`
       +`<a href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(pageUrl)}" target="_blank" rel="noopener" class="dl-btn" style="font-size:11px">Facebook</a>`
-      +`<button id="copyLinkBtn" class="dl-btn" style="font-size:11px">Copy link</button>`
-      +`<button id="qrBtn" class="dl-btn" style="font-size:11px">QR</button>`
-      +`<button id="favBtn" class="dl-btn" style="font-size:11px">${favOn?'♥ Đã thích':'♡ Thích'}</button>`
-      +`<button id="doneBtn" class="dl-btn" style="font-size:11px">${(function(){try{return JSON.parse(localStorage.getItem('j2me_done')||'[]').indexOf(id)>=0;}catch(e){return false;}})()?'✓ Đã phá đảo':'Phá đảo?'}</button></div>`
-      +`<div id="qrWrap" style="display:none;text-align:center;margin-top:8px"><img id="qrImg" alt="QR mở trên điện thoại" width="160" height="160" style="width:160px;height:160px;border:2px solid #b8d8f8;border-radius:12px;background:#fff"><br><small style="color:#4a7a9a;font-size:10px">Quét để mở trên điện thoại</small></div>`;
+      +`<button id="copyLinkBtn" class="dl-btn" style="font-size:11px">${cmtT('g_copy','Copy link')}</button>`
+      +`<button id="qrBtn" class="dl-btn" style="font-size:11px">${cmtT('g_qr','QR')}</button>`
+      +`<button id="favBtn" class="dl-btn" style="font-size:11px">${favOn?cmtT('g_favOn','♥ Đã thích'):cmtT('g_favOff','♡ Thích')}</button>`
+      +`<button id="doneBtn" class="dl-btn" style="font-size:11px">${(function(){try{return JSON.parse(localStorage.getItem('j2me_done')||'[]').indexOf(id)>=0;}catch(e){return false;}})()?cmtT('g_doneOn','✓ Đã phá đảo'):cmtT('g_doneOff','Phá đảo?')}</button></div>`
+      +`<div id="qrWrap" style="display:none;text-align:center;margin-top:8px"><img id="qrImg" alt="QR mở trên điện thoại" width="160" height="160" style="width:160px;height:160px;border:2px solid #b8d8f8;border-radius:12px;background:#fff"><br><small style="color:#4a7a9a;font-size:10px">${cmtT('g_qrNote','Quét để mở trên điện thoại')}</small></div>`;
       document.getElementById('copyLinkBtn').onclick=function(){copyPageUrl(pageUrl,this);try{__bm('share');}catch(e){}};
       document.getElementById('qrBtn').onclick=function(){const w=document.getElementById('qrWrap');const im=document.getElementById('qrImg');if(w.style.display==='none'){if(!im.src)im.src='https://api.qrserver.com/v1/create-qr-code/?size=160x160&data='+encodeURIComponent(pageUrl);w.style.display='block';}else{w.style.display='none';}};
-      document.getElementById('favBtn').onclick=function(){const on=favToggle(id);this.textContent=favHas(id)?'♥ Đã thích':'♡ Thích';if(on){xpBump('fav');}};
-      document.getElementById('doneBtn').onclick=function(){try{let a=JSON.parse(localStorage.getItem('j2me_done')||'[]');const has=a.indexOf(id)>=0;a=has?a.filter(function(x){return x!==id;}):a.concat([id]);localStorage.setItem('j2me_done',JSON.stringify(a.slice(0,500)));this.textContent=has?'Phá đảo?':'✓ Đã phá đảo';try{stEvent(has?'uncomplete':'complete',id);}catch(e){}}catch(e){}};
+      document.getElementById('favBtn').onclick=function(){const on=favToggle(id);this.textContent=favHas(id)?cmtT('g_favOn','♥ Đã thích'):cmtT('g_favOff','♡ Thích');if(on){xpBump('fav');}};
+      document.getElementById('doneBtn').onclick=function(){try{let a=JSON.parse(localStorage.getItem('j2me_done')||'[]');const has=a.indexOf(id)>=0;a=has?a.filter(function(x){return x!==id;}):a.concat([id]);localStorage.setItem('j2me_done',JSON.stringify(a.slice(0,500)));this.textContent=has?cmtT('g_doneOff','Phá đảo?'):cmtT('g_doneOn','✓ Đã phá đảo');try{stEvent(has?'uncomplete':'complete',id);}catch(e){}}catch(e){}};
     }
   }catch(e){}
   // body — lưới demo tự cân theo số lượng ảnh: 1 ảnh căn giữa khổ lớn, 2 ảnh chia đôi,
   // từ 3 ảnh trở lên 3 ảnh/hàng, hàng cuối lẻ tự căn giữa (flex + justify-content:center)
   const shots=(g.shots||[]);
   const shotCls=shots.length===1?' count-1':shots.length===2?' count-2':'';
-  const shotsHtml=shots.length?`<div class="shot-grid${shotCls}">${shots.map((s,i)=>`<img src="${escHtml(s)}" alt="Ảnh demo ${i+1}" width="240" height="320" loading="lazy" decoding="async" data-idx="${i}" class="shot-img" style="cursor:pointer">`).join('')}</div>`:`<p class="note">Chưa có ảnh demo cho game này.</p>`;
-  document.querySelector('.body-text').innerHTML=`<h3>📝 Giới thiệu</h3><div style="white-space:pre-line">${renderDesc(g.desc||'')}</div><h3>🖼️ Hình ảnh</h3>${shotsHtml}<h3>⚙️ Yêu cầu</h3><p style="font-size:13px">• <b>MIDP 2.0</b> • Màn hình <b>${escHtml((g.res||[]).join(', '))}</b> • Trống ≥<b>${escHtml(g.size)}</b> • Opera Mini</p>`;
+  const shotsHtml=shots.length?`<div class="shot-grid${shotCls}">${shots.map((s,i)=>`<img src="${escHtml(s)}" alt="${cmtT('g_shotAlt','Ảnh demo ')}${i+1}" width="240" height="320" loading="lazy" decoding="async" data-idx="${i}" class="shot-img" style="cursor:pointer">`).join('')}</div>`:`<p class="note">${cmtT('g_noShots','Chưa có ảnh demo cho game này.')}</p>`;
+  document.querySelector('.body-text').innerHTML=`<h3>${cmtT('g_intro','📝 Giới thiệu')}</h3><div style="white-space:pre-line">${renderDesc(g.desc||'')}</div><h3>${cmtT('g_shots','🖼️ Hình ảnh')}</h3>${shotsHtml}<h3>${cmtT('g_req','⚙️ Yêu cầu')}</h3><p style="font-size:13px">• <b>MIDP 2.0</b> • ${cmtT('g_thr_res','Màn hình')} <b>${escHtml((g.res||[]).join(', '))}</b> • Trống ≥<b>${escHtml(g.size)}</b> • Opera Mini</p>`;
   CURRENT_SHOTS=shots;
   document.querySelectorAll('.shot-img').forEach(img=>{
     img.addEventListener('click',()=>openLightbox(parseInt(img.dataset.idx,10)));
@@ -906,13 +890,18 @@ document.addEventListener('click',function(e){
   document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!m.classList.contains('hidden'))close();});
 })();
 renderDetail();
+// Vẽ lại các thẻ động (chi tiết/chia sẻ/bình luận) khi i18n sẵn sàng / đổi ngôn ngữ
+document.addEventListener('i18n-ready',function(){
+  try{
+    if(!(window.I18N&&I18N.lang&&I18N.lang()!=='vi')) return;
+    if(typeof renderDetail==='function'){ renderDetail(); }
+  }catch(e){}
+});
 </script>
 <button id="liteToggle" title="Tiết kiệm data">📴 Nhẹ</button>
 <script>
 (function(){function paint(){try{var on=document.documentElement.classList.contains('lite');var b=document.getElementById('liteToggle');if(b)b.textContent=on?'📶 Đủ':'📴 Nhẹ';}catch(e){}}try{var b=document.getElementById('liteToggle');if(b)b.onclick=function(){try{var h=document.documentElement;if(h.classList.contains('lite')){h.classList.remove('lite');localStorage.setItem('j2me_lite','0');}else{h.classList.add('lite');localStorage.setItem('j2me_lite','1');}paint();}catch(e){}};paint();}catch(e){}})();
 </script>
-<button id="musicToggle" title="Nhạc nền 8-bit">🎵 Nhạc</button>
-<script>(function(){try{var b=document.getElementById('musicToggle');if(!b)return;try{if(localStorage.getItem('j2me_music')==='1')b.textContent='🎵 Tắt';}catch(e){}b.onclick=function(){try{musToggle(b);}catch(e){}};}catch(e){}})();</script>
 <script>try{document.querySelectorAll('.js-year').forEach(function(el){el.textContent=new Date().getFullYear();});}catch(e){}</script>
 <script>
 // Stats local cho khóa tải: phút online + lượt thích + phá đảo + tên bình luận

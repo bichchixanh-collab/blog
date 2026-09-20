@@ -30,35 +30,36 @@ body{background:#e8f4fd;padding:12px;font-family:system-ui;color:#1a3a5c}
 <div class="top-info"><span>◉ J2ME</span><span>LIÊN HỆ</span><span>100%</span></div>
 <div class="header">
 <img class="site-logo" src="assets/logo.png" alt="J2ME.VERCEL.APP" width="720" height="287" style="display:block;width:100%;max-width:320px;height:auto;margin:0 auto 8px" decoding="async" fetchpriority="high" onerror="this.style.display='none'">
-<h1 style="margin:0">Liên hệ / DMCA</h1><p style="margin:4px 0 0;font-size:11px">J2ME.VERCEL.APP — Kho game Java J2ME</p></div>
+<h1 style="margin:0" data-i18n="ct_title">Liên hệ / DMCA</h1><p style="margin:4px 0 0;font-size:11px" data-i18n="ct_sub">J2ME.VERCEL.APP — Kho game Java J2ME</p></div>
 <div class="wrap">
   <div class="box">
-    <h2>✉ Liên hệ</h2>
+    <h2 data-i18n="ct_h1">✉ Liên hệ</h2>
     <!-- TODO: thay email bên dưới bằng email thật của bạn -->
     <p>Email: <b>admin@j2me.vercel.app</b></p>
-    <p>Báo link hỏng, sai thông tin game hoặc yêu cầu bổ sung game mới — ghi rõ <b>tên game + link trang lỗi</b> để xử lý nhanh.</p>
+    <p data-i18n-html="ct_p1">Báo link hỏng, sai thông tin game hoặc yêu cầu bổ sung game mới — ghi rõ <b>tên game + link trang lỗi</b> để xử lý nhanh.</p>
   </div>
   <div class="box">
-    <h2>⚖ Khiếu nại bản quyền (DMCA)</h2>
-    <p>Website chỉ sưu tầm, tổng hợp thông tin và liên kết tải; mọi bản quyền game thuộc về nhà phát hành gốc. Nếu bạn là chủ sở hữu quyền và cho rằng nội dung nào vi phạm, hãy gửi email với:</p>
+    <h2 data-i18n="ct_h2">⚖ Khiếu nại bản quyền (DMCA)</h2>
+    <p data-i18n="ct_p2">Website chỉ sưu tầm, tổng hợp thông tin và liên kết tải; mọi bản quyền game thuộc về nhà phát hành gốc. Nếu bạn là chủ sở hữu quyền và cho rằng nội dung nào vi phạm, hãy gửi email với:</p>
     <ul>
-      <li>Link trang vi phạm trên website này</li>
-      <li>Bằng chứng bạn là chủ sở hữu quyền</li>
-      <li>Thông tin liên hệ để phản hồi</li>
+      <li data-i18n="ct_li1">Link trang vi phạm trên website này</li>
+      <li data-i18n="ct_li2">Bằng chứng bạn là chủ sở hữu quyền</li>
+      <li data-i18n="ct_li3">Thông tin liên hệ để phản hồi</li>
     </ul>
-    <p>Nội dung vi phạm sẽ được gỡ trong vòng 48 giờ sau khi xác minh.</p>
+    <p data-i18n="ct_p3">Nội dung vi phạm sẽ được gỡ trong vòng 48 giờ sau khi xác minh.</p>
   </div>
   <div class="box">
-    <h2>⚠ Tuyên bố miễn trừ</h2>
-    <p>Nội dung chỉ phục vụ mục đích lưu trữ, nghiên cứu các tựa game Java J2ME cũ. Người dùng tự chịu trách nhiệm khi tải và sử dụng. Website không lưu trữ file game trên máy chủ của mình.</p>
+    <h2 data-i18n="ct_h3">⚠ Tuyên bố miễn trừ</h2>
+    <p data-i18n="ct_p4">Nội dung chỉ phục vụ mục đích lưu trữ, nghiên cứu các tựa game Java J2ME cũ. Người dùng tự chịu trách nhiệm khi tải và sử dụng. Website không lưu trữ file game trên máy chủ của mình.</p>
   </div>
 </div>
-<footer class="footer"><p><a href="index.html">Trang chủ</a> · <a href="category.html">Thể loại</a></p><p>© <span class="js-year">2026</span> J2ME.VERCEL.APP</p></footer>
+<footer class="footer"><p><a href="index.html" data-i18n="foot_home">Trang chủ</a> · <a href="category.html" data-i18n="foot_cat">Thể loại</a></p><p>© <span class="js-year">2026</span> J2ME.VERCEL.APP</p></footer>
 </div>
 <button id="liteToggle" title="Tiết kiệm data">📴 Nhẹ</button>
 <script>
 (function(){function paint(){try{var on=document.documentElement.classList.contains('lite');var b=document.getElementById('liteToggle');if(b)b.textContent=on?'📶 Đủ':'📴 Nhẹ';}catch(e){}}try{var b=document.getElementById('liteToggle');if(b)b.onclick=function(){try{var h=document.documentElement;if(h.classList.contains('lite')){h.classList.remove('lite');localStorage.setItem('j2me_lite','0');}else{h.classList.add('lite');localStorage.setItem('j2me_lite','1');}paint();}catch(e){}};paint();}catch(e){}})();
 </script>
 <script>try{document.querySelectorAll('.js-year').forEach(function(el){el.textContent=new Date().getFullYear();});}catch(e){}</script>
+<script src="assets/i18n.js"></script>
 </body>
 </html>

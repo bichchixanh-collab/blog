@@ -37,18 +37,19 @@ a.btn.ghost{background:#fff;color:#0066cc;border:1.5px solid #81c7f0;box-shadow:
 <img class="site-logo" src="assets/logo.png" alt="J2ME.VERCEL.APP" width="720" height="287" style="display:block;width:100%;max-width:320px;height:auto;margin:0 auto 8px" decoding="async" fetchpriority="high" onerror="this.style.display='none'">
 <img class="mascot" src="assets/anime-girl.png" alt="anime" width="72" height="72" onerror="this.style.display='none'">
 <h1>J2ME.VERCEL.APP</h1>
-<p>Kho game Java .JAR • Anime</p>
+<p data-i18n="site_tag">Kho game Java .JAR • Anime</p>
 </div>
 <div class="body">
 <div class="big">📡</div>
-<h2>Mất mạng rồi Senpai~</h2>
-<p>Trang này chưa được lưu offline.<br>Bật mạng rồi thử lại nha!</p>
-<div class="tip">💡 Mẹo: các trang game <b>đã mở trước đó</b> vẫn xem được offline. Hãy quay lại trang chủ rồi mở game từ lịch sử trình duyệt.</div>
-<div class="btns"><a class="btn" href="index.html">Về trang chủ</a><a class="btn ghost" href="category.html">Thể loại</a></div>
+<h2 data-i18n="off_title">Mất mạng rồi Senpai~</h2>
+<p data-i18n-html="off_desc">Trang này chưa được lưu offline.<br>Bật mạng rồi thử lại nha!</p>
+<div class="tip" data-i18n-html="off_tip">💡 Mẹo: các trang game <b>đã mở trước đó</b> vẫn xem được offline. Hãy quay lại trang chủ rồi mở game từ lịch sử trình duyệt.</div>
+<div class="btns"><a class="btn" href="index.html" data-i18n="e404_home">Về trang chủ</a><a class="btn ghost" href="category.html" data-i18n="e404_cat">Thể loại</a></div>
 </div>
 <div class="foot"><p>© <span class="js-year">2026</span> J2ME.VERCEL.APP — Anime WAP</p></div>
 </div>
 <script>var el=document.getElementById('clock');if(el)el.textContent=new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'});</script>
 <script>try{document.querySelectorAll('.js-year').forEach(function(el){el.textContent=new Date().getFullYear();});}catch(e){}</script>
+<script src="assets/i18n.js"></script>
 </body>
 </html>

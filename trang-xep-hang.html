@@ -37,13 +37,13 @@ body{background:#e8f4fd;padding:12px;font-family:"Be Vietnam Pro",system-ui,sans
 <div class="hero">
 <img class="site-logo" src="assets/logo.png" alt="J2ME.VERCEL.APP" width="720" height="287" style="display:block;width:100%;max-width:320px;height:auto;margin:0 auto 8px" decoding="async" fetchpriority="high" onerror="this.style.display='none'">
 <img class="mascot" src="assets/anime-girl.png" alt="anime" width="72" height="72" onerror="this.style.display='none'">
-<h1>Bảng Xếp Hạng</h1>
-<p>Top XP toàn web • 1 tài khoản 1 phiếu</p>
+<h1 data-i18n="rk_title">Bảng Xếp Hạng</h1>
+<p data-i18n="rk_sub">Top XP toàn web • 1 tài khoản 1 phiếu</p>
 </div>
 <div class="body">
 <div id="boardList"></div>
-<div id="boardMsg">Đang tải…</div>
-<p style="margin-top:8px"><a href="index.html" style="font-size:11px">‹ Về trang chủ</a> · <a href="dang-nhap.html" style="font-size:11px">Đăng nhập để lên bảng</a></p>
+<div id="boardMsg" data-i18n="rk_loading">Đang tải…</div>
+<p style="margin-top:8px"><a href="index.html" data-i18n="back_home" style="font-size:11px">‹ Về trang chủ</a> · <a href="dang-nhap.html" data-i18n="rk_login" style="font-size:11px">Đăng nhập để lên bảng</a></p>
 </div>
 <div class="foot"><p>© <span class="js-year">2026</span> J2ME.VERCEL.APP</p></div>
 </div>
@@ -53,18 +53,25 @@ body{background:#e8f4fd;padding:12px;font-family:"Be Vietnam Pro",system-ui,sans
 <script src="assets/js/sb-board.js"></script>
 <script>
 (function(){
+  function T(k,fb){ try{ if(window.I18N&&window.I18N.T) return window.I18N.T(k,fb); }catch(e){} return fb; }
   function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(m){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m];});}
+  function loadBoard(){
   window.SBBoard.board().then(function(rows){
     var box=document.getElementById('boardList'),msg=document.getElementById('boardMsg');
-    if(!rows||!rows.length){msg.textContent='Chưa có ai lên bảng — đăng nhập + cày XP để làm người đầu tiên!';return;}
+    if(!rows||!rows.length){msg.textContent=T('rk_empty','Chưa có ai lên bảng — đăng nhập + cày XP để làm người đầu tiên!');return;}
     msg.style.display='none';
     box.innerHTML=rows.map(function(r,i){
       var cls=i===0?'r1':i===1?'r2':i===2?'r3':'';
       var medal=i===0?'👑 ':i===1?'🥈 ':i===2?'🥉 ':'';
       return '<div class="row"><span class="rank '+cls+'">'+(i+1)+'</span><b>'+medal+esc(r.display_name)+'</b><small>'+Number(r.xp||0).toLocaleString('vi-VN')+' XP</small></div>';
     }).join('');
-  }).catch(function(){document.getElementById('boardMsg').textContent='Không tải được bảng lúc này.';});
+  }).catch(function(){document.getElementById('boardMsg').textContent=T('rk_err','Không tải được bảng lúc này.');});
+  }
+  loadBoard();
+  // Vẽ lại khi i18n sẵn sàng / đổi ngôn ngữ
+  document.addEventListener('i18n-ready',function(){try{if(window.I18N&&I18N.lang&&I18N.lang()!=='vi')loadBoard();}catch(e){}});
 })();
 </script>
+<script src="assets/i18n.js"></script>
 </body>
 </html>

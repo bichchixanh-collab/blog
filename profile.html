@@ -43,7 +43,7 @@ body{background:#e8f4fd;padding:12px;font-family:"Quicksand","Be Vietnam Pro",sy
 <div class="app">
 <div class="top-info"><span>◉ HỒ SƠ</span><span>GAME THỦ</span><span>100%</span></div>
 <div class="header">
-<img class="site-logo" src="assets/logo.png" alt="J2ME.VERCEL.APP" width="720" height="287" style="display:block;width:100%;max-width:320px;height:auto;margin:0 auto 8px" decoding="async" fetchpriority="high" onerror="this.style.display='none'"><h1>Hồ sơ game thủ</h1><p style="margin:4px 0 0;font-size:11px">Lưu trên máy bạn, không cần tài khoản ♡</p></div>
+<img class="site-logo" src="assets/logo.png" alt="J2ME.VERCEL.APP" width="720" height="287" style="display:block;width:100%;max-width:320px;height:auto;margin:0 auto 8px" decoding="async" fetchpriority="high" onerror="this.style.display='none'"><h1 data-i18n="pf_title">Hồ sơ game thủ</h1><p style="margin:4px 0 0;font-size:11px" data-i18n="pf_sub">Lưu trên máy bạn, không cần tài khoản ♡</p></div>
 <div class="wrap">
   <div class="box">
     <div class="lv-name" id="lvName">Tân thủ</div>
@@ -52,55 +52,58 @@ body{background:#e8f4fd;padding:12px;font-family:"Quicksand","Be Vietnam Pro",sy
     <small style="color:#4a7a9a" id="lvNext"></small>
   </div>
   <div class="box">
-    <b style="font-size:12px">Nhiệm vụ hằng ngày (+10 XP/cái)</b>
+    <b style="font-size:12px" data-i18n="pf_quest">Nhiệm vụ hằng ngày (+10 XP/cái)</b>
     <div id="questList"></div>
   </div>
   <div class="box">
-    <b style="font-size:12px">Tổng kết</b>
+    <b style="font-size:12px" data-i18n="pf_total">Tổng kết</b>
     <div class="stat-grid" style="margin-top:8px" id="statGrid"></div>
   </div>
   <div class="box">
-    <b style="font-size:12px">Huy hiệu</b>
+    <b style="font-size:12px" data-i18n="pf_badges">Huy hiệu</b>
     <div class="badge-grid" style="margin-top:8px" id="badgeGrid"></div>
   </div>
   <div class="box">
-    <b style="font-size:12px">Game yêu thích</b>
-    <div id="favList" style="margin-top:6px"><small style="color:#4a7a9a">Chưa thích game nào — bấm ♡ ở trang game nha!</small></div>
+    <b style="font-size:12px" data-i18n="pf_fav">Game yêu thích</b>
+    <div id="favList" style="margin-top:6px"><small style="color:#4a7a9a" data-i18n="pf_favEmpty">Chưa thích game nào — bấm ♡ ở trang game nha!</small></div>
   </div>
   <div class="box">
-    <b style="font-size:12px">Sao lưu hồ sơ</b><br>
-    <small style="color:#4a7a9a">Đổi máy không mất thành tích: xuất file rồi nhập lại.</small>
+    <b style="font-size:12px" data-i18n="pf_backup">Sao lưu hồ sơ</b><br>
+    <small style="color:#4a7a9a" data-i18n="pf_backupNote">Đổi máy không mất thành tích: xuất file rồi nhập lại.</small>
     <div style="margin-top:6px">
-      <button class="btn" id="expBtn">⬇ Xuất file</button>
-      <label class="btn" style="cursor:pointer">⬆ Nhập file<input id="impFile" type="file" accept=".json,application/json" style="display:none"></label>
-      <button class="btn" id="resetBtn" style="color:#a00;border-color:#e8a0a0">Xóa hết</button>
+      <button class="btn" id="expBtn" data-i18n="pf_export">⬇ Xuất file</button>
+      <label class="btn" style="cursor:pointer"><span data-i18n="pf_import">⬆ Nhập file</span><input id="impFile" type="file" accept=".json,application/json" style="display:none"></label>
+      <button class="btn" id="resetBtn" data-i18n="pf_wipe" style="color:#a00;border-color:#e8a0a0">Xóa hết</button>
     </div>
   </div>
 </div>
-<footer class="footer"><p><a href="index.html">Trang chủ</a> · <a href="category.html">Thể loại</a> · <a href="lien-he.html">Liên hệ / DMCA</a></p><p>© <span class="js-year">2026</span> J2ME.VERCEL.APP</p></footer>
+<footer class="footer"><p><a href="index.html" data-i18n="foot_home">Trang chủ</a> · <a href="category.html" data-i18n="foot_cat">Thể loại</a> · <a href="lien-he.html" data-i18n="foot_contact">Liên hệ / DMCA</a></p><p>© <span class="js-year">2026</span> J2ME.VERCEL.APP</p></footer>
 </div>
 <script>
+function T(k,fb){ try{ if(window.I18N&&window.I18N.T) return window.I18N.T(k,fb); }catch(e){} return fb; }
 function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(m){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m];});}
 function J(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v);}catch(e){return d;}}
 const LEVELS=[[0,'Tân thủ'],[30,'Mới chơi'],[80,'Game thủ'],[150,'Cao thủ'],[300,'Lão làng WAP'],[600,'Huyền thoại WAP']];
+function lvName(n){ const map={'Tân thủ':'pf_lv0','Mới chơi':'pf_lv1','Game thủ':'pf_lv2','Cao thủ':'pf_lv3','Lão làng WAP':'pf_lv4','Huyền thoại WAP':'pf_lv5'}; return T(map[n]||'',n); }
 function levelOf(xp){let t=LEVELS[0];for(const lv of LEVELS){if(xp>=lv[0])t=lv;}const i=LEVELS.indexOf(t);return {name:t[1],next:i+1<LEVELS.length?LEVELS[i+1]:null,cur:t[0]};}
 function favs(){const a=J('j2me_favs',[]);return Array.isArray(a)?a:[];}
 function seen(){const a=J('j2me_seen',[]);return Array.isArray(a)?a:[];}
 function done(){const a=J('j2me_done',[]);return Array.isArray(a)?a:[];}
 function dlIds(){const out={};try{for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.indexOf('dl_')===0){const parts=k.split('_');if(parts.length>=2)out[parts.slice(1,parts.length-1).join('_')]=true;}}}catch(e){}return Object.keys(out);}
-(async function(){
+async function renderProfile(){
+  // (Cho phép vẽ lại khi đổi ngôn ngữ: bấm nút VI/ID là tự dịch ngay)
   const KEEP=k=>k&&(k.indexOf('j2me_')===0||k.indexOf('dl_')===0||k.indexOf('cmt_')===0);
   const xp=(J('j2me_xp',{xp:0}).xp)||0;
   const lv=levelOf(xp);
-  document.getElementById('lvName').textContent=lv.name;
+  document.getElementById('lvName').textContent=lvName(lv.name);
   document.getElementById('lvXp').textContent=xp.toLocaleString('vi-VN')+' XP';
   if(lv.next){
     const pct=Math.min(100,Math.round(100*(xp-lv.cur)/(lv.next[0]-lv.cur)));
     document.getElementById('lvBar').style.width=pct+'%';
-    document.getElementById('lvNext').textContent='Còn '+(lv.next[0]-xp).toLocaleString('vi-VN')+' XP lên '+lv.next[1];
-  }else{document.getElementById('lvBar').style.width='100%';document.getElementById('lvNext').textContent='MAX rồi, huyền thoại!';}
+    document.getElementById('lvNext').textContent=T('pf_toGo','Còn {a} XP lên {b}').replace('{a}',(lv.next[0]-xp).toLocaleString('vi-VN')).replace('{b}',lvName(lv.next[1]));
+  }else{document.getElementById('lvBar').style.width='100%';document.getElementById('lvNext').textContent=T('pf_max','MAX rồi, huyền thoại!');}
   const day=new Date().toISOString().slice(0,10);
-  const qs=[['seen','Mở 3 game',3],['fav','Thích 1 game',1],['cmt','Bình luận 1 cái',1]];
+  const qs=[['seen',T('pf_q1','Mở 3 game'),3],['fav',T('pf_q2','Thích 1 game'),1],['cmt',T('pf_q3','Bình luận 1 cái'),1]];
   document.getElementById('questList').innerHTML=qs.map(function(q){
     const v=+(localStorage.getItem('j2me_q_'+q[0]+'_'+day)||0);
     const doneQ=v>=q[2];
@@ -108,9 +111,9 @@ function dlIds(){const out={};try{for(let i=0;i<localStorage.length;i++){const k
   }).join('');
   const dlTotal=+(localStorage.getItem('j2me_dl_total')||0), cmtTotal=+(localStorage.getItem('j2me_cmt_total')||0);
   const F=favs(), S=seen(), D=done(), DL=dlIds();
-  const stats=[['Đã xem',S.length],['Đã tải',DL.length],['Yêu thích',F.length],['Phá đảo',D.length],['Bình luận',cmtTotal],['Lượt tải',dlTotal]];
+  const stats=[[T('pf_s1','Đã xem'),S.length],[T('pf_s2','Đã tải'),DL.length],[T('pf_s3','Yêu thích'),F.length],[T('pf_s4','Phá đảo'),D.length],[T('pf_s5','Bình luận'),cmtTotal],[T('pf_s6','Lượt tải'),dlTotal]];
   document.getElementById('statGrid').innerHTML=stats.map(s=>`<div><b>${s[1]}</b><small>${s[0]}</small></div>`).join('');
-  const badges=[['🎮','Chơi 1 game',S.length>=1],['🎮🎮','Xem 5 game',S.length>=5],['🏆','Xem 20 game',S.length>=20],['⬇','Tải đầu tiên',DL.length>=1],['📦','Tải 5 game',DL.length>=5],['💾','Tải 20 game',DL.length>=20],['♡','Thích đầu tiên',F.length>=1],['💖','Thích 15 game',F.length>=15],['⚔','Phá đảo đầu tiên',D.length>=1]];
+  const badges=[['🎮',T('pf_b1','Chơi 1 game'),S.length>=1],['🎮🎮',T('pf_b2','Xem 5 game'),S.length>=5],['🏆',T('pf_b3','Xem 20 game'),S.length>=20],['⬇',T('pf_b4','Tải đầu tiên'),DL.length>=1],['📦',T('pf_b5','Tải 5 game'),DL.length>=5],['💾',T('pf_b6','Tải 20 game'),DL.length>=20],['♡',T('pf_b7','Thích đầu tiên'),F.length>=1],['💖',T('pf_b8','Thích 15 game'),F.length>=15],['⚔',T('pf_b9','Phá đảo đầu tiên'),D.length>=1]];
   document.getElementById('badgeGrid').innerHTML=badges.map(b=>`<div class="bdg${b[2]?' on':''}"><span class="e">${b[0]}</span>${b[1]}</div>`).join('');
   try{
     const r=await fetch('data/games.json',{headers:{Accept:'application/json'}});
@@ -128,21 +131,26 @@ function dlIds(){const out={};try{for(let i=0;i<localStorage.length;i++){const k
       const blob=new Blob([JSON.stringify(dump)],{type:'application/json'});
       const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='j2me-profile.json';a.click();
       setTimeout(function(){URL.revokeObjectURL(a.href);},2000);
-    }catch(e){alert('Không xuất được.');}
+    }catch(e){alert(T('pf_expErr','Không xuất được.'));}
   };
   document.getElementById('impFile').onchange=function(e){
     const f=e.target.files[0];if(!f)return;
     const rd=new FileReader();
-    rd.onload=function(){try{const j=JSON.parse(rd.result);Object.keys(j).forEach(k=>{if(KEEP(k))localStorage.setItem(k,String(j[k]));});location.reload();}catch(err){alert('File không hợp lệ.');}};
+    rd.onload=function(){try{const j=JSON.parse(rd.result);Object.keys(j).forEach(k=>{if(KEEP(k))localStorage.setItem(k,String(j[k]));});location.reload();}catch(err){alert(T('pf_impErr','File không hợp lệ.'));}};
     rd.readAsText(f);
   };
   document.getElementById('resetBtn').onclick=function(){
-    if(!confirm('Xóa hết thành tích trên máy này?'))return;
+    if(!confirm(T('pf_wipeAsk','Xóa hết thành tích trên máy này?')))return;
     try{const ks=[];for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(KEEP(k))ks.push(k);}ks.forEach(k=>localStorage.removeItem(k));}catch(e){}
     location.reload();
   };
-})();
+}
+renderProfile();
+document.addEventListener('i18n-ready',function(){
+  try{ if(window.I18N&&I18N.lang&&I18N.lang()!=='vi'){ renderProfile(); } }catch(e){}
+});
 </script>
+<script src="assets/i18n.js"></script>
 <button id="liteToggle" title="Tiết kiệm data">📴 Nhẹ</button>
 <script>
 (function(){function paint(){try{var on=document.documentElement.classList.contains('lite');var b=document.getElementById('liteToggle');if(b)b.textContent=on?'📶 Đủ':'📴 Nhẹ';}catch(e){}}try{var b=document.getElementById('liteToggle');if(b)b.onclick=function(){try{var h=document.documentElement;if(h.classList.contains('lite')){h.classList.remove('lite');localStorage.setItem('j2me_lite','0');}else{h.classList.add('lite');localStorage.setItem('j2me_lite','1');}paint();}catch(e){}};paint();}catch(e){}})();

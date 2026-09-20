@@ -41,21 +41,21 @@ small.dim{color:#4a7a9a;font-size:10px}
 <div class="hero">
 <img class="site-logo" src="assets/logo.png" alt="J2ME.VERCEL.APP" width="720" height="287" style="display:block;width:100%;max-width:320px;height:auto;margin:0 auto 8px" decoding="async" fetchpriority="high" onerror="this.style.display='none'">
 <img class="mascot" src="assets/anime-girl.png" alt="anime" width="72" height="72" onerror="this.style.display='none'">
-<h1>Đăng nhập Senpai</h1>
-<p>1 tài khoản, đồng bộ pet + bingo mọi máy</p>
+<h1 data-i18n="li_title">Đăng nhập Senpai</h1>
+<p data-i18n="li_sub">1 tài khoản, đồng bộ pet + bingo mọi máy</p>
 </div>
 <div class="body">
 <div class="who" id="whoBox"></div>
 <div id="formBox">
-<label>Email</label>
+<label data-i18n="li_email">Email</label>
 <input id="sbEmail" type="email" placeholder="ban@email.com" autocomplete="email">
-<label>Mật khẩu (≥6 ký tự)</label>
+<label data-i18n="li_pass">Mật khẩu (≥6 ký tự)</label>
 <input id="sbPass" type="password" placeholder="••••••" autocomplete="current-password">
-<div class="rowbtns"><button class="btn" id="btnIn">Đăng nhập</button><button class="btn ghost" id="btnUp">Đăng ký</button></div>
-<div class="rowbtns"><button class="btn ghost" id="btnMagic" style="flex:1">✉️ Gửi link đăng nhập ma thuật</button></div>
+<div class="rowbtns"><button class="btn" id="btnIn" data-i18n="li_in">Đăng nhập</button><button class="btn ghost" id="btnUp" data-i18n="li_up">Đăng ký</button></div>
+<div class="rowbtns"><button class="btn ghost" id="btnMagic" data-i18n="li_magic" style="flex:1">✉️ Gửi link đăng nhập ma thuật</button></div>
 </div>
-<div id="sbMsg">Chưa đăng nhập — pet và bingo vẫn lưu trên máy này, đăng nhập để giữ khi đổi máy.</div>
-<p style="margin-top:8px"><a href="index.html" style="font-size:11px">‹ Về trang chủ</a></p>
+<div id="sbMsg" data-i18n="li_msg0">Chưa đăng nhập — pet và bingo vẫn lưu trên máy này, đăng nhập để giữ khi đổi máy.</div>
+<p style="margin-top:8px"><a href="index.html" data-i18n="back_home" style="font-size:11px">‹ Về trang chủ</a></p>
 </div>
 <div class="foot"><p>© <span class="js-year">2026</span> J2ME.VERCEL.APP</p></div>
 </div>
@@ -67,6 +67,7 @@ small.dim{color:#4a7a9a;font-size:10px}
 <script>
 (function(){
   var $=function(id){return document.getElementById(id);};
+  function T(k,fb){ try{ if(window.I18N&&window.I18N.T) return window.I18N.T(k,fb); }catch(e){} return fb; }
   function say(t,cls){var m=$('sbMsg');m.className=cls||'';m.innerHTML=t;}
   async function paint(){
     console.log('[dangnhap] paint start, SBAuth=', typeof window.SBAuth, 'SBSync=', typeof window.SBSync);
@@ -75,10 +76,10 @@ small.dim{color:#4a7a9a;font-size:10px}
     console.log('[dangnhap] user=', u && (u.email || u.id));
     if(u&&(u.email||u.id)){
       $('whoBox').style.display='block';
-      $('whoBox').innerHTML='Đã đăng nhập: <b>'+String(u.email||u.id).replace(/[<>&"]/g,'')+'</b><br><small id="syncState" style="color:#4a7a9a">Đang đồng bộ…</small><div class="rowbtns"><button class="btn ghost" id="btnSync">🔄 Đồng bộ ngay</button><button class="btn ghost" id="btnOut">Đăng xuất</button></div>';
+      $('whoBox').innerHTML=T('li_logged','Đã đăng nhập: ')+'<b>'+String(u.email||u.id).replace(/[<>&"]/g,'')+'</b><br><small id="syncState" style="color:#4a7a9a">'+T('li_syncing','Đang đồng bộ…')+'</small><div class="rowbtns"><button class="btn ghost" id="btnSync">'+T('li_syncnow','🔄 Đồng bộ ngay')+'</button><button class="btn ghost" id="btnOut">'+T('li_out','Đăng xuất')+'</button></div>';
       $('formBox').style.display='none';
-      say('Xin chào Senpai~ Tài khoản đã sẵn sàng đồng bộ.','ok');
-      const doSync=function(){var st=$('syncState');if(st)st.textContent='Đang đồng bộ…';window.SBSync.syncNow().then(function(r){if(st)st.textContent='Đã đồng bộ ✓ XP '+r.xp+(r.fromCloud?' (đã kéo bản mới từ cloud)':'');}).catch(function(e){if(st)st.textContent='Đồng bộ lỗi: '+e.message+' (cần chạy SQL tạo bảng senpai)';});};
+      say(T('li_hi','Xin chào Senpai~ Tài khoản đã sẵn sàng đồng bộ.'),'ok');
+      const doSync=function(){var st=$('syncState');if(st)st.textContent=T('li_syncing','Đang đồng bộ…');window.SBSync.syncNow().then(function(r){if(st)st.textContent=T('li_synced','Đã đồng bộ ✓ XP ')+r.xp+(r.fromCloud?' (đã kéo bản mới từ cloud)':'');}).catch(function(e){if(st)st.textContent=T('li_syncerr','Đồng bộ lỗi: ')+e.message+' (cần chạy SQL tạo bảng senpai)';});};
       $('btnSync').onclick=doSync;
       try{if(window.SBSync)doSync();}catch(e){}
       try{if(window.SBBoard)window.SBBoard.ensureProfile().catch(function(){});}catch(e){}
@@ -86,11 +87,14 @@ small.dim{color:#4a7a9a;font-size:10px}
     }
   }
   function val(){return {e:$('sbEmail').value.trim(),p:$('sbPass').value};}
-  $('btnIn').onclick=function(){var v=val();if(!v.e||v.p.length<6)return say('Nhập email + mật khẩu ≥6 ký tự.','err');say('Đang đăng nhập…');window.SBAuth.signIn(v.e,v.p).then(function(){location.reload();}).catch(function(e){say('Lỗi: '+e.message,'err');});};
-  $('btnUp').onclick=function(){var v=val();if(!v.e||v.p.length<6)return say('Nhập email + mật khẩu ≥6 ký tự.','err');say('Đang tạo tài khoản…');window.SBAuth.signUp(v.e,v.p).then(function(r){if(r.session)location.reload();else say('Đã tạo! Check mail bấm link xác nhận rồi đăng nhập.','ok');}).catch(function(e){say('Lỗi: '+e.message,'err');});};
-  $('btnMagic').onclick=function(){var v=val();if(!v.e)return say('Nhập email trước đã.','err');say('Đang gửi link…');window.SBAuth.magic(v.e).then(function(){say('Đã gửi! Mở mail bấm link để vào.','ok');}).catch(function(e){say('Lỗi: '+e.message,'err');});};
+  $('btnIn').onclick=function(){var v=val();if(!v.e||v.p.length<6)return say(T('li_need','Nhập email + mật khẩu ≥6 ký tự.'),'err');say(T('li_logging','Đang đăng nhập…'));window.SBAuth.signIn(v.e,v.p).then(function(){location.reload();}).catch(function(e){say(T('li_err','Lỗi: ')+e.message,'err');});};
+  $('btnUp').onclick=function(){var v=val();if(!v.e||v.p.length<6)return say(T('li_need','Nhập email + mật khẩu ≥6 ký tự.'),'err');say(T('li_creating','Đang tạo tài khoản…'));window.SBAuth.signUp(v.e,v.p).then(function(r){if(r.session)location.reload();else say(T('li_created','Đã tạo! Check mail bấm link xác nhận rồi đăng nhập.'),'ok');}).catch(function(e){say(T('li_err','Lỗi: ')+e.message,'err');});};
+  $('btnMagic').onclick=function(){var v=val();if(!v.e)return say(T('li_needmail','Nhập email trước đã.'),'err');say(T('li_sending','Đang gửi link…'));window.SBAuth.magic(v.e).then(function(){say(T('li_sent','Đã gửi! Mở mail bấm link để vào.'),'ok');}).catch(function(e){say(T('li_err','Lỗi: ')+e.message,'err');});};
   paint();
+  // Vẽ lại chữ động khi i18n sẵn sàng / đổi ngôn ngữ
+  document.addEventListener('i18n-ready',function(){try{if(window.I18N&&I18N.lang&&I18N.lang()!=='vi')paint();}catch(e){}});
 })();
 </script>
+<script src="assets/i18n.js"></script>
 </body>
 </html>

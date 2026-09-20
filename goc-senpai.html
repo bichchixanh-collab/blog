@@ -52,60 +52,60 @@ select{padding:6px;border:1px solid #81c7f0;border-radius:8px;font-size:11px;bac
 <div class="app">
 <div class="top"><span>◉ GÓC SENPAI</span><span id="clock">00:00</span><span>♡ PET</span></div>
 <div class="hero">
-<img class="site-logo" src="assets/logo.png" alt="J2ME.VERCEL.APP" width="720" height="287" style="display:block;width:100%;max-width:320px;height:auto;margin:0 auto 8px" decoding="async" fetchpriority="high" onerror="this.style.display='none'"><h1>🎰 Góc Senpai</h1><p>Nuôi pet • Gắp gacha • Phiêu lưu mỗi ngày</p></div>
+<img class="site-logo" src="assets/logo.png" alt="J2ME.VERCEL.APP" width="720" height="287" style="display:block;width:100%;max-width:320px;height:auto;margin:0 auto 8px" decoding="async" fetchpriority="high" onerror="this.style.display='none'"><h1>🎰 Góc Senpai</h1><p data-i18n="sp_sub">Nuôi pet • Gắp gacha • Phiêu lưu mỗi ngày</p></div>
 <div class="wrap">
-<div id="senMsg">Chào Senpai~ Pet đang đợi bạn đó!</div>
+<div id="senMsg" data-i18n="sp_greet">Chào Senpai~ Pet đang đợi bạn đó!</div>
 
-<section class="card"><span class="pill">🐾 Pet của bạn</span>
+<section class="card"><span class="pill" data-i18n="sp_pet">🐾 Pet của bạn</span>
 <div class="petstage"><span id="petEmo">🥚</span><b id="petName">Trứng</b><br><small class="dim" id="petMood"></small><br><small class="dim" id="petNote" style="display:none"></small></div>
-<div style="font-size:11px;margin-top:6px">🍙 No <div class="bar"><i id="barNo" style="width:70%"></i></div>Vui <div class="bar"><i id="barVui" style="width:70%"></i></div></div>
-<div class="rowbtns"><button class="btn" id="feedBtn">🍙 Cho ăn (<span id="foodN">1</span>)</button><button class="btn ghost" id="playBtn">🎾 Chơi 30s</button></div>
+<div style="font-size:11px;margin-top:6px">🍙 <span data-i18n="sp_full">No</span> <div class="bar"><i id="barNo" style="width:70%"></i></div><span data-i18n="sp_happy">Vui</span> <div class="bar"><i id="barVui" style="width:70%"></i></div></div>
+<div class="rowbtns"><button class="btn" id="feedBtn">🍙 <span data-i18n="sp_feed">Cho ăn</span> (<span id="foodN">1</span>)</button><button class="btn ghost" id="playBtn" data-i18n="sp_play">🎾 Chơi 30s</button></div>
 <small class="dim" id="expN"></small>
 </section>
 
-<section class="card"><span class="pill">🕹️ Máy gắp (1 lượt/ngày)</span>
+<section class="card"><span class="pill" data-i18n="sp_machine">🕹️ Máy gắp (1 lượt/ngày)</span>
 <div class="clawbox"><div class="clawrail"><div id="clawTrack">🪝</div></div>
 <div class="prizes"><div>🎁</div><div>🍙</div><div>🎖️</div><div>🎨</div><div>🎁</div><div>🍙</div><div>🎖️</div><div>🎁</div><div>🍙</div></div></div>
-<div id="spinBox" style="margin-top:8px"><button class="btn" id="clawBtn">🎰 QUAY MIỄN PHÍ HÔM NAY</button></div>
+<div id="spinBox" style="margin-top:8px"><button class="btn" id="clawBtn" data-i18n="sp_spin">🎰 QUAY MIỄN PHÍ HÔM NAY</button></div>
 <div id="spunBox" style="display:none;font-size:11px;color:#4a7a9a;margin-top:8px"></div>
 <div id="clawWin" style="display:none"></div>
 <small class="dim" id="pityN"></small>
 </section>
 
-<section class="card"><span class="pill">🎯 Bingo tuần</span>
+<section class="card"><span class="pill" data-i18n="sp_bingo">🎯 Bingo tuần</span>
 <div id="bingoGrid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px"></div>
 <p style="font-size:11px;margin-top:8px"><span id="bingoInfo"></span></p>
-<div class="rowbtns"><button class="btn" onclick="SEN.bingoClaim()">Nhận thưởng line</button></div>
-<small class="dim">Bảng giống nhau cho mọi người, reset mỗi tuần. Ô tự tick khi bạn làm nhiệm vụ.</small>
+<div class="rowbtns"><button class="btn" data-i18n="sp_claim" onclick="SEN.bingoClaim()">Nhận thưởng line</button></div>
+<small class="dim" data-i18n="sp_bingoNote">Bảng giống nhau cho mọi người, reset mỗi tuần. Ô tự tick khi bạn làm nhiệm vụ.</small>
 </section>
 
-<section class="card"><span class="pill">✉️ Hộp thư sáng <span id="mailDot" style="display:none;color:#0066cc">●</span></span>
-<p style="font-size:11px">Mỗi ngày 1 lá thư + quà. <span id="mailStreak"></span></p>
+<section class="card"><span class="pill">✉️ <span data-i18n="sp_mail">Hộp thư sáng</span> <span id="mailDot" style="display:none;color:#0066cc">●</span></span>
+<p style="font-size:11px"><span data-i18n="sp_mailDesc">Mỗi ngày 1 lá thư + quà.</span> <span id="mailStreak"></span></p>
 <div id="mailLetter" style="display:none;font-size:12px;background:#fffbe6;border:1px dashed #e6c87a;border-radius:10px;padding:8px;margin-top:8px;line-height:1.7"></div>
-<div class="rowbtns"><button class="btn ghost" onclick="SEN.mailOpen()">Mở thư hôm nay</button></div>
+<div class="rowbtns"><button class="btn ghost" data-i18n="sp_openMail" onclick="SEN.mailOpen()">Mở thư hôm nay</button></div>
 </section>
 
-<section class="card"><span class="pill">🎒 Phiêu lưu offline</span>
+<section class="card"><span class="pill" data-i18n="sp_adv">🎒 Phiêu lưu offline</span>
 <div id="advBox" style="font-size:12px"></div>
-<small class="dim">Gửi pet đi, tắt web cũng tính giờ — quay lại nhận quà!</small>
+<small class="dim" data-i18n="sp_advNote">Gửi pet đi, tắt web cũng tính giờ — quay lại nhận quà!</small>
 </section>
 
-<section class="card"><span class="pill">⚔️ Đấu bot & skill</span>
-<p style="font-size:11px">Sức mạnh: <b id="powN">0</b> • Skill: <span id="skillRow"></span></p>
-<p style="font-size:11px;margin-top:6px">Cho pet ăn game để học skill:</p>
+<section class="card"><span class="pill" data-i18n="sp_battle">⚔️ Đấu bot & skill</span>
+<p style="font-size:11px"><span data-i18n="sp_power">Sức mạnh:</span> <b id="powN">0</b> • Skill: <span id="skillRow"></span></p>
+<p style="font-size:11px;margin-top:6px" data-i18n="sp_feedSkill">Cho pet ăn game để học skill:</p>
 <div id="eatList"></div>
-<div class="rowbtns"><button class="btn" id="battleBtn">⚔️ Đấu bot</button></div>
+<div class="rowbtns"><button class="btn" id="battleBtn" data-i18n="sp_fight">⚔️ Đấu bot</button></div>
 <p id="battleOut" style="font-size:12px;margin-top:6px"></p>
 </section>
 
-<section class="card"><span class="pill">🏆 Sưu tầm</span>
-<p style="font-size:11px">Huy hiệu hiếm: <span id="badgeRow"></span></p>
-<p style="font-size:11px;margin-top:6px">Theme: <select id="themeSel"></select> <small class="dim">(mở bằng gacha)</small></p>
+<section class="card"><span class="pill" data-i18n="sp_collect">🏆 Sưu tầm</span>
+<p style="font-size:11px"><span data-i18n="sp_badges">Huy hiệu hiếm:</span> <span id="badgeRow"></span></p>
+<p style="font-size:11px;margin-top:6px"><span data-i18n="sp_theme">Theme:</span> <select id="themeSel"></select> <small class="dim" data-i18n="sp_unlocked">(mở bằng gacha)</small></p>
 <p style="font-size:11px;margin-top:6px"><span id="statN"></span></p>
-<p style="margin-top:8px"><a href="index.html" style="font-size:11px">‹ Về trang chủ</a></p>
+<p style="margin-top:8px"><a href="index.html" data-i18n="back_home" style="font-size:11px">‹ Về trang chủ</a></p>
 </section>
 </div>
-<div class="foot"><p><a href="index.html">Trang chủ</a> · <a href="profile.html">Hồ sơ (xem XP)</a></p><p>© <span class="js-year">2026</span> J2ME.VERCEL.APP</p></div>
+<div class="foot"><p><a href="index.html" data-i18n="foot_home">Trang chủ</a> · <a href="profile.html" data-i18n="sp_profile">Hồ sơ (xem XP)</a></p><p>© <span class="js-year">2026</span> J2ME.VERCEL.APP</p></div>
 </div>
 <script>var el=document.getElementById('clock');if(el)el.textContent=new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'});try{document.querySelectorAll('.js-year').forEach(function(x){x.textContent=new Date().getFullYear();});}catch(e){}</script>
 <script src="assets/js/senpai.js"></script>
@@ -128,5 +128,6 @@ var _stApprCache={at:0,n:-1};
 function stApprovedCount(cb){var now=Date.now();if(_stApprCache.n>=0&&now-_stApprCache.at<60000){cb(_stApprCache.n);return;}var tk='';try{tk=stToken();}catch(e){}var names=stNames();if(!tk&&!names.length){cb(0);return;}var url=stApiRoot()+'/api/comments?mine=1'+(names.length?'&names='+encodeURIComponent(names.join(',')):'');var hh=tk?{'Authorization':'Bearer '+tk}:{};fetch(url,{headers:hh,cache:'no-store'}).then(function(r){return r.json();}).then(function(j){var n=+(j&&j.mine)||0;_stApprCache={at:now,n:n};cb(n);}).catch(function(){cb(_stApprCache.n>=0?_stApprCache.n:0);});}
 (function(){try{setInterval(function(){try{if(document.hidden)return;var ms=+localStorage.getItem('j2me_online_ms')||0;localStorage.setItem('j2me_online_ms',String(ms+60000));}catch(e){}try{var tk=stToken();if(tk)fetch(stApiRoot()+'/api/ustats',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+tk},body:JSON.stringify({t:'heartbeat'}),keepalive:true}).catch(function(){});}catch(e){}try{var pr=null;try{pr=JSON.parse(localStorage.getItem('j2me_presence')||'null');}catch(e){}fetch(stApiRoot()+'/api/presence',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({tok:(pr&&pr.tok)||''}),keepalive:true}).then(function(r){return r.json();}).then(function(j){if(j&&j.tok)try{localStorage.setItem('j2me_presence',JSON.stringify({tok:j.tok,n:j.n||0}));}catch(e){}}).catch(function(){});}catch(e){}},60000);}catch(e){}})();
 </script>
+<script src="assets/i18n.js"></script>
 </body>
 </html>

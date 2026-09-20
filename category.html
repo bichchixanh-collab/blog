@@ -34,11 +34,11 @@ body{background:#e8f4fd;padding:12px}
 <div class="app">
 <div class="top-info"><span>◉ JAVA J2ME</span><span id="clock">00:00</span><span>▂▃▅▇ 100%</span></div>
 <header class="header">
-<img class="site-logo" src="assets/logo.png" alt="J2ME.VERCEL.APP" width="720" height="287" style="display:block;width:100%;max-width:320px;height:auto;margin:0 auto 8px" decoding="async" fetchpriority="high" onerror="this.style.display='none'"><div class="logo-icon">🔔</div><h1>JAVA.WAP.SH</h1><p>Thể loại Game Java</p></header>
-<nav class="wap-nav" style="display:flex;gap:6px;overflow:auto;padding:8px 10px;background:#1a3a5c;white-space:nowrap"><a href="index.html" style="color:#b8d8f8;background:rgba(255,255,255,.08);padding:6px 12px;border-radius:20px;font-size:11px;text-decoration:none">⌂ Trang chủ</a><a href="category.html" style="background:#fff;color:#0066cc;padding:6px 12px;border-radius:20px;font-size:11px">≡ Thể loại</a></nav>
+<img class="site-logo" src="assets/logo.png" alt="J2ME.VERCEL.APP" width="720" height="287" style="display:block;width:100%;max-width:320px;height:auto;margin:0 auto 8px" decoding="async" fetchpriority="high" onerror="this.style.display='none'"><div class="logo-icon">🔔</div><h1>JAVA.WAP.SH</h1><p data-i18n="cat_sub">Thể loại Game Java</p></header>
+<nav class="wap-nav" style="display:flex;gap:6px;overflow:auto;padding:8px 10px;background:#1a3a5c;white-space:nowrap"><a href="index.html" style="color:#b8d8f8;background:rgba(255,255,255,.08);padding:6px 12px;border-radius:20px;font-size:11px;text-decoration:none" data-i18n="nav_home">⌂ Trang chủ</a><a href="category.html" style="background:#fff;color:#0066cc;padding:6px 12px;border-radius:20px;font-size:11px" data-i18n="nav_cat">≡ Thể loại</a></nav>
 
 <div class="wrap">
-  <div class="breadcrumb" style="font-size:11px;color:#4a7a9a"><a href="index.html" style="color:#0066cc">Trang chủ</a> › <b id="bcCat">Tất cả</b></div>
+  <div class="breadcrumb" style="font-size:11px;color:#4a7a9a"><a href="index.html" style="color:#0066cc" data-i18n="foot_home">Trang chủ</a> › <b id="bcCat">Tất cả</b></div>
 
   <section class="cat-grid" id="catGrid">
     <!-- JS sẽ render -->
@@ -50,10 +50,12 @@ body{background:#e8f4fd;padding:12px}
   </section>
 </div>
 
-<footer class="footer"><p>© <span class="js-year">2026</span> J2ME.VERCEL.APP</p><p style="font-size:10px;opacity:.7"><a href="index.html" style="color:#fff">Trang chủ</a> · <a href="profile.html" style="color:#fff">Hồ sơ</a> · <a href="lien-he.html" style="color:#fff">Liên hệ / DMCA</a></p></footer>
+<footer class="footer"><p>© <span class="js-year">2026</span> J2ME.VERCEL.APP</p><p style="font-size:10px;opacity:.7"><a href="index.html" style="color:#fff" data-i18n="foot_home">Trang chủ</a> · <a href="profile.html" style="color:#fff" data-i18n="foot_profile">♡ Hồ sơ</a> · <a href="lien-he.html" style="color:#fff" data-i18n="foot_contact">Liên hệ / DMCA</a></p></footer>
 </div>
 
 <script>
+function T(k,fb){ try{ if(window.I18N&&window.I18N.T) return window.I18N.T(k,fb); }catch(e){} return fb; }
+function CATKEY(vi){ try{ if(window.I18N&&window.I18N.catName){ var m={'Hành Động':'catn_hanhdong','Nhập Vai':'catn_nhapvai','Đua xe':'catn_duaxe','Bắn súng':'catn_bansung','Trí tuệ':'catn_tritue','Thể thao':'catn_thethao','Phiêu lưu':'catn_phieuluu','Nông trại':'catn_nongtrai','Việt Hóa':'catn_viethoa'}; if(m[vi]) return m[vi]; } }catch(e){} return vi; }
 function tick(){const el=document.getElementById('clock');if(el)el.textContent=new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'})}tick();setInterval(tick,30000);
 const CATS=[
   {id:'Hành Động',icon:'⚔️',color:'#0066cc'},
@@ -88,14 +90,14 @@ async function render(){
     if(g.vi) counts['Việt Hóa']=(counts['Việt Hóa']||0)+1;
   });
 
-  // Render category grid (CATS là hằng nội bộ, an toàn)
+  // Render category grid (CATS là hằng nội bộ, an toàn; hiển thị tên theo ngôn ngữ, link giữ ?cat= gốc)
   grid.innerHTML=CATS.map(c=>{
     const cnt = c.filter==='vi' ? (counts['Việt Hóa']||0) : (counts[c.id]||0);
     return `<a href="category.html?cat=${encodeURIComponent(c.id)}" class="cat-card" style="text-decoration:none">
       <div style="font-size:22px">${c.icon}</div>
-      <b>${c.id}</b><br><small>${cnt} game</small>
+      <b>${T(CATKEY(c.id),c.id)}</b><br><small>${cnt} game</small>
     </a>`;
-  }).join('') + `<a href="index.html" class="cat-card" style="background:#e8f4fd"><div style="font-size:22px">📚</div><b>Tất cả</b><br><small>${games.length} game</small></a>`;
+  }).join('') + `<a href="index.html" class="cat-card" style="background:#e8f4fd"><div style="font-size:22px">📚</div><b>${T('cat_allBtn','Tất cả')}</b><br><small>${games.length} game</small></a>`;
 
   if(cat){
     const catSafe=escHtml(cat);
@@ -106,7 +108,7 @@ async function render(){
     if(cat==='Việt Hóa') filtered=games.filter(g=>g.vi);
     else filtered=games.filter(g=>g.cat===cat);
     if(filtered.length===0){
-      list.innerHTML=`<p style="padding:16px;text-align:center;color:#4a7a9a">Chưa có game nào cho <b>${catSafe}</b> — <a href="admin.php" style="color:#0066cc">đăng bài ngay</a> ♡</p>`;
+      list.innerHTML=`<p style="padding:16px;text-align:center;color:#4a7a9a">${T('cat_empty1','Chưa có game nào cho')} <b>${catSafe}</b> — <a href="admin.php" style="color:#0066cc">${T('cat_empty2','đăng bài ngay')}</a> ♡</p>`;
     } else {
       list.innerHTML=filtered.map(g=>`
         <a href="game/${escHtml(g.id)}.html" style="display:flex;gap:10px;align-items:center;background:#fff;border:1.5px solid #b8d8f8;border-radius:12px;padding:10px;text-decoration:none">
@@ -120,11 +122,16 @@ async function render(){
     const md=document.querySelector('meta[name="description"]'); if(md) md.content=`Game Java ${cat} hay nhất cho J2ME: tải JAR miễn phí, hỗ trợ 128x160, 240x320.`;
     grid.style.display='none';
   } else {
-    bc.textContent='Tất cả thể loại';
+    bc.textContent=T('cat_all','Tất cả thể loại');
   }
 }
 render();
+// Vẽ lại khi i18n sẵn sàng / đổi ngôn ngữ (chỉ khi đang là ID)
+document.addEventListener('i18n-ready',function(){
+  try{ if(window.I18N&&I18N.lang&&I18N.lang()!=='vi'){ render(); } }catch(e){}
+});
 </script>
+<script src="assets/i18n.js"></script>
 <button id="liteToggle" title="Tiết kiệm data">📴 Nhẹ</button>
 <script>
 (function(){function paint(){try{var on=document.documentElement.classList.contains('lite');var b=document.getElementById('liteToggle');if(b)b.textContent=on?'📶 Đủ':'📴 Nhẹ';}catch(e){}}try{var b=document.getElementById('liteToggle');if(b)b.onclick=function(){try{var h=document.documentElement;if(h.classList.contains('lite')){h.classList.remove('lite');localStorage.setItem('j2me_lite','0');}else{h.classList.add('lite');localStorage.setItem('j2me_lite','1');}paint();}catch(e){}};paint();}catch(e){}})();
