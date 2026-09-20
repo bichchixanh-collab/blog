@@ -131,7 +131,7 @@ document.addEventListener('i18n-ready',function(){
   try{ if(window.I18N&&I18N.lang&&I18N.lang()!=='vi'){ render(); } }catch(e){}
 });
 </script>
-<script src="assets/i18n.js?v=2"></script>
+<script src="assets/i18n.js?v=3"></script>
 <button id="liteToggle" title="Tiết kiệm data">📴 Nhẹ</button>
 <script>
 (function(){function paint(){try{var on=document.documentElement.classList.contains('lite');var b=document.getElementById('liteToggle');if(b)b.textContent=on?'📶 Đủ':'📴 Nhẹ';}catch(e){}}try{var b=document.getElementById('liteToggle');if(b)b.onclick=function(){try{var h=document.documentElement;if(h.classList.contains('lite')){h.classList.remove('lite');localStorage.setItem('j2me_lite','0');}else{h.classList.add('lite');localStorage.setItem('j2me_lite','1');}paint();}catch(e){}};paint();}catch(e){}})();

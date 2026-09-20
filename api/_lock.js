@@ -97,6 +97,21 @@ function presenceIpHash(ip) {
   try { return crypto.createHash('sha256').update(String(ip || ''), 'utf8').digest('hex').slice(0, 16); }
   catch { return ''; }
 }
+// Gắn chain theo SUBNET (IPv4 /24, IPv6 /64) thay vì IP đầy đủ: mạng di động
+// đổi IP trong cùng dải vẫn giữ chuỗi (khỏi kẹt vé oan), khác dải vẫn rớt.
+function presenceNetHash(ip) {
+  try {
+    const s = String(ip || '').trim();
+    if (s.includes(':')) {
+      const parts = s.split(':').filter(Boolean);
+      const prefix = parts.slice(0, 4).join(':').toLowerCase();
+      return crypto.createHash('sha256').update('v6/' + prefix, 'utf8').digest('hex').slice(0, 16);
+    }
+    const m = s.match(/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.\d{1,3}$/);
+    const key = m ? `v4/${m[1]}.${m[2]}.${m[3]}` : `raw/${s}`;
+    return crypto.createHash('sha256').update(key, 'utf8').digest('hex').slice(0, 16);
+  } catch { return ''; }
+}
 function signPresence(o) {
   const body = b64uEncode(JSON.stringify(o));
   const sig = crypto.createHmac('sha256', hkey('presence')).update(body, 'utf8').digest('hex');
@@ -123,7 +138,7 @@ function readPresence(tok) {
 function mintPresence(prevTok, ip) {
   try {
     const now = Date.now();
-    const iph = presenceIpHash(ip);
+    const iph = presenceNetHash(ip);
     const prev = readPresence(prevTok);
     if (!prev || prev.iph !== iph || prev.iat > now + 120 * 1000) {
       return signPresence({ v: 1, n: 0, iat: now, iph });
@@ -139,7 +154,9 @@ function verifyPresence(tok, ip) {
     const o = readPresence(tok);
     if (!o) return null;
     const now = Date.now();
-    if (o.iph !== presenceIpHash(ip)) return null;
+    // Chấp nhận cả iph subnet mới lẫn iph IP-cũ (token mint trước khi deploy bản subnet)
+    const cur = presenceNetHash(ip);
+    if (o.iph !== cur && o.iph !== presenceIpHash(ip)) return null;
     if (o.iat > now + 120 * 1000) return null;
     if (now - o.iat > PRESENCE_MAX_AGE_MS) return null;
     const n = Math.floor(o.n);

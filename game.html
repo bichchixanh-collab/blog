@@ -27,7 +27,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700&family=Mali:wght@600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/style.min.css" data-root-href="style.min.css">
 <script>try{if(localStorage.getItem('j2me_lite')==='1')document.documentElement.classList.add('lite');}catch(e){}</script>
-<script>(function(){try{var p=location.pathname||'/';var gi=p.indexOf('/game/');var r=gi>=0?p.slice(0,gi).replace(/\/$/,''):'';document.write('<script src="'+r+'/assets/i18n.js?v=2"><\/script>');}catch(e){}})();</script>
+<script>(function(){try{var p=location.pathname||'/';var gi=p.indexOf('/game/');var r=gi>=0?p.slice(0,gi).replace(/\/$/,''):'';document.write('<script src="'+r+'/assets/i18n.js?v=3"><\/script>');}catch(e){}})();</script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{overflow-x:hidden;max-width:100%}
@@ -470,6 +470,7 @@ function renderCreditBox(inner,headerHtml){
   +'<div style="margin-top:8px"><button type="button" data-credit-copy="1" style="background:#7a5a00;color:#fff;border:none;border-radius:6px;padding:5px 12px;font-size:11px;font-weight:700;cursor:pointer">'+cmtT('g_creditCopy','📋 Chép credit')+'</button></div></div>';
 }
 document.addEventListener('click',function(e){var b=e.target&&e.target.closest?e.target.closest('[data-credit-copy]'):null;if(!b)return;try{navigator.clipboard.writeText(b.parentNode.parentNode.innerText).then(function(){b.textContent=cmtT('g_creditCopied','✓ Đã chép!');}).catch(function(){});}catch(err){}});
+document.addEventListener('click',function(e){var b=e.target&&e.target.closest?e.target.closest('[data-relock]'):null;if(!b)return;try{localStorage.removeItem('j2me_presence');}catch(err){}location.reload();});
 function renderDesc(s){
   var parts=[],heads=[];
   var raw=String(s||'');
@@ -604,7 +605,7 @@ function __statsRowsHtml(rows){
 }
 // Live refresh hộp khóa trong modal: cập nhật số phút realtime (10s/lần),
 // tự xin vé + sang trang tải ngay khi đủ điều kiện. Dừng khi đóng modal.
-let __lockTimer=null, __lockAppr=null, __lockTick=0;
+let __lockTimer=null, __lockAppr=null, __lockTick=0, __lockFailMin=0;
 function __lockStop(){ try{ if(__lockTimer){ clearInterval(__lockTimer); __lockTimer=null; } }catch(e){} }
 function __lockHead(){
   var hardNow=false; try{hardNow=stLogged();}catch(e){}
@@ -622,22 +623,32 @@ function __lockLive(gid,gm,msg,res,head,foot){
       var needCmt=rows.some(function(r){return r.k==='c';});
       var paint=function(rr){
         __lockPaint(msg,rr,head,foot);
-        if(__statsPass(rr)){ __lockStop(); msg.textContent=cmtT('g_getting','Đủ điều kiện! Đang lấy vé...'); __ticketAndGo(gid,res,msg); }
+        if(__statsPass(rr)){ __lockStop(); msg.textContent=cmtT('g_getting','Đủ điều kiện! Đang lấy vé...'); __ticketAndGo(gid,res,msg,true); }
       };
       if(needCmt&&(__lockTick%3===0)){ try{stApprovedCount(function(n){__lockAppr=n;paint(__statsRows(gm,n));});}catch(e){paint(rows);} }
       else paint(rows);
     }catch(e){}
   },10000);
 }
-function __ticketAndGo(gid,res,msgEl){
+function __ticketAndGo(gid,res,msgEl,wasPassing){
   __lockStop();
   msgEl.textContent=cmtT('g_ticket','Đang lấy vé tải...');
   var gm=(GAMES_MAP||{})[gid]||{id:gid};
   fetch(apiRoot()+'/api/ticket?id='+encodeURIComponent(gid)+'&res='+encodeURIComponent(res)+'&proof='+encodeURIComponent(__proof(gm)),{cache:'no-store',headers:stAuthHeaders()})
     .then(function(r){return r.json().then(function(j){return {st:r.status,j:j};});})
     .then(function(o){
-      if(o.st===200&&o.j&&o.j.ticket){try{countDownload(gid);}catch(e2){}location.href=apiRoot()+'/go.html?ticket='+encodeURIComponent(o.j.ticket);}
-      else if(o.st===403){var rs0=__statsRows(gm,null);var needC0=rs0.some(function(r){return r.k==='c';});var hd='🔒 <b>'+cmtT('g_cond','Chưa đủ điều kiện')+'</b>'+(o.j&&o.j.reason?' (<b>'+escHtml(o.j.reason)+'</b>)':'')+'. '+cmtT('g_srv','Server vừa kiểm tra — số bên dưới là mới nhất:');var ft='<div style="margin-top:6px"><small>'+cmtT('g_hang','Treo trang thêm cho đủ rồi bấm Tải lại (không cần F5).')+'</small></div>';var paint=function(rr){__lockPaint(msgEl,rr,hd,ft);};paint(rs0);if(needC0){try{stApprovedCount(function(n){__lockAppr=n;paint(__statsRows(gm,n));__lockLive(gid,gm,msgEl,res,hd,ft);});}catch(e){__lockLive(gid,gm,msgEl,res,hd,ft);}}else{__lockLive(gid,gm,msgEl,res,hd,ft);}}
+      if(o.st===200&&o.j&&o.j.ticket){__lockFailMin=0;try{countDownload(gid);}catch(e2){}location.href=apiRoot()+'/go.html?ticket='+encodeURIComponent(o.j.ticket);}
+      else if(o.st===403){
+        var reason=(o.j&&o.j.reason)||'';
+        // Hiển thị đủ mà vé vẫn rớt 'minutes' nhiều lần liên tiếp = chain cũ (đổi IP/dải mạng):
+        // dừng auto-retry, hiện nút đếm lại thay vì kẹt 4/5, 32/5 mãi.
+        if(reason==='minutes'&&wasPassing){__lockFailMin=(__lockFailMin||0)+1;}else{__lockFailMin=0;}
+        if(__lockFailMin>=3){
+          msgEl.innerHTML='🔒 <b>'+cmtT('g_cond','Chưa đủ điều kiện')+'</b> (<b>minutes</b>). '+cmtT('g_ipStuck','Mạng của bạn vừa đổi IP nên vé cũ không còn hiệu lực.')
+            +'<div style="margin-top:8px;text-align:center"><button data-relock="1" class="dl-btn" style="font-size:11px">'+cmtT('g_recount','🔄 Đếm lại từ đầu')+'</button></div>';
+          return;
+        }
+        var rs0=__statsRows(gm,null);var needC0=rs0.some(function(r){return r.k==='c';});var hd='🔒 <b>'+cmtT('g_cond','Chưa đủ điều kiện')+'</b>'+(reason?' (<b>'+escHtml(reason)+'</b>)':'')+'. '+cmtT('g_srv','Server vừa kiểm tra — số bên dưới là mới nhất:');var ft='<div style="margin-top:6px"><small>'+cmtT('g_hang','Treo trang thêm cho đủ rồi bấm Tải lại (không cần F5).')+'</small></div>';var paint=function(rr){__lockPaint(msgEl,rr,hd,ft);};paint(rs0);if(needC0){try{stApprovedCount(function(n){__lockAppr=n;paint(__statsRows(gm,n));__lockLive(gid,gm,msgEl,res,hd,ft);});}catch(e){__lockLive(gid,gm,msgEl,res,hd,ft);}}else{__lockLive(gid,gm,msgEl,res,hd,ft);}}
       else{msgEl.textContent=cmtT('g_noTicket2','Không lấy được vé (')+o.st+'), thử lại sau.';}
     }).catch(function(){msgEl.textContent=cmtT('g_offline','Mất mạng, thử lại sau.');});
 }
@@ -759,7 +770,7 @@ function doDownload(name,res){
   // Mọi link tải đều đi qua go.html bằng vé server (chống soi source/crack link)
   if(gt==='stats'){
     pending={href:'#',gid:gid,name:name,res:res};
-    __lockAppr=null;
+    __lockAppr=null; __lockFailMin=0;
     if(mc0)mc0.style.display='none';
     msg.textContent=cmtT('go_checking2','Đang kiểm tra điều kiện...');
     document.getElementById('dlModal').classList.remove('hidden');document.body.style.overflow='hidden';
@@ -793,6 +804,7 @@ document.addEventListener('click',function(e){const b=e.target&&e.target.closest
   const close=()=>{
     try{ playClick(520,0.1,0.15); }catch(e){}
     try{ if(typeof __lockStop==='function') __lockStop(); }catch(e){}
+    try{ __lockFailMin=0; }catch(e){}
     modal.classList.add('hidden');
     document.body.style.overflow='';
   };
