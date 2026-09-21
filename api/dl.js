@@ -9,7 +9,7 @@ const { check, ipOf } = require('./_rate');
 const { countDl } = require('./_store');
 const { verifyTicket, gateHash, mintTicket, resolveJarUrl, checkProofExtended } = require('./_lock');
 const { countApproved } = require('./comments');
-const ALLOW_HOSTS = new Set(['drive.google.com', 'www.mediafire.com', 'mediafire.com', 'github.com', 'raw.githubusercontent.com', 'cdn.jsdelivr.net', (process.env.FILES_HOST || '').toLowerCase()].filter(Boolean));
+const ALLOW_HOSTS = new Set(['sfile.mobi', 'sfile.co', 'drive.google.com', 'www.mediafire.com', 'mediafire.com', 'github.com', 'raw.githubusercontent.com', 'cdn.jsdelivr.net', (process.env.FILES_HOST || '').toLowerCase()].filter(Boolean));
 
 function loadGames() {
   try { return JSON.parse(fs.readFileSync(path.join(process.cwd(), 'data', 'games.json'), 'utf-8')); } catch { return []; }

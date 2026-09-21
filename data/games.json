@@ -1,5 +1,105 @@
 [
     {
+        "id": "kisah-tiga-negara-gui-shen-lu-bu",
+        "name": "Kisah Tiga Negara - Gui Shen Lu Bu",
+        "cat": "Nhập vai",
+        "size": "688 Kb",
+        "res": [
+            "240x320"
+        ],
+        "hot": false,
+        "vi": false,
+        "new": false,
+        "gate": {
+            "type": "stats",
+            "require": {
+                "minutes": 10,
+                "comments": 1
+            }
+        },
+        "desc": "Permainan ini berlatar belakang periode Tiga Kerajaan , dan alur ceritanya berpusat pada pertempuran para pahlawan dan interaksi karakter, termasuk unsur penaklukan dan interaksi, dengan gaya dialog yang relatif ringan. Konten permainan melibatkan pemain dan karakter permainan yang mengalami kisah periode Tiga Kerajaan bersama-sama. \r\n\r\nDalam permainan ini, pemain dapat menghidupkan kembali era Tiga Kerajaan klasik dengan para pahlawan dan wanita cantik.\r\n\r\n\"Legenda Tiga Kerajaan: Dewa Hantu Lu Bu\" adalah permainan peran aksi dengan gameplay inti yang menggabungkan elemen strategi berbasis giliran . Pemain dapat terlibat dalam pertempuran strategis dalam berbagai gaya adegan pertempuran . Sistem pertarungan mencakup efek khusus dan interaksi adegan, dan juga menampilkan keterampilan bertarung \"kuda\" . Permainan ini mencakup berbagai sistem unik, seperti sihir, pembuatan obat, penambangan, dan pengumpulan keterampilan hidup",
+        "thumb": "https:\/\/i.ibb.co\/B5ND2Knm\/wm-1789994852783.jpg",
+        "shots": [
+            "https:\/\/i.ibb.co\/B5ND2Knm\/wm-1789994852783.jpg",
+            "https:\/\/i.ibb.co\/jZgB7sbQ\/wm-1789994854852.jpg",
+            "https:\/\/i.ibb.co\/r2SvgqYw\/wm-1789994855480.jpg",
+            "https:\/\/i.ibb.co\/sdbGW9tS\/wm-1789994856089.jpg",
+            "https:\/\/i.ibb.co\/9kdhH28M\/wm-1789994856711.jpg"
+        ],
+        "jar": {
+            "240x320": "https:\/\/sfile.co\/GPoSqFjl2cT"
+        },
+        "downloads": 0,
+        "created_at": "2026-09-21T14:58:00+02:00",
+        "updated_at": "2026-09-21T14:58:00+02:00"
+    },
+    {
+        "id": "legend-vs-zombies",
+        "name": "Legend Vs Zombies",
+        "cat": "Trí tuệ",
+        "size": "718 Kb",
+        "res": [
+            "240x320"
+        ],
+        "hot": false,
+        "vi": false,
+        "new": true,
+        "gate": {
+            "type": "stats",
+            "require": {
+                "comments": 1
+            }
+        },
+        "desc": "Trò này thì chắc không lạ gì với ae nữa rồi :3\r\nHack:\r\n- Vô hạn gem\r\n- Vô hạn coin",
+        "thumb": "https:\/\/i.ibb.co\/0yQ7kFT2\/wm-1789994006683.jpg",
+        "shots": [
+            "https:\/\/i.ibb.co\/B5wCry2Z\/wm-1789993887197.jpg",
+            "https:\/\/i.ibb.co\/CKWcXG14\/wm-1789993888692.jpg",
+            "https:\/\/i.ibb.co\/bZcXKmT\/wm-1789993889384.jpg",
+            "https:\/\/i.ibb.co\/0yQ7kFT2\/wm-1789994006683.jpg"
+        ],
+        "jar": {
+            "240x320": "https:\/\/sfile.co\/WTlmWIsdqz0"
+        },
+        "downloads": 0,
+        "created_at": "2026-09-21T14:40:59+02:00",
+        "updated_at": "2026-09-21T17:19:29+02:00"
+    },
+    {
+        "id": "boom-air",
+        "name": "Boom Air",
+        "cat": "Hành động",
+        "size": "690 Kb",
+        "res": [
+            "240x320"
+        ],
+        "hot": false,
+        "vi": true,
+        "new": false,
+        "gate": {
+            "type": "stats",
+            "require": {
+                "minutes": 10,
+                "comments": 2
+            }
+        },
+        "desc": "Selamat datang kembali di J2ME! Kali ini saya membawa game klasik yang seru dengan grafis chibi yang lucu, cocok dimainkan saat waktu luang.\r\n\r\n🎮 **Game: Bom Air**\r\n\r\nKendalikan karakter dan ikuti misi di setiap level untuk menyelesaikan semua tantangan!",
+        "thumb": "https:\/\/i.ibb.co\/FLC2Vfqg\/wm-1789915723809.jpg",
+        "shots": [
+            "https:\/\/i.ibb.co\/FLC2Vfqg\/wm-1789915723809.jpg",
+            "https:\/\/i.ibb.co\/Fb37Qgm6\/wm-1789915729242.jpg",
+            "https:\/\/i.ibb.co\/MmLDj5Z\/wm-1789915730893.jpg",
+            "https:\/\/i.ibb.co\/CsBwr2r3\/wm-1789915731473.jpg",
+            "https:\/\/i.ibb.co\/bg1ZQHZs\/wm-1789915732113.jpg"
+        ],
+        "jar": {
+            "240x320": "https:\/\/drive.google.com\/file\/d\/130sn3E5AVYSqVn7sgfy4OEbcQ44AlhV-\/view"
+        },
+        "downloads": 0,
+        "created_at": "2026-09-20T17:11:34+02:00",
+        "updated_at": "2026-09-20T17:11:34+02:00"
+    },
+    {
         "id": "honor-of-king",
         "name": "Honor Of King",
         "cat": "Trí tuệ",
@@ -166,11 +266,11 @@
             "https:\/\/i.ibb.co\/Sw8mZJn7\/wm-1789315401490.jpg"
         ],
         "jar": {
-            "240x320": "ENC:nAaiPBM4SXZIQ1zUEw9gmTTCk+GHP8iiFFEShnFSyT4QrG7EA0yuFi\/WOAr3Xt4EyEi9z2gVaTCtuSoFpoM5DL6kFSnEK98xcCvH1kIVpgSECfhuSUCem3MheJ5RmpMsLyL17VZTUmS7sMuP7Q=="
+            "240x320": "https:\/\/drive.google.com\/file\/d\/1zcb1Ip99D96Li-XFeQEyxcliZ4GwQh37\/view?usp=sharing"
         },
         "downloads": 0,
         "created_at": "2026-09-13T15:33:42+02:00",
-        "updated_at": "2026-09-19T17:26:52+02:00"
+        "updated_at": "2026-09-20T17:13:21+02:00"
     },
     {
         "id": "haku-farm",
