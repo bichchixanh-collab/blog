@@ -70,7 +70,7 @@ var el=document.getElementById('clock');if(el)el.textContent=new Date().toLocale
   function T(k,fb){ try{ if(window.I18N&&window.I18N.T) return window.I18N.T(k,fb); }catch(e){} return fb; }
   // Mọi link tải đều qua đây bằng vé server — KHÔNG đọc URL file từ games.json,
   // không hiện link thật trong source. Vé hết hạn 15 phút, sai gate là vô hiệu.
-  var TRUST=['drive.google.com','www.mediafire.com','mediafire.com','github.com','raw.githubusercontent.com','cdn.jsdelivr.net'];
+  var TRUST=['sfile.mobi','sfile.co','drive.google.com','www.mediafire.com','mediafire.com','github.com','raw.githubusercontent.com','cdn.jsdelivr.net'];
   function root(){try{var p=location.pathname||'/';var i=p.lastIndexOf('/');return i<=0?'':p.slice(0,i);}catch(e){return '';}}
   function fail(t){document.getElementById('host').textContent=t;var b=document.getElementById('go');b.href='#';b.classList.add('off');}
   function rowsHtml(rows){
