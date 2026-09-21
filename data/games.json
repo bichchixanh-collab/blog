@@ -1,5 +1,39 @@
 [
     {
+        "id": "kisah-tiga-negara-gui-shen-lu-bu",
+        "name": "Kisah Tiga Negara - Gui Shen Lu Bu",
+        "cat": "Nhập vai",
+        "size": "688 Kb",
+        "res": [
+            "240x320"
+        ],
+        "hot": false,
+        "vi": false,
+        "new": false,
+        "gate": {
+            "type": "stats",
+            "require": {
+                "minutes": 10,
+                "comments": 1
+            }
+        },
+        "desc": "Permainan ini berlatar belakang periode Tiga Kerajaan , dan alur ceritanya berpusat pada pertempuran para pahlawan dan interaksi karakter, termasuk unsur penaklukan dan interaksi, dengan gaya dialog yang relatif ringan. Konten permainan melibatkan pemain dan karakter permainan yang mengalami kisah periode Tiga Kerajaan bersama-sama. \r\n\r\nDalam permainan ini, pemain dapat menghidupkan kembali era Tiga Kerajaan klasik dengan para pahlawan dan wanita cantik.\r\n\r\n\"Legenda Tiga Kerajaan: Dewa Hantu Lu Bu\" adalah permainan peran aksi dengan gameplay inti yang menggabungkan elemen strategi berbasis giliran . Pemain dapat terlibat dalam pertempuran strategis dalam berbagai gaya adegan pertempuran . Sistem pertarungan mencakup efek khusus dan interaksi adegan, dan juga menampilkan keterampilan bertarung \"kuda\" . Permainan ini mencakup berbagai sistem unik, seperti sihir, pembuatan obat, penambangan, dan pengumpulan keterampilan hidup",
+        "thumb": "https:\/\/i.ibb.co\/B5ND2Knm\/wm-1789994852783.jpg",
+        "shots": [
+            "https:\/\/i.ibb.co\/B5ND2Knm\/wm-1789994852783.jpg",
+            "https:\/\/i.ibb.co\/jZgB7sbQ\/wm-1789994854852.jpg",
+            "https:\/\/i.ibb.co\/r2SvgqYw\/wm-1789994855480.jpg",
+            "https:\/\/i.ibb.co\/sdbGW9tS\/wm-1789994856089.jpg",
+            "https:\/\/i.ibb.co\/9kdhH28M\/wm-1789994856711.jpg"
+        ],
+        "jar": {
+            "240x320": "https:\/\/sfile.co\/GPoSqFjl2cT"
+        },
+        "downloads": 0,
+        "created_at": "2026-09-21T14:58:00+02:00",
+        "updated_at": "2026-09-21T14:58:00+02:00"
+    },
+    {
         "id": "legend-vs-zombies",
         "name": "Legend Vs Zombies",
         "cat": "Trí tuệ",
