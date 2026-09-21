@@ -45,11 +45,10 @@
         "vi": false,
         "new": true,
         "gate": {
-            "type": "none",
-            "lines": 1,
-            "level": 3,
-            "badge": "rare",
-            "xp": 100
+            "type": "stats",
+            "require": {
+                "comments": 1
+            }
         },
         "desc": "Trò này thì chắc không lạ gì với ae nữa rồi :3\r\nHack:\r\n- Vô hạn gem\r\n- Vô hạn coin",
         "thumb": "https:\/\/i.ibb.co\/0yQ7kFT2\/wm-1789994006683.jpg",
@@ -64,7 +63,7 @@
         },
         "downloads": 0,
         "created_at": "2026-09-21T14:40:59+02:00",
-        "updated_at": "2026-09-21T14:40:59+02:00"
+        "updated_at": "2026-09-21T17:19:29+02:00"
     },
     {
         "id": "boom-air",
