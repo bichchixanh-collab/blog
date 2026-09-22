@@ -83,8 +83,15 @@ small.dim{color:#4a7a9a;font-size:10px}
       // Nếu login OK mà hard:false => SUPABASE_JWT_SECRET trên Vercel sai/thiếu (vé + EXP uid đều liệt).
       try{
         var _tk=''; try{var _s=JSON.parse(localStorage.getItem('sb_session')||'null');_tk=(_s&&_s.access_token)||'';}catch(e){}
+        var _alg=''; try{var _hd=JSON.parse(atob(String(_tk.split('.')[0]||'').replace(/-/g,'+').replace(/_/g,'/')));_alg=(_hd&&_hd.alg)||'';}catch(e){}
         if(_tk) fetch('api/comments?mine=1',{headers:{'Authorization':'Bearer '+_tk},cache:'no-store'}).then(function(r){return r.json();}).then(function(j){
-          if(j&&j.hard!==true){var el=$('srvAuth');if(el){el.style.color='#c43c64';el.textContent=T('li_srvAuth','⚠ Server không nhận phiên đăng nhập — kiểm tra SUPABASE_JWT_SECRET trên Vercel rồi deploy lại.');}}
+          if(j&&j.hard!==true){
+            var el=$('srvAuth');
+            if(el){el.style.color='#c43c64';
+              el.textContent=(_alg&&_alg!=='HS256')
+                ?T('li_srvAlg','⚠ Token dùng thuật toán {a}, server chỉ hỗ trợ HS256 — kiểm tra cài đặt Auth trong Supabase.').replace('{a}',_alg)
+                :T('li_srvAuth','⚠ Server không nhận phiên đăng nhập — kiểm tra SUPABASE_JWT_SECRET trên Vercel rồi deploy lại.');}
+          }
         }).catch(function(){});
       }catch(e){}
       const doSync=function(){var st=$('syncState');if(st)st.textContent=T('li_syncing','Đang đồng bộ…');window.SBSync.syncNow().then(function(r){if(st)st.textContent=T('li_synced','Đã đồng bộ ✓ XP ')+r.xp+(r.fromCloud?T('li_cloud',' (đã kéo bản mới từ cloud)'):'');}).catch(function(e){if(st)st.textContent=T('li_syncerr','Đồng bộ lỗi: ')+e.message+' '+T('li_sql','(cần chạy SQL tạo bảng senpai)');});};
@@ -103,6 +110,6 @@ small.dim{color:#4a7a9a;font-size:10px}
   document.addEventListener('i18n-ready',function(){try{if(window.I18N&&I18N.lang&&I18N.lang()!=='vi')paint();}catch(e){}});
 })();
 </script>
-<script src="assets/i18n.js?v=9"></script>
+<script src="assets/i18n.js?v=10"></script>
 </body>
 </html>

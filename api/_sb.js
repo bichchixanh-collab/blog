@@ -8,11 +8,11 @@ const { isoWeek } = require('./_bingo');
 
 const SB_URL = (process.env.SUPABASE_URL || 'https://pmotbltodyyilarnvtpn.supabase.co').replace(/\/$/, '');
 function jwtSecret() {
-  const s = process.env.SUPABASE_JWT_SECRET || '';
+  const s = String(process.env.SUPABASE_JWT_SECRET || '').trim();
   return s.length >= 16 ? s : null;
 }
 function serviceKey() {
-  const s = process.env.SUPABASE_SERVICE_KEY || '';
+  const s = String(process.env.SUPABASE_SERVICE_KEY || '').trim();
   return s.length >= 20 ? s : null;
 }
 function b64uJson(part) {
