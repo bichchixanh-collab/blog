@@ -276,7 +276,9 @@ module.exports = async (req, res) => {
         const names = String((req.query && req.query.names) || '').split(',').map((s) => s.trim()).filter(Boolean).slice(0, 5);
         if (names.some((s) => s.length > 30)) return send(res, 400, { error: 'bad names' });
         if (!me && !names.length) return send(res, 400, { error: 'missing names', alg: seenAlg || undefined, dbg: getLastAuthDbg() });
-        const n = await countApproved(names, me ? me.uid : null);
+        // Đã login: chỉ đếm theo uid (khớp vé cứng — tên gõ tay ai cũng mạo được nên vé bỏ qua).
+        // Khách: đếm theo tên (khớp vé mềm dùng proof names).
+        const n = await countApproved(me ? [] : names, me ? me.uid : null);
         // Sức khỏe service key (đọc user_stats của chính caller): false = key sai/thiếu.
         let svc = null;
         if (me) {
