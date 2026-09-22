@@ -47,6 +47,7 @@ body{background:#e8f4fd;padding:12px}
   <section id="gameSection" style="display:none">
     <div class="kawaii-title" id="catTitle">Game</div>
     <div id="catList" style="display:grid;gap:8px"></div>
+    <div id="catPager" style="display:flex;gap:6px;align-items:center;justify-content:center;margin-top:10px;font-size:11px"></div>
   </section>
 </div>
 
@@ -69,8 +70,38 @@ const CATS=[
   {id:'Việt Hóa',icon:'🇻🇳',color:'#0066cc',filter:'vi'},
 ];
 let GAMES=null;
+const CAT_LIMIT=6;
+let CAT_PAGE=1, CAT_LIST=[];
 async function loadGames(){ if(GAMES) return GAMES; const r=await fetch('data/games.json',{headers:{Accept:'application/json'}}); GAMES=await r.json(); return GAMES; }
 function getCat(){ return new URLSearchParams(location.search).get('cat'); }
+// Vẽ danh sách game của thể loại đang xem: 6 game/trang
+function renderCatPage(){
+  const list=document.getElementById('catList'), pager=document.getElementById('catPager');
+  if(!list) return;
+  const pages=Math.max(1,Math.ceil(CAT_LIST.length/CAT_LIMIT));
+  if(CAT_PAGE>pages)CAT_PAGE=pages; if(CAT_PAGE<1)CAT_PAGE=1;
+  const cat=getCat()||'', catSafe=escHtml(cat);
+  if(!CAT_LIST.length){
+    list.innerHTML=`<p style="padding:16px;text-align:center;color:#4a7a9a">${T('cat_empty1','Chưa có game nào cho')} <b>${catSafe}</b> — <a href="admin.php" style="color:#0066cc">${T('cat_empty2','đăng bài ngay')}</a> ♡</p>`;
+    if(pager)pager.innerHTML='';
+    return;
+  }
+  list.innerHTML=CAT_LIST.slice((CAT_PAGE-1)*CAT_LIMIT,CAT_PAGE*CAT_LIMIT).map(g=>`
+    <a href="game/${escHtml(g.id)}.html" style="display:flex;gap:10px;align-items:center;background:#fff;border:1.5px solid #b8d8f8;border-radius:12px;padding:10px;text-decoration:none">
+      <img src="${escHtml(g.thumb)}" width="48" height="48" style="border-radius:10px;border:1.5px solid #b8d8f8;object-fit:cover;flex-shrink:0" alt="${escHtml(g.name)}">
+      <div style="flex:1;min-width:0"><b style="font-size:12px;color:#1a3a5c">${escHtml(g.name)} ${(g.gate&&g.gate.type&&g.gate.type!=='none')?'<span style="background:#7a5a00;color:#fff;font-size:8px;padding:1px 4px;border-radius:4px">🔒</span>':''}</b><br><small style="color:#4a7a9a">${escHtml(g.size)} • ${escHtml((g.res||[])[0]||'')}</small></div>
+      <span style="background:linear-gradient(180deg,#4da6ff,#0066cc);color:#fff;padding:6px 12px;border-radius:20px;font-size:11px;font-weight:700;border:1.5px solid #fff;white-space:nowrap">${T('dl','⬇ JAR')}</span>
+    </a>
+  `).join('');
+  if(!pager) return;
+  if(pages<=1){pager.innerHTML='';return;}
+  const btn=function(label,p,dis,cur){return '<button data-cpg="'+p+'" '+(dis?'disabled':'')+' style="background:'+(cur?'#0066cc':'#fff')+';color:'+(cur?'#fff':'#0066cc')+';border:1.5px solid #81c7f0;border-radius:14px;padding:4px 10px;font-size:11px;font-weight:700;cursor:'+(dis?'default':'pointer')+';opacity:'+(dis?'.5':'1')+'">'+label+'</button>';};
+  let h=btn('«',CAT_PAGE-1,CAT_PAGE<=1,false);
+  for(let p=1;p<=pages;p++){ if(pages>7&&Math.abs(p-CAT_PAGE)>2&&(p!==1&&p!==pages))continue; h+=btn(String(p),p,false,p===CAT_PAGE); }
+  h+=btn('»',CAT_PAGE+1,CAT_PAGE>=pages,false);
+  pager.innerHTML=h;
+  pager.querySelectorAll('[data-cpg]').forEach(function(b){b.onclick=function(){const p=parseInt(b.getAttribute('data-cpg'),10);if(p>=1&&p<=pages&&p!==CAT_PAGE){CAT_PAGE=p;renderCatPage();try{document.getElementById('gameSection').scrollIntoView({block:'start'});}catch(e){}}};});
+}
 // Chống XSS: escape dữ liệu game + tham số cat trước khi chèn vào HTML
 function escHtml(s){return String(s==null?'':s).replace(/[&<>"']/g,function(m){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m];});}
 
@@ -81,7 +112,6 @@ async function render(){
   const bc=document.getElementById('bcCat');
   const section=document.getElementById('gameSection');
   const title=document.getElementById('catTitle');
-  const list=document.getElementById('catList');
 
   // Count per cat
   const counts={};
@@ -100,24 +130,12 @@ async function render(){
   }).join('') + `<a href="index.html" class="cat-card" style="background:#e8f4fd"><div style="font-size:22px">📚</div><b>${T('cat_allBtn','Tất cả')}</b><br><small>${games.length} game</small></a>`;
 
   if(cat){
-    const catSafe=escHtml(cat);
     bc.textContent=cat;
     title.textContent=(CATS.find(c=>c.id===cat)?.icon||'🎮')+' '+cat;
     section.style.display='block';
-    let filtered;
-    if(cat==='Việt Hóa') filtered=games.filter(g=>g.vi);
-    else filtered=games.filter(g=>g.cat===cat);
-    if(filtered.length===0){
-      list.innerHTML=`<p style="padding:16px;text-align:center;color:#4a7a9a">${T('cat_empty1','Chưa có game nào cho')} <b>${catSafe}</b> — <a href="admin.php" style="color:#0066cc">${T('cat_empty2','đăng bài ngay')}</a> ♡</p>`;
-    } else {
-      list.innerHTML=filtered.map(g=>`
-        <a href="game/${escHtml(g.id)}.html" style="display:flex;gap:10px;align-items:center;background:#fff;border:1.5px solid #b8d8f8;border-radius:12px;padding:10px;text-decoration:none">
-          <img src="${escHtml(g.thumb)}" width="48" height="48" style="border-radius:10px;border:1.5px solid #b8d8f8;object-fit:cover;flex-shrink:0" alt="${escHtml(g.name)}">
-          <div style="flex:1;min-width:0"><b style="font-size:12px;color:#1a3a5c">${escHtml(g.name)} ${(g.gate&&g.gate.type&&g.gate.type!=='none')?'<span style="background:#7a5a00;color:#fff;font-size:8px;padding:1px 4px;border-radius:4px">🔒</span>':''}</b><br><small style="color:#4a7a9a">${escHtml(g.size)} • ${escHtml((g.res||[])[0]||'')}</small></div>
-          <span style="background:linear-gradient(180deg,#4da6ff,#0066cc);color:#fff;padding:6px 12px;border-radius:20px;font-size:11px;font-weight:700;border:1.5px solid #fff;white-space:nowrap">${T('dl','⬇ JAR')}</span>
-        </a>
-      `).join('');
-    }
+    if(cat==='Việt Hóa') CAT_LIST=games.filter(g=>g.vi);
+    else CAT_LIST=games.filter(g=>g.cat===cat);
+    renderCatPage();
     document.title=cat+' - Game Java | J2ME.VERCEL.APP';
     const md=document.querySelector('meta[name="description"]'); if(md) md.content=`Game Java ${cat} hay nhất cho J2ME: tải JAR miễn phí, hỗ trợ 128x160, 240x320.`;
     grid.style.display='none';

@@ -120,6 +120,7 @@ body{background:#e8f4fd;padding:12px}
     <div class="scallop"></div><div class="stars"></div>
     <div class="kawaii-title" data-i18n="new_update">★ Mới Cập Nhật</div>
     <div id="newList"></div>
+    <div id="newPager" style="display:flex;gap:6px;align-items:center;justify-content:center;margin-top:10px;font-size:11px"></div>
   </section>
 
   <section class="kawaii-c" id="viethoa">
@@ -383,6 +384,24 @@ function suggestGames(q){
     }
   }catch(e){}
 })();
+// Phân trang box Mới Cập Nhật: 3 game/trang (mới nhất trước)
+let NEW_PAGE=1; const NEW_LIMIT=3;
+function newPages(){ const g=(typeof CACHE!=='undefined'&&CACHE)||[]; return Math.max(1,Math.ceil(g.length/NEW_LIMIT)); }
+function renderNewPage(){
+  const games=(typeof CACHE!=='undefined'&&CACHE)||[];
+  const pages=newPages();
+  if(NEW_PAGE>pages)NEW_PAGE=pages; if(NEW_PAGE<1)NEW_PAGE=1;
+  const box=document.getElementById('newList'); if(!box)return;
+  box.innerHTML=games.slice((NEW_PAGE-1)*NEW_LIMIT,NEW_PAGE*NEW_LIMIT).map((g,i)=>card(g,i+3)).join('');
+  const pg=document.getElementById('newPager'); if(!pg)return;
+  if(pages<=1){pg.innerHTML='';return;}
+  const btn=function(label,p,dis,cur){return '<button data-npg="'+p+'" '+(dis?'disabled':'')+' style="background:'+(cur?'#0066cc':'#fff')+';color:'+(cur?'#fff':'#0066cc')+';border:1.5px solid #81c7f0;border-radius:14px;padding:4px 10px;font-size:11px;font-weight:700;cursor:'+(dis?'default':'pointer')+';opacity:'+(dis?'.5':'1')+'">'+label+'</button>';};
+  let h=btn('«',NEW_PAGE-1,NEW_PAGE<=1,false);
+  for(let p=1;p<=pages;p++){ if(pages>7&&Math.abs(p-NEW_PAGE)>2&&(p!==1&&p!==pages))continue; h+=btn(String(p),p,false,p===NEW_PAGE); }
+  h+=btn('»',NEW_PAGE+1,NEW_PAGE>=pages,false);
+  pg.innerHTML=h;
+  pg.querySelectorAll('[data-npg]').forEach(function(b){b.onclick=function(){const p=parseInt(b.getAttribute('data-npg'),10);if(p>=1&&p<=pages&&p!==NEW_PAGE){NEW_PAGE=p;renderNewPage();try{document.getElementById('new').scrollIntoView({block:'start'});}catch(e){}}};});
+}
 async function paintIndex(games){
   // Gộp lượt tải thật từ api/stats để bảng HOT/Top xếp đúng (rớt thì dùng số tĩnh)
   try{
@@ -412,7 +431,7 @@ async function paintIndex(games){
       sb.style.display='';
     }
   }catch(e){}
-  document.getElementById('newList').innerHTML=games.slice(0,4).map((g,i)=>card(g,i+3)).join('');
+  renderNewPage();
   document.getElementById('viethoaGrid').innerHTML=games.filter(g=>g.vi).slice(0,6).map(g=>`<a href="game/${escHtml(g.id)}.html" class="grid-item"><img src="${escHtml(g.thumb)}" width="48" height="48" loading="lazy" decoding="async" alt="${escHtml(g.name)}"><span>${escHtml(String(g.name||'').split('[')[0].slice(0,14))} ${lockBadge(g)}</span><small>${escHtml((g.res||[])[0]||'')}</small></a>`).join('') || games.slice(0,6).map(g=>`<a href="game/${escHtml(g.id)}.html" class="grid-item"><img src="${escHtml(g.thumb)}" width="48" height="48" loading="lazy" decoding="async" alt="${escHtml(g.name)}"><span>${escHtml(String(g.name||'').split('[')[0].slice(0,14))} ${lockBadge(g)}</span></a>`).join('');
   const extra=document.getElementById('extraList'); if(extra) extra.innerHTML=games.slice(3,6).map(g=>card(g)).join('');
   const extra2=document.getElementById('extraGrid2'); if(extra2) extra2.innerHTML=games.slice(6,9).map(g=>`<a href="game/${escHtml(g.id)}.html" class="grid-item"><img src="${escHtml(g.thumb)}" width="48" height="48" loading="lazy" alt="${escHtml(g.name)}"><span>${escHtml(String(g.name||'').split('[')[0].slice(0,12))} ${lockBadge(g)}</span><small>${escHtml(g.size||'')}</small></a>`).join('');
