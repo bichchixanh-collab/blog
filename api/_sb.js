@@ -161,6 +161,16 @@ async function getSenpai(uid) {
     return null;
   } catch { return null; }
 }
+// Chẩn đoán service key (không lộ secret): đọc thử 1 hàng user_stats.
+// Trả về {ok, code} với code = 200 | 'no-env' | status HTTP | 'net-err'.
+async function diagService() {
+  try {
+    if (!serviceKey()) return { ok: false, code: 'no-env' };
+    const r = await sbFetch('/rest/v1/user_stats?select=uid&limit=1');
+    if (r.status === 200) return { ok: true, code: 200 };
+    return { ok: false, code: r.status };
+  } catch (e) { return { ok: false, code: 'net-err' }; }
+}
 // Đọc stats của uid. Thiếu hàng -> zeros. Lỗi hạ tầng -> null (caller rớt mềm).
 async function getUserStats(uid) {
   try {
@@ -221,4 +231,4 @@ async function eventUserStats(uid, ev) {
     return null;
   } catch { return null; }
 }
-module.exports = { SB_URL, jwtSecret, serviceKey, bearerToken, verifySbToken, verifySbTokenAsync, getLastAuthDbg, getUserStats, getSenpai, eventUserStats };
+module.exports = { SB_URL, jwtSecret, serviceKey, bearerToken, verifySbToken, verifySbTokenAsync, getLastAuthDbg, diagService, getUserStats, getSenpai, eventUserStats };

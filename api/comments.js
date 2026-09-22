@@ -281,9 +281,9 @@ module.exports = async (req, res) => {
         let svc = null;
         if (me) {
           try {
-            const { getUserStats } = require('./_sb');
-            svc = !!(await getUserStats(me.uid));
-          } catch (e) { svc = false; }
+            const { diagService } = require('./_sb');
+            svc = await diagService();
+          } catch (e) { svc = { ok: false, code: 'net-err' }; }
         }
         return send(res, 200, { mine: n, hard: !!me, alg: seenAlg || undefined, svc }, 60);
       }

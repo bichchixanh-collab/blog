@@ -91,9 +91,9 @@ small.dim{color:#4a7a9a;font-size:10px}
               el.textContent=(_alg&&_alg!=='HS256')
                 ?T('li_srvAlg','⚠ Token dùng thuật toán {a}, server chỉ hỗ trợ HS256 — kiểm tra cài đặt Auth trong Supabase.').replace('{a}',_alg)
                 :T('li_srvAuth','⚠ Server không nhận phiên đăng nhập — kiểm tra SUPABASE_JWT_SECRET trên Vercel rồi deploy lại.');}
-          } else if(j&&j.svc===false){
+          } else if(j&&(j.svc===false||(j.svc&&j.svc.ok===false))){
             var el2=$('srvAuth');
-            if(el2){el2.style.color='#c43c64';el2.textContent=T('li_svcBad','⚠ Service key lỗi — kiểm tra SUPABASE_SERVICE_KEY trên Vercel rồi deploy lại.');}
+            if(el2){el2.style.color='#c43c64';var _c=(j.svc&&j.svc.code!=null)?j.svc.code:'?';el2.textContent=T('li_svcBad','⚠ Service key lỗi — kiểm tra SUPABASE_SERVICE_KEY trên Vercel rồi deploy lại.').replace('{c}',_c);}
           }
         }).catch(function(){});
       }catch(e){}
@@ -113,6 +113,6 @@ small.dim{color:#4a7a9a;font-size:10px}
   document.addEventListener('i18n-ready',function(){try{if(window.I18N&&I18N.lang&&I18N.lang()!=='vi')paint();}catch(e){}});
 })();
 </script>
-<script src="assets/i18n.js?v=11"></script>
+<script src="assets/i18n.js?v=12"></script>
 </body>
 </html>
