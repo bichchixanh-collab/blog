@@ -76,9 +76,17 @@ small.dim{color:#4a7a9a;font-size:10px}
     console.log('[dangnhap] user=', u && (u.email || u.id));
     if(u&&(u.email||u.id)){
       $('whoBox').style.display='block';
-      $('whoBox').innerHTML=T('li_logged','Đã đăng nhập: ')+'<b>'+String(u.email||u.id).replace(/[<>&"]/g,'')+'</b><br><small id="syncState" style="color:#4a7a9a">'+T('li_syncing','Đang đồng bộ…')+'</small><div class="rowbtns"><button class="btn ghost" id="btnSync">'+T('li_syncnow','🔄 Đồng bộ ngay')+'</button><button class="btn ghost" id="btnOut">'+T('li_out','Đăng xuất')+'</button></div>';
+      $('whoBox').innerHTML=T('li_logged','Đã đăng nhập: ')+'<b>'+String(u.email||u.id).replace(/[<>&"]/g,'')+'</b><br><small id="syncState" style="color:#4a7a9a">'+T('li_syncing','Đang đồng bộ…')+'</small><div class="rowbtns"><button class="btn ghost" id="btnSync">'+T('li_syncnow','🔄 Đồng bộ ngay')+'</button><button class="btn ghost" id="btnOut">'+T('li_out','Đăng xuất')+'</button></div><small id="srvAuth" style="display:block;margin-top:6px;color:#4a7a9a"></small>';
       $('formBox').style.display='none';
       say(T('li_hi','Xin chào Senpai~ Tài khoản đã sẵn sàng đồng bộ.'),'ok');
+      // Đèn báo server: hỏi /api/comments?mine=1 kèm token — hard:true mới là server nhận phiên.
+      // Nếu login OK mà hard:false => SUPABASE_JWT_SECRET trên Vercel sai/thiếu (vé + EXP uid đều liệt).
+      try{
+        var _tk=''; try{var _s=JSON.parse(localStorage.getItem('sb_session')||'null');_tk=(_s&&_s.access_token)||'';}catch(e){}
+        if(_tk) fetch('api/comments?mine=1',{headers:{'Authorization':'Bearer '+_tk},cache:'no-store'}).then(function(r){return r.json();}).then(function(j){
+          if(j&&j.hard!==true){var el=$('srvAuth');if(el){el.style.color='#c43c64';el.textContent=T('li_srvAuth','⚠ Server không nhận phiên đăng nhập — kiểm tra SUPABASE_JWT_SECRET trên Vercel rồi deploy lại.');}}
+        }).catch(function(){});
+      }catch(e){}
       const doSync=function(){var st=$('syncState');if(st)st.textContent=T('li_syncing','Đang đồng bộ…');window.SBSync.syncNow().then(function(r){if(st)st.textContent=T('li_synced','Đã đồng bộ ✓ XP ')+r.xp+(r.fromCloud?T('li_cloud',' (đã kéo bản mới từ cloud)'):'');}).catch(function(e){if(st)st.textContent=T('li_syncerr','Đồng bộ lỗi: ')+e.message+' '+T('li_sql','(cần chạy SQL tạo bảng senpai)');});};
       $('btnSync').onclick=doSync;
       try{if(window.SBSync)doSync();}catch(e){}
@@ -95,6 +103,6 @@ small.dim{color:#4a7a9a;font-size:10px}
   document.addEventListener('i18n-ready',function(){try{if(window.I18N&&I18N.lang&&I18N.lang()!=='vi')paint();}catch(e){}});
 })();
 </script>
-<script src="assets/i18n.js?v=5"></script>
+<script src="assets/i18n.js?v=9"></script>
 </body>
 </html>
