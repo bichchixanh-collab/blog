@@ -86,9 +86,6 @@ async function verifyEs256(h, b, sig, head) {
   } catch (e) {}
   return false;
 }
-  } catch (e) {}
-  return false;
-}
 async function verifySbTokenAsync(token) {
   try {
     const fast = verifySbToken(token);
