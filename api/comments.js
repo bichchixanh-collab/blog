@@ -277,7 +277,15 @@ module.exports = async (req, res) => {
         if (names.some((s) => s.length > 30)) return send(res, 400, { error: 'bad names' });
         if (!me && !names.length) return send(res, 400, { error: 'missing names', alg: seenAlg || undefined, dbg: getLastAuthDbg() });
         const n = await countApproved(names, me ? me.uid : null);
-        return send(res, 200, { mine: n, hard: !!me, alg: seenAlg || undefined }, 60);
+        // Sức khỏe service key (đọc user_stats của chính caller): false = key sai/thiếu.
+        let svc = null;
+        if (me) {
+          try {
+            const { getUserStats } = require('./_sb');
+            svc = !!(await getUserStats(me.uid));
+          } catch (e) { svc = false; }
+        }
+        return send(res, 200, { mine: n, hard: !!me, alg: seenAlg || undefined, svc }, 60);
       }
       const game = String((req.query && req.query.game) || '').slice(0, 120);
       if (!game) return send(res, 400, { error: 'missing game' });
