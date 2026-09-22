@@ -27,7 +27,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700&family=Mali:wght@600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/style.min.css" data-root-href="style.min.css">
 <script>try{if(localStorage.getItem('j2me_lite')==='1')document.documentElement.classList.add('lite');}catch(e){}</script>
-<script>(function(){try{var p=location.pathname||'/';var gi=p.indexOf('/game/');var r=gi>=0?p.slice(0,gi).replace(/\/$/,''):'';document.write('<script src="'+r+'/assets/i18n.js?v=7"><\/script>');}catch(e){}})();</script>
+<script>(function(){try{var p=location.pathname||'/';var gi=p.indexOf('/game/');var r=gi>=0?p.slice(0,gi).replace(/\/$/,''):'';document.write('<script src="'+r+'/assets/i18n.js?v=8"><\/script><script src="'+r+'/assets/js/sb-config.js"><\/script><script src="'+r+'/assets/js/sb-auth.js"><\/script>');}catch(e){}})();</script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{overflow-x:hidden;max-width:100%}
@@ -666,7 +666,9 @@ function __ticketAndGo(gid,res,msgEl,wasPassing){
   __lockStop();
   msgEl.textContent=cmtT('g_ticket','Đang lấy vé tải...');
   var gm=(GAMES_MAP||{})[gid]||{id:gid};
-  fetch(apiRoot()+'/api/ticket?id='+encodeURIComponent(gid)+'&res='+encodeURIComponent(res)+'&proof='+encodeURIComponent(__proof(gm)),{cache:'no-store',headers:stAuthHeaders()})
+  stFreshToken().then(function(_tk){
+    var _hh={}; try{if(_tk)_hh={'Authorization':'Bearer '+_tk};}catch(e){}
+    fetch(apiRoot()+'/api/ticket?id='+encodeURIComponent(gid)+'&res='+encodeURIComponent(res)+'&proof='+encodeURIComponent(__proof(gm)),{cache:'no-store',headers:_hh})
     .then(function(r){return r.json().then(function(j){return {st:r.status,j:j};});})
     .then(function(o){
       if(o.st===200&&o.j&&o.j.ticket){__lockFailMin=0;ECO.owned=true;try{ecoRender();}catch(e){}try{countDownload(gid);}catch(e2){}location.href=apiRoot()+'/go.html?ticket='+encodeURIComponent(o.j.ticket);}
@@ -694,6 +696,7 @@ function __ticketAndGo(gid,res,msgEl,wasPassing){
         var rs0=__statsRows(gm,null);var needC0=rs0.some(function(r){return r.k==='c';});var hd='🔒 <b>'+cmtT('g_cond','Chưa đủ điều kiện')+'</b>'+(reason?' (<b>'+escHtml(reason)+'</b>)':'')+'. '+cmtT('g_srv','Server vừa kiểm tra — số bên dưới là mới nhất:');var ft='<div style="margin-top:6px"><small>'+cmtT('g_hang','Treo trang thêm cho đủ rồi bấm Tải lại (không cần F5).')+'</small></div>';var paint=function(rr){__lockPaint(msgEl,rr,hd,ft);};__pullSrvVals(function(){var rs=__statsRows(gm,null);var nc=rs.some(function(r){return r.k==='c';});paint(rs);if(nc){try{stApprovedCount(function(n){__lockAppr=n;paint(__statsRows(gm,n));__lockLive(gid,gm,msgEl,res,hd,ft);});}catch(e){__lockLive(gid,gm,msgEl,res,hd,ft);}}else{__lockLive(gid,gm,msgEl,res,hd,ft);}});}
       else{msgEl.textContent=cmtT('g_noTicket2','Không lấy được vé (')+o.st+'), thử lại sau.';}
     }).catch(function(){msgEl.textContent=cmtT('g_offline','Mất mạng, thử lại sau.');});
+  }).catch(function(){msgEl.textContent=cmtT('g_offline','Mất mạng, thử lại sau.');});
 }
 async function renderDetail(){
   const qs=new URLSearchParams(location.search);
@@ -880,7 +883,10 @@ function ecoLoad(cost,gid){
   try{ if(!ecoEnsureBox()) return; }catch(e){ return; }
   ecoRender();
   var a=ecoAuth();
-  fetch(apiRoot()+'/api/economy?cid='+encodeURIComponent(a.cid),{headers:a.h,cache:'no-store'})
+  stFreshToken().then(function(_tk){
+    var hh={}; try{for(var k in a.h)hh[k]=a.h[k];}catch(e){}
+    try{if(_tk)hh['Authorization']='Bearer '+_tk;}catch(e){}
+    fetch(apiRoot()+'/api/economy?cid='+encodeURIComponent(a.cid),{headers:hh,cache:'no-store'})
     .then(function(r){return r.ok?r.json():null;})
     .then(function(j){
       if(!j) return;
@@ -888,11 +894,16 @@ function ecoLoad(cost,gid){
       ECO.owned=!!(j.owned&&j.owned.indexOf(gid)>=0); ECO.ready=true;
       ecoRender();
     }).catch(function(){});
+  }).catch(function(){});
 }
 function ecoCheckin(){
   var b=document.getElementById('ecoCheckBtn'); if(b){b.disabled=true;b.textContent='…';}
   var a=ecoAuth();
-  fetch(apiRoot()+'/api/economy',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({op:'checkin',cid:a.cid,sbt:(function(){try{return stToken();}catch(e){return '';}})()})})
+  var hh={'Content-Type':'application/json'};
+  try{var _tk00=stToken();if(_tk00)hh['Authorization']='Bearer '+_tk00;}catch(e){}
+  stFreshToken().then(function(_tk){
+    try{if(_tk)hh['Authorization']='Bearer '+_tk;}catch(e){}
+    fetch(apiRoot()+'/api/economy',{method:'POST',headers:hh,body:JSON.stringify({op:'checkin',cid:a.cid,sbt:(function(){try{return stToken();}catch(e){return '';}})()})})
     .then(function(r){return r.json().then(function(j){return {st:r.status,j:j};});})
     .then(function(o){
       var j=o.j||{};
@@ -913,6 +924,7 @@ function ecoCheckin(){
       }
     })
     .catch(function(){ecoRender();});
+    }).catch(function(){ecoRender();});
 }
 // Nút tải render động dùng data-attr (không inline onclick → tránh XSS qua tên game)
 document.addEventListener('click',function(e){const b=e.target&&e.target.closest?e.target.closest('[data-dl-btn]'):null; if(!b) return; e.preventDefault(); try{doDownload(b.dataset.name||'',b.dataset.res||'');}catch(err){}});
@@ -1002,18 +1014,21 @@ async function loadComments(gameId, page){
     ev.preventDefault();
     msg.textContent=cmtT('cmt_sending','Đang gửi...');
     try{const last=+localStorage.getItem('cmt_last')||0; if(Date.now()-last<5*60*1000){msg.textContent=cmtT('cmt_fast','Bạn gửi quá nhanh, thử lại sau vài phút.');return;}}catch(e){}
-    const payload={game:gameId,name:document.getElementById('cmtName').value,stars:document.getElementById('cmtStars').value,text:document.getElementById('cmtText').value,website:document.getElementById('cmtWeb').value,sbt:stToken()};
+    const payload={game:gameId,name:document.getElementById('cmtName').value,stars:document.getElementById('cmtStars').value,text:document.getElementById('cmtText').value,website:document.getElementById('cmtWeb').value,sbt:''};
     if(window._cmtReplyTo&&window._cmtReplyTo.id)payload.replyTo=window._cmtReplyTo.id;
+    // Refresh token trước khi gửi để server nhận đúng tài khoản (lấy +5 EXP / đếm duyệt)
+    stFreshToken().then(function(tk){ payload.sbt=tk||'';
     fetch(apiRoot()+'/api/comments',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)})
       .then(function(r){return r.text().then(function(t){let j={};try{j=JSON.parse(t);}catch(e){}return {st:r.status,j:j};});})
       .then(function(o){
-        if(o.st===200&&o.j.ok){msg.textContent=cmtT('cmt_sent','Đã gửi! Bình luận hiện sau khi admin duyệt.')+(o.j.xpBonus?' (+5 EXP)':(o.j.xpReason==='no_uid'?' ('+cmtT('g_loginBonus','Đăng nhập để nhận +5 EXP khi bình luận')+')':''));document.getElementById('cmtText').value='';window._cmtReplyTo=null;const tg=document.getElementById('replyTag');if(tg)tg.remove();try{localStorage.setItem('cmt_last',String(Date.now()));}catch(e){}try{xpBump('comment');}catch(e){}try{__bm('comment');}catch(e){}try{stSaveName(document.getElementById('cmtName').value);}catch(e){}try{_stApprCache={at:0,n:-1};}catch(e){}try{if(o.j.xpBonus)ECO.bal+=5;}catch(e){}}
+        if(o.st===200&&o.j.ok){msg.textContent=cmtT('cmt_sent','Đã gửi! Bình luận hiện sau khi admin duyệt.')+(o.j.xpBonus?' (+5 EXP)':(o.j.auth==='stale'?' ('+cmtT('g_relogin','Phiên hết hạn — đăng nhập lại để nhận EXP')+')':(o.j.xpReason==='no_uid'?' ('+cmtT('g_loginBonus','Đăng nhập để nhận +5 EXP khi bình luận')+')':'')));document.getElementById('cmtText').value='';window._cmtReplyTo=null;const tg=document.getElementById('replyTag');if(tg)tg.remove();try{localStorage.setItem('cmt_last',String(Date.now()));}catch(e){}try{xpBump('comment');}catch(e){}try{__bm('comment');}catch(e){}try{stSaveName(document.getElementById('cmtName').value);}catch(e){}try{_stApprCache={at:0,n:-1};}catch(e){}try{if(o.j.xpBonus)ECO.bal+=5;}catch(e){}}
         else if(o.st===503){msg.textContent=cmtT('cmt_nohost','Chức năng bình luận chưa được bật trên hosting này.');}
         else if(o.st===429){msg.textContent=cmtT('cmt_fast','Bạn gửi quá nhanh, thử lại sau vài phút.');}
         else if(o.st===403){msg.textContent=cmtT('cmt_403post','Bị chặn (403): tải lại trang rồi gửi lại.');}
         else{var _e=(o.j&&o.j.error)||'';if(_e==='cross-origin denied')_e=cmtT('cmt_cross','bị chặn cross-origin, tải lại trang rồi thử lại');msg.textContent=cmtT('cmt_errPre','Lỗi: ')+(_e||cmtT('cmt_code','mã {s}, thử lại sau').replace('{s}',o.st));}
       })
       .catch(function(){msg.textContent=cmtT('cmt_neterr','Không gửi được. Kiểm tra mạng rồi thử lại.');});
+    }).catch(function(){msg.textContent=cmtT('cmt_neterr','Không gửi được. Kiểm tra mạng rồi thử lại.');});
   };
 }
 function startCmtPolling(){
@@ -1080,6 +1095,9 @@ function stNames(){var a=stGet('j2me_names',[]);return Array.isArray(a)?a.filter
 function stSaveName(n){n=String(n||'').trim().slice(0,30);if(n.length<2)return;var a=stNames(),l=n.toLowerCase(),has=false;for(var i=0;i<a.length;i++)if(String(a[i]).toLowerCase()===l)has=true;if(!has){a.push(n);stSet('j2me_names',a.slice(-5));}}
 function stApiRoot(){try{var p=location.pathname||'/';var gi=p.indexOf('/game/');return gi>=0?p.slice(0,gi):'';}catch(e){return '';}}
 function stToken(){try{var s=JSON.parse(localStorage.getItem('sb_session')||'null');return (s&&s.access_token)||'';}catch(e){return '';}}
+// Token tươi: tự refresh khi sắp hết hạn (SBAuth), rớt về token cũ nếu không refresh được.
+// Form bình luận/ví/vé DÙNG HÀM NÀY thay vì stToken() để server luôn nhận đúng tài khoản.
+async function stFreshToken(){try{if(window.SBAuth&&SBAuth.session){var s=await SBAuth.session();if(s&&s.access_token)return s.access_token;}}catch(e){}try{return stToken();}catch(e){return '';}}
 function stUid(){try{var t=stToken();if(!t)return '';var p=(t.split('.')[1]||'').replace(/-/g,'+').replace(/_/g,'/');while(p.length%4)p+='=';var j=JSON.parse(atob(p));return j.sub||'';}catch(e){return '';}}
 function stLogged(){return !!stToken();}
 function stAuthHeaders(){var t=stToken();return t?{'Authorization':'Bearer '+t}:{};}

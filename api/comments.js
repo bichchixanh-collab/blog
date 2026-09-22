@@ -300,6 +300,7 @@ module.exports = async (req, res) => {
       const stars = Math.min(5, Math.max(1, parseInt(p.stars, 10) || 0));
       // Gắn uid nếu gửi kèm access_token hợp lệ (đếm duyệt chính xác cho khóa cứng)
       let cmtUid = null;
+      const sbtHad = !!String(p.sbt || '');
       try {
         const tok = String(p.sbt || '');
         if (tok) { const me = verifySbToken(tok); if (me) cmtUid = me.uid; }
@@ -361,7 +362,7 @@ module.exports = async (req, res) => {
           } else if (nextStatus === 'approved' && !cmtUid) {
             xpReason = 'no_uid';
           }
-          return send(res, 200, { ok: true, status: nextStatus, reason: chk.reason || undefined, xpBonus, xpReason }, 0);
+          return send(res, 200, { ok: true, status: nextStatus, reason: chk.reason || undefined, xpBonus, xpReason, auth: cmtUid ? 'ok' : (sbtHad ? 'stale' : 'guest') }, 0);
         }
         if (put.code === 409 || put.code === 422) {
           lastErr = new Error(`conflict ${put.code}`);
