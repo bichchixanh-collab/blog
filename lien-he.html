@@ -60,6 +60,6 @@ body{background:#e8f4fd;padding:12px;font-family:system-ui;color:#1a3a5c}
 (function(){function paint(){try{var on=document.documentElement.classList.contains('lite');var b=document.getElementById('liteToggle');if(b)b.textContent=on?'📶 Đủ':'📴 Nhẹ';}catch(e){}}try{var b=document.getElementById('liteToggle');if(b)b.onclick=function(){try{var h=document.documentElement;if(h.classList.contains('lite')){h.classList.remove('lite');localStorage.setItem('j2me_lite','0');}else{h.classList.add('lite');localStorage.setItem('j2me_lite','1');}paint();}catch(e){}};paint();}catch(e){}})();
 </script>
 <script>try{document.querySelectorAll('.js-year').forEach(function(el){el.textContent=new Date().getFullYear();});}catch(e){}</script>
-<script src="assets/i18n.js?v=3"></script>
+<script src="assets/i18n.js?v=5"></script>
 </body>
 </html>

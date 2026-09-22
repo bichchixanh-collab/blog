@@ -354,6 +354,8 @@ if (isset($_POST['save'])) {
                 $gate = ['type' => $gateType, 'require' => $rq];
             }
             if ($gateType !== 'none' && isset($_POST['gate_login'])) $gate['login'] = 1;
+            // Giá tải EXP (admin set tùy ý; tải lại game đã sở hữu thì miễn phí)
+            $dlCost = max(0, min(100000, (int)($_POST['dl_cost'] ?? 10)));
             $createdAt = $editGame['created_at'] ?? date('c');
             $g = [
                 'id'=>$id,
@@ -365,6 +367,7 @@ if (isset($_POST['save'])) {
                 'vi'=>isset($_POST['vi']),
                 'new'=>isset($_POST['new']),
                 'gate'=>$gate,
+                'dl_cost'=>$dlCost,
                 'desc'=>trim($_POST['desc'] ?? ''),
                 'thumb'=>$thumb,
                 'shots'=>$shots,
@@ -442,6 +445,7 @@ if (isset($_POST['import'])) {
                 if(empty($it['created_at'])) $it['created_at']=date('c');
                 $it['updated_at']=date('c');
                 foreach(['cat','size','desc','thumb'] as $k) $it[$k]=(string)($it[$k]??'');
+                $it['dl_cost']=max(0,min(100000,(int)($it['dl_cost']??10)));
                 $clean[]=$it;
             }
             if(!$clean){ $msg='Không có bài nào hợp lệ trong file.'; $msgType='error'; }
@@ -513,9 +517,31 @@ if (isset($_POST['cmt_action'])) {
         if($got['error']){ $msg='❌ '.$got['error']; $msgType='error'; }
         else{
             $list=is_array($got['data'])?$got['data']:[];
+            $apprUid=''; $wasPending=false;
+            foreach($list as $c){ if(($c['id']??'')===$cid){ $wasPending=(($c['status']??'')!=='approved'); if(!empty($c['uid']))$apprUid=(string)$c['uid']; } }
             if($act==='delete') $list=array_values(array_filter($list,fn($c)=>($c['id']??'')!==$cid));
             else foreach($list as &$c){ if(($c['id']??'')===$cid) $c['status']='approved'; } unset($c);
             $ok=githubPutFile($config,'data/comments.json',$list,'moderate comment '.$cid.' ('.$act.')',$syncMsg);
+            // Thưởng +5 EXP cho chủ bình luận có tài khoản (mỗi bình luận 1 lần)
+            if($ok && $act==='approve' && $wasPending && $apprUid!==''){
+                $eGot=githubGetFile($config,'data/economy.json');
+                if(!$eGot['error']){
+                    $emap=is_array($eGot['data'])?$eGot['data']:[];
+                    $ek='u_'.$apprUid;
+                    $er=is_array($emap[$ek]??null)?$emap[$ek]:[];
+                    if(empty($er['bonus'][$cid])){
+                        $er['bal']=max(0,(int)($er['bal']??0))+5;
+                        if(!is_array($er['bonus']??null))$er['bonus']=[];
+                        $er['bonus'][$cid]=1;
+                        if(!isset($er['last']))$er['last']='';
+                        if(!isset($er['streak']))$er['streak']=0;
+                        if(!isset($er['owned'])||!is_array($er['owned']))$er['owned']=[];
+                        $emap[$ek]=$er;
+                        $eSync='';
+                        if(githubPutFile($config,'data/economy.json',$emap,'economy: approve bonus +5 '.$cid,$eSync)) $msg.=' (+5 EXP)';
+                    }
+                }
+            }
             $msg=($act==='delete'?'Đã xóa bình luận. ':'Đã duyệt bình luận. ').$syncMsg; $msgType=$ok?'success':'error';
             $cmtList=$list;
         }
@@ -528,14 +554,38 @@ if (isset($_POST['cmt_auto_approve'])) {
         if($got['error']){ $msg='❌ '.$got['error']; $msgType='error'; }
         else{
             $list=is_array($got['data'])?$got['data']:[];
-            $cnt=0; $skip=0;
+            $cnt=0; $skip=0; $bonusUids=[];
             foreach($list as &$c){ if(($c['status']??'')==='pending'){
                 $chk=cmt_check($c['text']??'', $c['name']??'');
-                if($chk['ok']){ $c['status']='approved'; $cnt++; } else { $skip++; if(!isset($c['mod_reason'])) $c['mod_reason']=$chk['reason']; }
+                if($chk['ok']){ $c['status']='approved'; $cnt++; if(!empty($c['uid']))$bonusUids[(string)$c['uid']][]=(string)($c['id']??''); } else { $skip++; if(!isset($c['mod_reason'])) $c['mod_reason']=$chk['reason']; }
             }} unset($c);
             if($cnt>0){
                 $ok=githubPutFile($config,'data/comments.json',$list,'auto-approve '.$cnt.' comments',$syncMsg);
-                $msg="✅ Auto-duyệt $cnt bình luận sạch (bỏ qua $skip không đạt filter). ".$syncMsg; $msgType=$ok?'success':'error';
+                // Thưởng +5 EXP/bình luận cho chủ có tài khoản
+                $bonusN=0;
+                if($ok && $bonusUids){
+                    $eGot=githubGetFile($config,'data/economy.json');
+                    if(!$eGot['error']){
+                        $emap=is_array($eGot['data'])?$eGot['data']:[];
+                        foreach($bonusUids as $bu=>$cids){
+                            $ek='u_'.$bu;
+                            $er=is_array($emap[$ek]??null)?$emap[$ek]:[];
+                            if(!is_array($er['bonus']??null))$er['bonus']=[];
+                            foreach(array_unique($cids) as $bc){
+                                if($bc===''||!empty($er['bonus'][$bc]))continue;
+                                $er['bal']=max(0,(int)($er['bal']??0))+5;
+                                $er['bonus'][$bc]=1; $bonusN++;
+                            }
+                            if(!isset($er['last']))$er['last']='';
+                            if(!isset($er['streak']))$er['streak']=0;
+                            if(!isset($er['owned'])||!is_array($er['owned']))$er['owned']=[];
+                            $emap[$ek]=$er;
+                        }
+                        $eSync='';
+                        if(!githubPutFile($config,'data/economy.json',$emap,'economy: approve bonus +5 x'.$bonusN,$eSync))$bonusN=0;
+                    }
+                }
+                $msg="✅ Auto-duyệt $cnt bình luận sạch (bỏ qua $skip không đạt filter). ".($bonusN>0?"+$bonusN lượt thưởng EXP. ":'').$syncMsg; $msgType=$ok?'success':'error';
                 $cmtList=$list;
             } else { $msg="Không có bình luận nào đạt filter để duyệt (bỏ qua $skip)."; $msgType='info'; }
         }
@@ -782,6 +832,7 @@ hr{border:none;border-top:1px dashed #d6deea;margin:12px 0}
           <small style="color:#5a6b87">Tích nhiều điều kiện = phải đủ TẤT CẢ. Bình luận tính theo tên đã dùng (server đếm chéo).</small>
         </div>
         <div id="gateLoginRow" style="display:<?=($egT==='none'?'none':'block')?>"><label style="font-size:11px"><input type="checkbox" name="gate_login" <?=!empty($eg['login'])?'checked':''?>> 🔐 Bắt buộc đăng nhập (áp dụng mọi loại khóa — khách không tải được)</label></div>
+        <div style="margin-top:6px"><small>💰 Giá tải (EXP)</small><input type="number" name="dl_cost" min="0" max="100000" value="<?=htmlspecialchars($editGame['dl_cost']??10)?>" style="width:100px"> <small style="color:#5a6b87">tải lại game đã sở hữu thì miễn phí • gợi ý: kho cũ ~5, game mới ~15</small></div>
         <script>function gateTypeChanged(v){try{document.getElementById('gateOpts').style.display=v==='none'?'none':'grid';document.getElementById('gateStats').style.display=v==='stats'?'grid':'none';document.getElementById('gateLoginRow').style.display=v==='none'?'none':'block';}catch(e){}}</script>
         <small style="color:#5a6b87">Khóa mềm: chặn nút tải + link copy tay (proof theo ngày). Ngoài web hiện ổ khóa + đường dẫn sang Góc Senpai.</small>
         <br><small>🔑 Mã hóa link: <?=lock_secret()!==null?'<b style="color:#0a9c4a">đã bật (AES-GCM)</b>':'<b style="color:#c43c64">CHƯA — link lưu plaintext, dễ soi source</b>'?> — đặt LOCK_SECRET (≥16 ký tự) trong env hoặc config.php, và thêm cùng giá trị vào Vercel env.</small>
@@ -1049,6 +1100,7 @@ const g={
       cat:String(fd.get('cat')||''), size:String(fd.get('size')||''), res:res,
       hot:ck('hot'), vi:ck('vi'), new:ck('new'),
       desc:String(fd.get('desc')||''), thumb:String(fd.get('thumb')||''),
+      dl_cost:Math.max(0,Math.min(100000,parseInt(fd.get('dl_cost')||'10',10)||0)),
       gate:(function(){var t=String(fd.get('gate_type')||'none');var g={type:t,lines:+(fd.get('gate_lines')||1),level:+(fd.get('gate_level')||3),xp:+(fd.get('gate_xp')||100)};if(t==='stats'){var rq={};if(ck('rq_minutes_on'))rq.minutes=+(fd.get('rq_minutes')||1);if(ck('rq_likes_on'))rq.likes=+(fd.get('rq_likes')||1);if(ck('rq_completed_on'))rq.completed=+(fd.get('rq_completed')||1);if(ck('rq_comments_on'))rq.comments=+(fd.get('rq_comments')||1);g.require=rq;}if(t!=='none'&&ck('gate_login'))g.login=1;return g;})(),
       shots:shots, jar:jar, created_at:new Date().toISOString()
     };

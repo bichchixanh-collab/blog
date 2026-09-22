@@ -7,6 +7,7 @@ const { check, ipOf } = require('./_rate');
 const { mintTicket, checkProofExtended } = require('./_lock');
 const { countApproved } = require('./comments');
 const { bearerToken, verifySbToken, getUserStats, getSenpai } = require('./_sb');
+const { chargeForDownload, costOf } = require('./economy');
 const { countLinesMax, petLevel } = require('./_bingo');
 // Gom số server-side theo tài khoản cho khóa CỨNG. null = hạ tầng lỗi (fail-closed).
 async function resolveServerStats(uid) {
@@ -64,6 +65,25 @@ module.exports = async (req, res) => {
       const chk = await checkProofExtended(proof, id, gate, countApproved, serverStats, !!me, ipOf(req));
       if (!chk.ok) { send(res, 403, { error: 'locked', reason: chk.reason, hard: serverStats ? 1 : 0 }); return; }
       hard = chk.hard ? 1 : 0;
+    }
+    // Ví EXP: trừ giá tải của bài (tải lại game đã sở hữu thì miễn phí).
+    {
+      const cost = costOf(g);
+      if (cost > 0) {
+        const mePay = verifySbToken(bearerToken(req));
+        let cidPay = '';
+        try {
+          const raw = Buffer.from(String((req.query && req.query.proof) || '').replace(/-/g, '+').replace(/_/g, '/'), 'base64').toString('utf8');
+          const pj = JSON.parse(raw);
+          if (pj && typeof pj.cid === 'string') cidPay = pj.cid.slice(0, 64);
+        } catch (e) {}
+        const pay = await chargeForDownload({ uid: mePay ? mePay.uid : null, cid: cidPay, gameId: id, cost });
+        if (!pay.ok && pay.reason === 'low_exp') {
+          send(res, 402, { error: 'low_exp', need: pay.need, bal: pay.bal });
+          return;
+        }
+        if (!pay.ok) { send(res, 503, { error: 'economy unavailable' }); return; }
+      }
     }
     const t = mintTicket(id, resName, gate || { type: 'none' }, hard);
     send(res, 200, { ticket: t.ticket, exp: t.exp, hard });
