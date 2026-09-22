@@ -248,7 +248,22 @@ function githubPutFile($config, $repoPath, $data, $commitMsg, &$outMsg, $isRaw=f
     $outMsg='❌ Lỗi ghi GitHub ($code): '.htmlspecialchars(substr($res,0,300));
     return false;
 }
-require_once __DIR__.'/sitemap_lib.php';
+if(file_exists(__DIR__.'/sitemap_lib.php')) require_once __DIR__.'/sitemap_lib.php';
+// Dự phòng khi thiếu sitemap_lib.php (file này chưa từng được commit): dựng sitemap
+// tối thiểu để trang admin không fatal, flow đăng bài vẫn chạy.
+if(!function_exists('build_sitemap_xml')){
+    function build_sitemap_xml($games){
+        $x='<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
+        $x.='<url><loc>https://J2ME.VERCEL.APP/</loc><changefreq>daily</changefreq></url>';
+        $x.='<url><loc>https://J2ME.VERCEL.APP/category.html</loc><changefreq>weekly</changefreq></url>';
+        if(is_array($games)) foreach($games as $g){
+            $id=preg_replace('/[^a-z0-9\-]/i','',strval($g['id']??''));
+            if($id==='')continue;
+            $x.='<url><loc>https://J2ME.VERCEL.APP/game/'.htmlspecialchars($id).'.html</loc><changefreq>weekly</changefreq></url>';
+        }
+        return $x.'</urlset>';
+    }
+}
 if (!function_exists('lock_secret')){ function lock_secret(){ $s=getenv('LOCK_SECRET'); if($s && strlen($s)>=16) return $s; global $config; $c=$config['LOCK_SECRET']??null; return $c && strlen($c)>=16 ? $c : null; } }
 // Ping Google/Bing báo sitemap mới (không chặn, lỗi thì bỏ qua).
 function ping_sitemap(){

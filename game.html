@@ -27,7 +27,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700&family=Mali:wght@600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/style.min.css" data-root-href="style.min.css">
 <script>try{if(localStorage.getItem('j2me_lite')==='1')document.documentElement.classList.add('lite');}catch(e){}</script>
-<script>(function(){try{var p=location.pathname||'/';var gi=p.indexOf('/game/');var r=gi>=0?p.slice(0,gi).replace(/\/$/,''):'';document.write('<script src="'+r+'/assets/i18n.js?v=5"><\/script>');}catch(e){}})();</script>
+<script>(function(){try{var p=location.pathname||'/';var gi=p.indexOf('/game/');var r=gi>=0?p.slice(0,gi).replace(/\/$/,''):'';document.write('<script src="'+r+'/assets/i18n.js?v=6"><\/script>');}catch(e){}})();</script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{overflow-x:hidden;max-width:100%}
@@ -471,6 +471,16 @@ function renderCreditBox(inner,headerHtml){
 }
 document.addEventListener('click',function(e){var b=e.target&&e.target.closest?e.target.closest('[data-credit-copy]'):null;if(!b)return;try{navigator.clipboard.writeText(b.parentNode.parentNode.innerText).then(function(){b.textContent=cmtT('g_creditCopied','✓ Đã chép!');}).catch(function(){});}catch(err){}});
 document.addEventListener('click',function(e){var b=e.target&&e.target.closest?e.target.closest('[data-relock]'):null;if(!b)return;try{localStorage.removeItem('j2me_presence');}catch(err){}location.reload();});
+document.addEventListener('click',function(e){
+  var b=e.target&&e.target.closest?e.target.closest('[data-eco-comment]'):null;if(!b)return;
+  try{var mc=document.getElementById('modalCancel');if(mc)mc.click();}catch(err){}
+  setTimeout(function(){
+    try{
+      var box=document.getElementById('cmtBox'); if(box){box.style.display='block';box.scrollIntoView({behavior:'smooth',block:'start'});}
+      var tx=document.getElementById('cmtText'); if(tx)tx.focus({preventScroll:true});
+    }catch(err2){}
+  },150);
+});
 function renderDesc(s){
   var parts=[],heads=[];
   var raw=String(s||'');
@@ -664,7 +674,12 @@ function __ticketAndGo(gid,res,msgEl,wasPassing){
         var need=(o.j&&o.j.need)||ECO.cost, bal=(o.j&&typeof o.j.bal==='number')?o.j.bal:ECO.bal;
         ECO.retry=true; ECO.bal=bal;
         try{ecoRender();}catch(e){}
-        msgEl.innerHTML='🔒 <b>'+cmtT('g_cond','Chưa đủ điều kiện')+'</b> ('+cmtT('g_cost','Giá tải:')+' '+need+' EXP). '+cmtT('g_lowexp','Thiếu {n} EXP — điểm danh mỗi ngày để tích nhé').replace('{n}',Math.max(0,need-bal));
+        var short=Math.max(0,need-bal);
+        var acts='<div style="margin-top:8px;display:grid;gap:6px">'
+          +'<button data-eco-comment="1" class="dl-btn" style="font-size:11px;justify-content:center">'+cmtT('g_actComment','💬 Bình luận game này (+5 EXP khi duyệt)')+'</button>';
+        if(short>5) acts+='<small style="color:#4a7a9a">'+cmtT('g_actStreak','🔥 Giữ chuỗi điểm danh để nhận thưởng lớn')+'</small>';
+        acts+='</div>';
+        msgEl.innerHTML='🔒 <b>'+cmtT('g_cond','Chưa đủ điều kiện')+'</b> ('+cmtT('g_cost','Giá tải:')+' '+need+' EXP). '+cmtT('g_lowexp','Thiếu {n} EXP — điểm danh mỗi ngày để tích nhé').replace('{n}',short)+acts;
       }
       else if(o.st===403){
         var reason=(o.j&&o.j.reason)||'';
