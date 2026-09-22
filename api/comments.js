@@ -265,12 +265,19 @@ module.exports = async (req, res) => {
       // Đếm bình luận đã duyệt của tôi: ?mine=1&names=Ten1,Ten2 (tối đa 5 tên),
       // hoặc kèm Bearer token để đếm chính xác theo tài khoản.
       if (String((req.query && req.query.mine) || '') === '1') {
-        const me = await verifySbTokenAsync(bearerToken(req));
+        const rawTok = bearerToken(req);
+        const me = await verifySbTokenAsync(rawTok);
+        // Chẩn đoán (không nhạy cảm): thuật toán token client gửi để đối chiếu khi hard=false.
+        let seenAlg = '';
+        try {
+          const hd = JSON.parse(Buffer.from(String((rawTok.split('.')[0] || '')).replace(/-/g, '+').replace(/_/g, '/'), 'base64').toString('utf8'));
+          seenAlg = (hd && hd.alg) || '';
+        } catch (e) {}
         const names = String((req.query && req.query.names) || '').split(',').map((s) => s.trim()).filter(Boolean).slice(0, 5);
         if (names.some((s) => s.length > 30)) return send(res, 400, { error: 'bad names' });
-        if (!me && !names.length) return send(res, 400, { error: 'missing names' });
+        if (!me && !names.length) return send(res, 400, { error: 'missing names', alg: seenAlg || undefined });
         const n = await countApproved(names, me ? me.uid : null);
-        return send(res, 200, { mine: n, hard: !!me }, 60);
+        return send(res, 200, { mine: n, hard: !!me, alg: seenAlg || undefined }, 60);
       }
       const game = String((req.query && req.query.game) || '').slice(0, 120);
       if (!game) return send(res, 400, { error: 'missing game' });

@@ -50,13 +50,14 @@ function verifySbToken(token) {
 let _jwksCache = { at: 0, keys: null };
 async function getJwks() {
   const now = Date.now();
-  if (_jwksCache.keys && now - _jwksCache.at < 10 * 60 * 1000) return _jwksCache.keys;
+  if (_jwksCache.keys && _jwksCache.keys.length && now - _jwksCache.at < 10 * 60 * 1000) return _jwksCache.keys;
   let sig;
-  try { sig = (typeof AbortSignal !== 'undefined' && AbortSignal.timeout) ? AbortSignal.timeout(5000) : undefined; } catch (e) { sig = undefined; }
+  try { sig = (typeof AbortSignal !== 'undefined' && AbortSignal.timeout) ? AbortSignal.timeout(8000) : undefined; } catch (e) { sig = undefined; }
   const r = await fetch(`${SB_URL}/auth/v1/.well-known/jwks.json`, sig ? { signal: sig } : {});
   if (!r.ok) throw new Error(`jwks ${r.status}`);
   const j = await r.json().catch(() => null);
-  const keys = (j && Array.isArray(j.keys)) ? j.keys : [];
+  const keys = (j && Array.isArray(j.keys)) ? j.keys.filter((k) => k && k.kty === 'EC' && typeof k.x === 'string' && typeof k.y === 'string') : [];
+  if (!keys.length) throw new Error('jwks empty');
   _jwksCache = { at: now, keys };
   return keys;
 }
@@ -71,14 +72,20 @@ async function verifyEs256(h, b, sig, head) {
     const data = Buffer.from(`${h}.${b}`, 'utf8');
     const sigBuf = b64ToBuf(sig);
     if (!sigBuf) return false;
-    const list = kid ? keys.filter((k) => k && k.kid === kid) : keys;
+    // Lọc theo kid; nếu kid lạ (vừa xoay khóa) thì thử hết để tự phục hồi.
+    let list = kid ? keys.filter((k) => k && k.kid === kid) : keys;
+    if (!list.length) list = keys;
     for (const k of list) {
       try {
         if (!k || k.kty !== 'EC') continue;
-        const pub = crypto.createPublicKey({ key: k, format: 'jwk' });
+        // Chỉ đưa 4 trường chuẩn cho createPublicKey (bỏ alg/use/key_ops/ext/kid).
+        const pub = crypto.createPublicKey({ key: { kty: 'EC', crv: k.crv, x: k.x, y: k.y }, format: 'jwk' });
         if (crypto.verify('sha256', data, pub, sigBuf)) return true;
       } catch (e) {}
     }
+  } catch (e) {}
+  return false;
+}
   } catch (e) {}
   return false;
 }
