@@ -27,7 +27,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700&family=Mali:wght@600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/style.min.css" data-root-href="style.min.css">
 <script>try{if(localStorage.getItem('j2me_lite')==='1')document.documentElement.classList.add('lite');}catch(e){}</script>
-<script>(function(){try{var p=location.pathname||'/';var gi=p.indexOf('/game/');var r=gi>=0?p.slice(0,gi).replace(/\/$/,''):'';document.write('<script src="'+r+'/assets/i18n.js?v=3"><\/script>');}catch(e){}})();</script>
+<script>(function(){try{var p=location.pathname||'/';var gi=p.indexOf('/game/');var r=gi>=0?p.slice(0,gi).replace(/\/$/,''):'';document.write('<script src="'+r+'/assets/i18n.js?v=4"><\/script>');}catch(e){}})();</script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{overflow-x:hidden;max-width:100%}
@@ -574,11 +574,29 @@ function __proof(g){
     try{st.names=stNames();}catch(e){}
     var o={id:g.id,day:new Date().toISOString().slice(0,10),lines:__blines(),st:st};
     try{var pr=stPresence();if(pr)o.presence=pr.tok;}catch(e){}
+    try{if(typeof stCid==='function'){var _cid=stCid();if(_cid)o.cid=_cid;}}catch(e){}
     return btoa(unescape(encodeURIComponent(JSON.stringify(o)))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
   }catch(e){return '';}
 }
 // --- Khóa tải kiểu stats: phút online / bình luận duyệt / like / phá đảo (gộp AND) ---
-function __statVals(){var o={min:0,likes:0,done:0};try{o.min=stVerifiedMin();}catch(e){}try{o.likes=stLikes();}catch(e){}try{o.done=stDone();}catch(e){}return o;}
+// Đã đăng nhập: hiển thị theo SỐ SERVER (ustats theo tài khoản) cho khớp với
+// thứ server dùng để cấp vé; khách vãng lai: dùng presence chain + số local.
+let __srvVals=null;
+function __pullSrvVals(cb){
+  __srvVals=null;
+  var tk=''; try{tk=stToken();}catch(e){}
+  if(!tk){ if(cb)cb(); return; }
+  fetch(apiRoot()+'/api/ustats',{headers:{'Authorization':'Bearer '+tk},cache:'no-store'})
+    .then(function(r){return r.ok?r.json():null;})
+    .then(function(j){
+      if(j&&typeof j.minutes==='number'){
+        var num=function(v){return (typeof v==='number'&&isFinite(v))?v:0;};
+        __srvVals={min:num(j.minutes),likes:num(j.likes),done:num(j.completed)};
+      }
+      if(cb)cb();
+    }).catch(function(){ if(cb)cb(); });
+}
+function __statVals(){if(__srvVals)return __srvVals;var o={min:0,likes:0,done:0};try{o.min=stVerifiedMin();}catch(e){}try{o.likes=stLikes();}catch(e){}try{o.done=stDone();}catch(e){}return o;}
 function __statsRows(g,apprN){
   var rq=(g.gate&&g.gate.require)||{},rows=[],v=__statVals();
   if(rq.minutes!=null)rows.push({k:'m',need:+rq.minutes,has:v.min,ok:v.min>=+rq.minutes,label:cmtT('go_req_min','Online đủ {n} phút').replace('{n}',rq.minutes),hint:'<small>'+cmtT('go_auto','mở web là tự tính')+'</small>'});
@@ -619,14 +637,19 @@ function __lockLive(gid,gm,msg,res,head,foot){
     try{
       if(!document.body.contains(msg)||document.getElementById('dlModal').classList.contains('hidden')){ __lockStop(); return; }
       __lockTick++;
-      var rows=__statsRows(gm,__lockAppr);
-      var needCmt=rows.some(function(r){return r.k==='c';});
-      var paint=function(rr){
-        __lockPaint(msg,rr,head,foot);
-        if(__statsPass(rr)){ __lockStop(); msg.textContent=cmtT('g_getting','Đủ điều kiện! Đang lấy vé...'); __ticketAndGo(gid,res,msg,true); }
+      var doPaint=function(){
+        var rows=__statsRows(gm,__lockAppr);
+        var needCmt=rows.some(function(r){return r.k==='c';});
+        var paint=function(rr){
+          __lockPaint(msg,rr,head,foot);
+          if(__statsPass(rr)){ __lockStop(); msg.textContent=cmtT('g_getting','Đủ điều kiện! Đang lấy vé...'); __ticketAndGo(gid,res,msg,true); }
+        };
+        if(needCmt&&(__lockTick%3===0)){ try{stApprovedCount(function(n){__lockAppr=n;paint(__statsRows(gm,n));});}catch(e){paint(rows);} }
+        else paint(rows);
       };
-      if(needCmt&&(__lockTick%3===0)){ try{stApprovedCount(function(n){__lockAppr=n;paint(__statsRows(gm,n));});}catch(e){paint(rows);} }
-      else paint(rows);
+      // Mỗi ~30s đồng bộ lại số server (nếu đã đăng nhập) rồi mới vẽ
+      if(__lockTick%3===0){ try{__pullSrvVals(doPaint);}catch(e){doPaint();} }
+      else doPaint();
     }catch(e){}
   },10000);
 }
@@ -648,7 +671,7 @@ function __ticketAndGo(gid,res,msgEl,wasPassing){
             +'<div style="margin-top:8px;text-align:center"><button data-relock="1" class="dl-btn" style="font-size:11px">'+cmtT('g_recount','🔄 Đếm lại từ đầu')+'</button></div>';
           return;
         }
-        var rs0=__statsRows(gm,null);var needC0=rs0.some(function(r){return r.k==='c';});var hd='🔒 <b>'+cmtT('g_cond','Chưa đủ điều kiện')+'</b>'+(reason?' (<b>'+escHtml(reason)+'</b>)':'')+'. '+cmtT('g_srv','Server vừa kiểm tra — số bên dưới là mới nhất:');var ft='<div style="margin-top:6px"><small>'+cmtT('g_hang','Treo trang thêm cho đủ rồi bấm Tải lại (không cần F5).')+'</small></div>';var paint=function(rr){__lockPaint(msgEl,rr,hd,ft);};paint(rs0);if(needC0){try{stApprovedCount(function(n){__lockAppr=n;paint(__statsRows(gm,n));__lockLive(gid,gm,msgEl,res,hd,ft);});}catch(e){__lockLive(gid,gm,msgEl,res,hd,ft);}}else{__lockLive(gid,gm,msgEl,res,hd,ft);}}
+        var rs0=__statsRows(gm,null);var needC0=rs0.some(function(r){return r.k==='c';});var hd='🔒 <b>'+cmtT('g_cond','Chưa đủ điều kiện')+'</b>'+(reason?' (<b>'+escHtml(reason)+'</b>)':'')+'. '+cmtT('g_srv','Server vừa kiểm tra — số bên dưới là mới nhất:');var ft='<div style="margin-top:6px"><small>'+cmtT('g_hang','Treo trang thêm cho đủ rồi bấm Tải lại (không cần F5).')+'</small></div>';var paint=function(rr){__lockPaint(msgEl,rr,hd,ft);};__pullSrvVals(function(){var rs=__statsRows(gm,null);var nc=rs.some(function(r){return r.k==='c';});paint(rs);if(nc){try{stApprovedCount(function(n){__lockAppr=n;paint(__statsRows(gm,n));__lockLive(gid,gm,msgEl,res,hd,ft);});}catch(e){__lockLive(gid,gm,msgEl,res,hd,ft);}}else{__lockLive(gid,gm,msgEl,res,hd,ft);}});}
       else{msgEl.textContent=cmtT('g_noTicket2','Không lấy được vé (')+o.st+'), thử lại sau.';}
     }).catch(function(){msgEl.textContent=cmtT('g_offline','Mất mạng, thử lại sau.');});
 }
@@ -781,8 +804,13 @@ function doDownload(name,res){
       else{__lockPaint(msg,rows);}
       __lockLive(gid,gm,msg,res);
     };
-    if(needCmt){msg.innerHTML='<div style="text-align:left">'+__statsRowsHtml(rows0)+'</div>';try{stApprovedCount(function(n){__lockAppr=n;show(__statsRows(gm,n));});}catch(e){show(rows0);}}
-    else show(rows0);
+    var runShow=function(){
+      if(needCmt){try{stApprovedCount(function(n){__lockAppr=n;show(__statsRows(gm,n));});}catch(e){show(__statsRows(gm,null));}}
+      else show(__statsRows(gm,null));
+    };
+    // Vẽ khung ngay bằng số local, rồi đồng bộ số server (nếu đã đăng nhập) để khớp vé
+    msg.innerHTML='<div style="text-align:left">'+__statsRowsHtml(rows0)+'</div>';
+    try{__pullSrvVals(runShow);}catch(e){runShow();}
     return false;
   }
   const lock=gm?__gate(gm):null;
@@ -967,8 +995,9 @@ function stLogged(){return !!stToken();}
 function stAuthHeaders(){var t=stToken();return t?{'Authorization':'Bearer '+t}:{};}
 function stEvent(t,id){try{var tk=stToken();if(!tk)return;fetch(stApiRoot()+'/api/ustats',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+tk},body:JSON.stringify({t:t,id:String(id||'').slice(0,120)}),keepalive:true}).catch(function(){});}catch(e){}}
 var _stApprCache={at:0,n:-1};
+function stCid(){try{var c=localStorage.getItem('j2me_cid');if(typeof c==='string'&&/^[0-9a-f]{24}$/.test(c))return c;c='';var ch='0123456789abcdef';for(var i=0;i<24;i++)c+=ch[Math.floor(Math.random()*16)];try{localStorage.setItem('j2me_cid',c);}catch(e){}return c;}catch(e){return '';}}
 function stApprovedCount(cb){var now=Date.now();if(_stApprCache.n>=0&&now-_stApprCache.at<60000){cb(_stApprCache.n);return;}var tk='';try{tk=stToken();}catch(e){}var names=stNames();if(!tk&&!names.length){cb(0);return;}var url=stApiRoot()+'/api/comments?mine=1'+(names.length?'&names='+encodeURIComponent(names.join(',')):'');var hh=tk?{'Authorization':'Bearer '+tk}:{};fetch(url,{headers:hh,cache:'no-store'}).then(function(r){return r.json();}).then(function(j){var n=+(j&&j.mine)||0;_stApprCache={at:now,n:n};cb(n);}).catch(function(){cb(_stApprCache.n>=0?_stApprCache.n:0);});}
-(function(){try{setInterval(function(){try{if(document.hidden)return;var ms=+localStorage.getItem('j2me_online_ms')||0;localStorage.setItem('j2me_online_ms',String(ms+60000));}catch(e){}try{var tk=stToken();if(tk)fetch(stApiRoot()+'/api/ustats',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+tk},body:JSON.stringify({t:'heartbeat'}),keepalive:true}).catch(function(){});}catch(e){}try{var pr=null;try{pr=JSON.parse(localStorage.getItem('j2me_presence')||'null');}catch(e){}fetch(stApiRoot()+'/api/presence',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({tok:(pr&&pr.tok)||''}),keepalive:true}).then(function(r){return r.json();}).then(function(j){if(j&&j.tok)try{localStorage.setItem('j2me_presence',JSON.stringify({tok:j.tok,n:j.n||0}));}catch(e){}}).catch(function(){});}catch(e){}},60000);}catch(e){}})();
+(function(){try{setInterval(function(){try{if(document.hidden)return;var ms=+localStorage.getItem('j2me_online_ms')||0;localStorage.setItem('j2me_online_ms',String(ms+60000));}catch(e){}try{var tk=stToken();if(tk)fetch(stApiRoot()+'/api/ustats',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+tk},body:JSON.stringify({t:'heartbeat'}),keepalive:true}).catch(function(){});}catch(e){}try{var pr=null;try{pr=JSON.parse(localStorage.getItem('j2me_presence')||'null');}catch(e){}fetch(stApiRoot()+'/api/presence',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({tok:(pr&&pr.tok)||'',cid:stCid()}),keepalive:true}).then(function(r){return r.json();}).then(function(j){if(j&&j.tok)try{localStorage.setItem('j2me_presence',JSON.stringify({tok:j.tok,n:j.n||0}));}catch(e){}}).catch(function(){});}catch(e){}},60000);}catch(e){}})();
 </script>
 </body>
 </html>

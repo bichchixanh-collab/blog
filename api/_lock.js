@@ -97,6 +97,15 @@ function presenceIpHash(ip) {
   try { return crypto.createHash('sha256').update(String(ip || ''), 'utf8').digest('hex').slice(0, 16); }
   catch { return ''; }
 }
+// cidh = hash device-id của client: cùng máy thì nối chuỗi bất kể đổi IP;
+// khác máy (kể cả copy token) thì không nối được vì không nêu đúng cid.
+function presenceCidHash(cid) {
+  try {
+    const s = String(cid || '').trim();
+    if (!s) return '';
+    return crypto.createHash('sha256').update('cid/' + s, 'utf8').digest('hex').slice(0, 16);
+  } catch { return ''; }
+}
 // Gắn chain theo SUBNET (IPv4 /24, IPv6 /64) thay vì IP đầy đủ: mạng di động
 // đổi IP trong cùng dải vẫn giữ chuỗi (khỏi kẹt vé oan), khác dải vẫn rớt.
 function presenceNetHash(ip) {
@@ -131,37 +140,54 @@ function readPresence(tok) {
     if (!raw) return null;
     const o = JSON.parse(raw.toString('utf8'));
     if (!o || o.v !== 1 || typeof o.n !== 'number' || typeof o.iat !== 'number') return null;
+    if (o.cidh != null && typeof o.cidh !== 'string') return null;
     return o;
   } catch { return null; }
 }
 // Đổi link mới. Trả về token (mới hoặc giữ nguyên nếu gọi quá sớm — idempotent).
-function mintPresence(prevTok, ip) {
+// Ưu tiên nối theo device-id (đổi IP thoải mái); token cũ chưa có cidh thì nối
+// theo subnet 1 lần để migrate (không bắt đếm lại), rồi gắn cid mới từ đó.
+function mintPresence(prevTok, ip, cid) {
   try {
     const now = Date.now();
-    const iph = presenceNetHash(ip);
+    const cidh = presenceCidHash(cid);
+    const curNet = presenceNetHash(ip);
     const prev = readPresence(prevTok);
-    if (!prev || prev.iph !== iph || prev.iat > now + 120 * 1000) {
-      return signPresence({ v: 1, n: 0, iat: now, iph });
+    const fresh = !!(prev && !(prev.iat > now + 120 * 1000));
+    let cont = false;
+    if (prev && fresh) {
+      if (cidh && prev.cidh === cidh) cont = true; // cùng máy: bỏ qua IP
+      else if (!prev.cidh && prev.iph && (prev.iph === curNet || prev.iph === presenceIpHash(ip))) cont = true; // token cũ: theo subnet
+      else if (!cidh && prev.cidh && prev.iph && (prev.iph === curNet || prev.iph === presenceIpHash(ip))) cont = true; // client cũ không gửi cid
     }
-    if (now - prev.iat < PRESENCE_MIN_MS) return prevTok; // quá sớm: giữ nguyên, không lỗi
-    const n = Math.min(99999, Math.max(0, Math.floor(prev.n) || 0) + 1);
-    return signPresence({ v: 1, n, iat: now, iph });
+    if (cont) {
+      if (now - prev.iat < PRESENCE_MIN_MS) return prevTok; // quá sớm: giữ nguyên, không lỗi
+      const base = Math.max(0, Math.floor(prev.n) || 0);
+      const o = { v: 1, n: Math.min(99999, base + 1), iat: now, iph: prev.iph || curNet };
+      if (cidh) o.cidh = cidh; else if (prev.cidh) o.cidh = prev.cidh;
+      return signPresence(o);
+    }
+    const o0 = { v: 1, n: 0, iat: now, iph: curNet };
+    if (cidh) o0.cidh = cidh;
+    return signPresence(o0);
   } catch { return null; }
 }
 // Verify token nộp kèm proof. Trả về {n} hoặc null.
-function verifyPresence(tok, ip) {
+function verifyPresence(tok, ip, cid) {
   try {
     const o = readPresence(tok);
     if (!o) return null;
     const now = Date.now();
-    // Chấp nhận cả iph subnet mới lẫn iph IP-cũ (token mint trước khi deploy bản subnet)
-    const cur = presenceNetHash(ip);
-    if (o.iph !== cur && o.iph !== presenceIpHash(ip)) return null;
     if (o.iat > now + 120 * 1000) return null;
     if (now - o.iat > PRESENCE_MAX_AGE_MS) return null;
     const n = Math.floor(o.n);
     if (!Number.isFinite(n) || n < 0 || n > 99999) return null;
-    return { n };
+    const cidh = presenceCidHash(cid);
+    if (o.cidh && cidh && o.cidh === cidh) return { n }; // cùng máy: bỏ qua IP
+    if (o.cidh && !cidh) return null; // token gắn máy khác mà không nêu cid
+    // Token cũ chưa gắn máy: chấp nhận cả iph subnet mới lẫn iph IP-cũ (tương thích trước deploy)
+    if (!o.cidh && (o.iph === presenceNetHash(ip) || o.iph === presenceIpHash(ip))) return { n };
+    return null;
   } catch { return null; }
 }
 // Kiểm tra proof client ký (tương thích proof cũ {id,day,lines} + proof mới có st).
@@ -221,8 +247,10 @@ async function checkProofExtended(p, id, gate, countApproved, serverStats, authe
       const st = (o && o.st) || {};
       const num = (v) => (typeof v === 'number' && Number.isFinite(v) ? v : -1);
       if (rq.minutes != null) {
-        // Ưu tiên presence chain đã ký — không bịa được nếu không có LOCK_SECRET
-        const pv = verifyPresence(o.presence, clientIp);
+        // Ưu tiên presence chain đã ký — gắn theo máy (cid), đổi IP thoải mái;
+        // không bịa được nếu không có LOCK_SECRET. Token cũ chưa có cid thì theo subnet.
+        const cid = o && typeof o.cid === 'string' ? o.cid.slice(0, 64) : '';
+        const pv = verifyPresence(o.presence, clientIp, cid);
         if (pv) {
           if (!(pv.n >= rq.minutes)) return { ok: false, reason: 'minutes' };
         } else if (lockSecret()) {

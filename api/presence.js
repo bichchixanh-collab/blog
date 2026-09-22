@@ -32,7 +32,8 @@ module.exports = async (req, res) => {
     // Nhịp chuẩn 60s/tab → 10 req/10 phút là đủ; 30 cho dư đa tab + jitter
     if (!await check({ ip: ipOf(req), route: 'presence', limit: 30, windowS: 600 })) { send(res, 429, { error: 'slow down' }); return; }
     const p = (await readJsonBody(req)) || {};
-    const tok = mintPresence(typeof p.tok === 'string' ? p.tok.slice(0, 500) : '', ipOf(req));
+    const cid = typeof p.cid === 'string' ? p.cid.slice(0, 64) : '';
+    const tok = mintPresence(typeof p.tok === 'string' ? p.tok.slice(0, 500) : '', ipOf(req), cid);
     if (!tok) { send(res, 500, { error: 'error' }); return; }
     const o = readPresence(tok) || { n: 0 };
     send(res, 200, { tok, n: o.n || 0 });
