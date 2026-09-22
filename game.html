@@ -694,7 +694,7 @@ function __ticketAndGo(gid,res,msgEl,wasPassing){
           return;
         }
         var rs0=__statsRows(gm,null);var needC0=rs0.some(function(r){return r.k==='c';});var hd='🔒 <b>'+cmtT('g_cond','Chưa đủ điều kiện')+'</b>'+(reason?' (<b>'+escHtml(reason)+'</b>)':'')+'. '+cmtT('g_srv','Server vừa kiểm tra — số bên dưới là mới nhất:');var ft='<div style="margin-top:6px"><small>'+cmtT('g_hang','Treo trang thêm cho đủ rồi bấm Tải lại (không cần F5).')+'</small></div>';var paint=function(rr){__lockPaint(msgEl,rr,hd,ft);};__pullSrvVals(function(){var rs=__statsRows(gm,null);var nc=rs.some(function(r){return r.k==='c';});paint(rs);if(nc){try{stApprovedCount(function(n){__lockAppr=n;paint(__statsRows(gm,n));__lockLive(gid,gm,msgEl,res,hd,ft);});}catch(e){__lockLive(gid,gm,msgEl,res,hd,ft);}}else{__lockLive(gid,gm,msgEl,res,hd,ft);}});}
-      else{msgEl.textContent=cmtT('g_noTicket2','Không lấy được vé (')+o.st+'), thử lại sau.';}
+      else{msgEl.textContent=cmtT('g_noTicket2','Không lấy được vé (')+o.st+')'+((o.j&&o.j.error)?' ['+o.j.error+']':'');}
     }).catch(function(){msgEl.textContent=cmtT('g_offline','Mất mạng, thử lại sau.');});
   }).catch(function(){msgEl.textContent=cmtT('g_offline','Mất mạng, thử lại sau.');});
 }
