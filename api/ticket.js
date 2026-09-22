@@ -6,7 +6,7 @@ const fs = require('fs'), path = require('path');
 const { check, ipOf } = require('./_rate');
 const { mintTicket, checkProofExtended } = require('./_lock');
 const { countApproved } = require('./comments');
-const { bearerToken, verifySbToken, getUserStats, getSenpai } = require('./_sb');
+const { bearerToken, verifySbTokenAsync, getUserStats, getSenpai } = require('./_sb');
 const { chargeForDownload, costOf } = require('./economy');
 const { countLinesMax, petLevel } = require('./_bingo');
 // Gom số server-side theo tài khoản cho khóa CỨNG. null = hạ tầng lỗi (fail-closed).
@@ -52,7 +52,7 @@ module.exports = async (req, res) => {
     const gate = (g.gate && g.gate.type && g.gate.type !== 'none') ? g.gate : null;
     let hard = 0;
     if (gate) {
-      const me = verifySbToken(bearerToken(req));
+      const me = await verifySbTokenAsync(bearerToken(req));
       // Chế độ bắt đăng nhập (type login hoặc cờ login): thiếu token là từ chối ngay
       if ((gate.type === 'login' || gate.login) && !me) { send(res, 403, { error: 'login required' }); return; }
       // Đã đăng nhập: KHÓA CỨNG theo số server-side (fail-closed nếu hạ tầng lỗi)
@@ -70,7 +70,7 @@ module.exports = async (req, res) => {
     {
       const cost = costOf(g);
       if (cost > 0) {
-        const mePay = verifySbToken(bearerToken(req));
+        const mePay = await verifySbTokenAsync(bearerToken(req));
         let cidPay = '';
         try {
           const raw = Buffer.from(String((req.query && req.query.proof) || '').replace(/-/g, '+').replace(/_/g, '/'), 'base64').toString('utf8');

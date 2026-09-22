@@ -2,7 +2,7 @@
 // Khi đã đăng nhập, Supabase là nguồn chính; localStorage chỉ là cache offline.
 // GET  -> {senpai:{xp,data}, stats:{minutes,likes,completed,bingo,pet_xp}} (cần Bearer)
 // POST -> body {senpai:{xp,data}} hợp nhất lên server (union/max, không mất data)
-const { bearerToken, verifySbToken, getUserStats } = require('./_sb');
+const { bearerToken, verifySbTokenAsync, getUserStats } = require('./_sb');
 const { check, ipOf } = require('./_rate');
 
 function send(res, code, obj) {
@@ -41,7 +41,7 @@ function readJsonBody(req) {
 
 module.exports = async (req, res) => {
   try {
-    const me = verifySbToken(bearerToken(req));
+    const me = await verifySbTokenAsync(bearerToken(req));
     if (!me) { send(res, 401, { error: 'login required' }); return; }
     if (req.method === 'GET') {
       if (!await check({ ip: ipOf(req), route: 'userdata-get', limit: 60, windowS: 60 })) { send(res, 429, { error: 'slow down' }); return; }

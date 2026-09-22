@@ -9,7 +9,7 @@
 const fs = require('fs');
 const path = require('path');
 const https = require('https');
-const { bearerToken, verifySbToken } = require('./_sb');
+const { bearerToken, verifySbTokenAsync } = require('./_sb');
 const { checkComment, isAutoApprove } = require('./_moderate');
 const { creditCommentBonus } = require('./economy');
 
@@ -265,7 +265,7 @@ module.exports = async (req, res) => {
       // Đếm bình luận đã duyệt của tôi: ?mine=1&names=Ten1,Ten2 (tối đa 5 tên),
       // hoặc kèm Bearer token để đếm chính xác theo tài khoản.
       if (String((req.query && req.query.mine) || '') === '1') {
-        const me = verifySbToken(bearerToken(req));
+        const me = await verifySbTokenAsync(bearerToken(req));
         const names = String((req.query && req.query.names) || '').split(',').map((s) => s.trim()).filter(Boolean).slice(0, 5);
         if (names.some((s) => s.length > 30)) return send(res, 400, { error: 'bad names' });
         if (!me && !names.length) return send(res, 400, { error: 'missing names' });
@@ -303,7 +303,7 @@ module.exports = async (req, res) => {
       const sbtHad = !!String(p.sbt || '');
       try {
         const tok = String(p.sbt || '');
-        if (tok) { const me = verifySbToken(tok); if (me) cmtUid = me.uid; }
+        if (tok) { const me = await verifySbTokenAsync(tok); if (me) cmtUid = me.uid; }
       } catch (e) {}
       if (!validGameId(game)) return send(res, 400, { error: 'game invalid' });
       if (name.length < 2) return send(res, 400, { error: 'name too short' });

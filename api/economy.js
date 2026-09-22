@@ -11,7 +11,7 @@ const fs = require('fs');
 const path = require('path');
 const https = require('https');
 const crypto = require('crypto');
-const { bearerToken, verifySbToken } = require('./_sb');
+const { bearerToken, verifySbTokenAsync } = require('./_sb');
 const { check: rateCheck, ipOf } = require('./_rate');
 
 const REPO = process.env.GITHUB_REPO || 'bichchixanh-collab/blog';
@@ -300,10 +300,10 @@ module.exports = async (req, res) => {
     const q = req.query || {};
     const p = isPost ? ((await readJsonBody(req)) || {}) : {};
     // Auth: Bearer header trước, rớt về token trong body/query (client gửi kèm sbt).
-    let me = verifySbToken(bearerToken(req));
+    let me = await verifySbTokenAsync(bearerToken(req));
     if (!me) {
       const sbt = String((isPost ? p.sbt : q.sbt) || '').slice(0, 2000);
-      if (sbt) me = verifySbToken(sbt);
+      if (sbt) me = await verifySbTokenAsync(sbt);
     }
     const cid = String((isPost ? p.cid : q.cid) || '').toLowerCase().slice(0, 64);
     const key = keyOf(me ? me.uid : null, cid);

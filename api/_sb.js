@@ -45,6 +45,60 @@ function verifySbToken(token) {
     return { uid: String(body.sub), email: body.email || '' };
   } catch { return null; }
 }
+// Bản async: thử HS256 trước (nhanh, sync), rớt mới thử ES256 qua JWKS của
+// Supabase (project mới ký ES256 — không cần thêm lib, dùng crypto có sẵn).
+let _jwksCache = { at: 0, keys: null };
+async function getJwks() {
+  const now = Date.now();
+  if (_jwksCache.keys && now - _jwksCache.at < 10 * 60 * 1000) return _jwksCache.keys;
+  let sig;
+  try { sig = (typeof AbortSignal !== 'undefined' && AbortSignal.timeout) ? AbortSignal.timeout(5000) : undefined; } catch (e) { sig = undefined; }
+  const r = await fetch(`${SB_URL}/auth/v1/.well-known/jwks.json`, sig ? { signal: sig } : {});
+  if (!r.ok) throw new Error(`jwks ${r.status}`);
+  const j = await r.json().catch(() => null);
+  const keys = (j && Array.isArray(j.keys)) ? j.keys : [];
+  _jwksCache = { at: now, keys };
+  return keys;
+}
+function b64ToBuf(u) {
+  try { return Buffer.from(String(u || '').replace(/-/g, '+').replace(/_/g, '/'), 'base64'); }
+  catch (e) { return null; }
+}
+async function verifyEs256(h, b, sig, head) {
+  try {
+    const keys = await getJwks();
+    const kid = head && head.kid;
+    const data = Buffer.from(`${h}.${b}`, 'utf8');
+    const sigBuf = b64ToBuf(sig);
+    if (!sigBuf) return false;
+    const list = kid ? keys.filter((k) => k && k.kid === kid) : keys;
+    for (const k of list) {
+      try {
+        if (!k || k.kty !== 'EC') continue;
+        const pub = crypto.createPublicKey({ key: k, format: 'jwk' });
+        if (crypto.verify('sha256', data, pub, sigBuf)) return true;
+      } catch (e) {}
+    }
+  } catch (e) {}
+  return false;
+}
+async function verifySbTokenAsync(token) {
+  try {
+    const fast = verifySbToken(token);
+    if (fast) return fast;
+    if (!token || typeof token !== 'string') return null;
+    const p = token.split('.');
+    if (p.length !== 3) return null;
+    const head = b64uJson(p[0]);
+    if (!head || String(head.alg || '').toUpperCase() !== 'ES256') return null;
+    const ok = await verifyEs256(p[0], p[1], p[2], head);
+    if (!ok) return null;
+    const body = b64uJson(p[1]);
+    if (!body || !body.sub) return null;
+    if (typeof body.exp === 'number' && Date.now() / 1000 > body.exp + 30) return null;
+    return { uid: String(body.sub), email: body.email || '' };
+  } catch { return null; }
+}
 async function sbFetch(path, opts) {
   const key = serviceKey();
   if (!key) throw new Error('no service key');
@@ -152,4 +206,4 @@ async function eventUserStats(uid, ev) {
     return null;
   } catch { return null; }
 }
-module.exports = { SB_URL, jwtSecret, serviceKey, bearerToken, verifySbToken, getUserStats, getSenpai, eventUserStats };
+module.exports = { SB_URL, jwtSecret, serviceKey, bearerToken, verifySbToken, verifySbTokenAsync, getUserStats, getSenpai, eventUserStats };

@@ -5,7 +5,7 @@
 // GET  /api/ustats            -> {uid, minutes, likes, completed, bingoLines, petLv}
 // POST /api/ustats {t, ...}   -> {ok, minutes, likes, completed}
 const { check, ipOf } = require('./_rate');
-const { bearerToken, verifySbToken, getUserStats, eventUserStats } = require('./_sb');
+const { bearerToken, verifySbTokenAsync, getUserStats, eventUserStats } = require('./_sb');
 const { countLinesMax, petLevel } = require('./_bingo');
 
 function send(res, code, obj) {
@@ -39,7 +39,7 @@ function readJsonBody(req) {
 }
 module.exports = async (req, res) => {
   try {
-    const me = verifySbToken(bearerToken(req));
+    const me = await verifySbTokenAsync(bearerToken(req));
     if (!me) { send(res, 401, { error: 'login required' }); return; }
     if (req.method === 'GET') {
       if (!await check({ ip: ipOf(req), route: 'ustats-get', limit: 60, windowS: 60 })) { send(res, 429, { error: 'slow down' }); return; }
