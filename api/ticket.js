@@ -56,10 +56,18 @@ module.exports = async (req, res) => {
       // Chế độ bắt đăng nhập (type login hoặc cờ login): thiếu token là từ chối ngay
       if ((gate.type === 'login' || gate.login) && !me) { send(res, 403, { error: 'login required' }); return; }
       // Đã đăng nhập: KHÓA CỨNG theo số server-side (fail-closed nếu hạ tầng lỗi)
-      let serverStats = null;
+      let serverStats = null, statsMiss = '';
       if (me) {
         serverStats = await resolveServerStats(me.uid);
-        if (!serverStats) { send(res, 503, { error: 'stats unavailable' }); return; }
+        if (!serverStats) {
+          // Chẩn đoán mảnh nào rỗng (user_stats / senpai) để sửa đúng chỗ.
+          try {
+            const [st, sen] = await Promise.all([getUserStats(me.uid), getSenpai(me.uid)]);
+            statsMiss = !st ? 'user_stats' : (!sen ? 'senpai' : 'unknown');
+          } catch (e) { statsMiss = 'fetch-error'; }
+          send(res, 503, { error: 'stats unavailable', miss: statsMiss });
+          return;
+        }
       }
       const proof = req.query && req.query.proof;
       const chk = await checkProofExtended(proof, id, gate, countApproved, serverStats, !!me, ipOf(req));
