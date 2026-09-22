@@ -350,15 +350,18 @@ module.exports = async (req, res) => {
         if (put.code === 200 || put.code === 201) {
           memCache = { at: Date.now(), list, sha: JSON.parse(put.body).content.sha };
           // Thưởng EXP nếu auto-duyệt ngay + đạt chuẩn chống farm (không chặn response).
-          let xpBonus = false;
+          let xpBonus = false, xpReason = '';
           if (nextStatus === 'approved' && cmtUid) {
             try {
               const newId = list[list.length - 1].id;
               const bc = await creditCommentBonus({ uid: cmtUid, commentId: newId, text, list });
               xpBonus = !!bc.credited;
+              xpReason = bc.credited ? '' : String(bc.reason || '');
             } catch (e) {}
+          } else if (nextStatus === 'approved' && !cmtUid) {
+            xpReason = 'no_uid';
           }
-          return send(res, 200, { ok: true, status: nextStatus, reason: chk.reason || undefined, xpBonus }, 0);
+          return send(res, 200, { ok: true, status: nextStatus, reason: chk.reason || undefined, xpBonus, xpReason }, 0);
         }
         if (put.code === 409 || put.code === 422) {
           lastErr = new Error(`conflict ${put.code}`);
