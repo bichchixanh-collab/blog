@@ -1007,7 +1007,7 @@ async function loadComments(gameId, page){
     fetch(apiRoot()+'/api/comments',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)})
       .then(function(r){return r.text().then(function(t){let j={};try{j=JSON.parse(t);}catch(e){}return {st:r.status,j:j};});})
       .then(function(o){
-        if(o.st===200&&o.j.ok){msg.textContent=cmtT('cmt_sent','Đã gửi! Bình luận hiện sau khi admin duyệt.');document.getElementById('cmtText').value='';window._cmtReplyTo=null;const tg=document.getElementById('replyTag');if(tg)tg.remove();try{localStorage.setItem('cmt_last',String(Date.now()));}catch(e){}try{xpBump('comment');}catch(e){}try{__bm('comment');}catch(e){}try{stSaveName(document.getElementById('cmtName').value);}catch(e){}try{_stApprCache={at:0,n:-1};}catch(e){}}
+        if(o.st===200&&o.j.ok){msg.textContent=cmtT('cmt_sent','Đã gửi! Bình luận hiện sau khi admin duyệt.')+(o.j.xpBonus?' (+5 EXP)':'');document.getElementById('cmtText').value='';window._cmtReplyTo=null;const tg=document.getElementById('replyTag');if(tg)tg.remove();try{localStorage.setItem('cmt_last',String(Date.now()));}catch(e){}try{xpBump('comment');}catch(e){}try{__bm('comment');}catch(e){}try{stSaveName(document.getElementById('cmtName').value);}catch(e){}try{_stApprCache={at:0,n:-1};}catch(e){}try{if(o.j.xpBonus)ECO.bal+=5;}catch(e){}}
         else if(o.st===503){msg.textContent=cmtT('cmt_nohost','Chức năng bình luận chưa được bật trên hosting này.');}
         else if(o.st===429){msg.textContent=cmtT('cmt_fast','Bạn gửi quá nhanh, thử lại sau vài phút.');}
         else if(o.st===403){msg.textContent=cmtT('cmt_403post','Bị chặn (403): tải lại trang rồi gửi lại.');}

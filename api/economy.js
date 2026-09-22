@@ -125,6 +125,92 @@ function pubRec(rec) {
   return { bal: rec.bal, checked: rec.last === today, streak: rec.streak, owned: rec.owned };
 }
 
+// ---- Chống farm EXP bình luận (vẫn auto-duyệt hiển thị, chỉ siết TIỀN thưởng) ----
+// Điều kiện thưởng: có uid, dài ≥12 ký tự, chữ cái ≥40%, không lặp ký tự ≥6,
+// không trùng lặp (>80% bigram) với 30 bình luận đã duyệt gần nhất của cùng uid,
+// tối đa 2 lượt thưởng/ngày/uid.
+const BONUS_MIN_LEN = 12;
+const BONUS_MAX_PER_DAY = 2;
+function normText(s) {
+  return String(s || '').toLowerCase().replace(/[^a-z0-9àáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđ ]/g, ' ').replace(/\s+/g, ' ').trim();
+}
+function bigrams(s) {
+  const set = new Set();
+  for (let i = 0; i + 1 < s.length; i++) {
+    const b = s.slice(i, i + 2);
+    if (b[0] !== ' ' || b[1] !== ' ') set.add(b);
+  }
+  return set;
+}
+function bonusEligible({ text, uid, list, excludeId }) {
+  if (!uid) return { ok: false, reason: 'no_uid' };
+  const t = String(text || '').trim();
+  if (t.length < BONUS_MIN_LEN) return { ok: false, reason: 'too_short' };
+  const letters = (t.match(/[A-Za-zÀ-ỹđ]/g) || []).length;
+  if (letters / Math.max(1, t.length) < 0.4) return { ok: false, reason: 'gibberish' };
+  if (/(.)\1{5,}/.test(t)) return { ok: false, reason: 'repeat' };
+  const mine = (Array.isArray(list) ? list : [])
+    .filter((c) => c && c.status === 'approved' && c.uid === uid && (!excludeId || c.id !== excludeId))
+    .slice(-60);
+  const today = dayStr();
+  let todayN = 0;
+  for (const c of mine) {
+    try { if (String(c.created_at || '').slice(0, 10) === today) todayN++; } catch (e) {}
+  }
+  if (todayN >= BONUS_MAX_PER_DAY) return { ok: false, reason: 'daily_cap' };
+  const nb = bigrams(normText(t));
+  if (nb.size) {
+    const recent = mine.slice(-30);
+    for (const c of recent) {
+      const cb = bigrams(normText(c.text));
+      if (!cb.size) continue;
+      let inter = 0;
+      for (const b of nb) if (cb.has(b)) inter++;
+      const sim = inter / Math.min(nb.size, cb.size);
+      if (sim > 0.8) return { ok: false, reason: 'duplicate' };
+    }
+  }
+  return { ok: true };
+}
+
+// Cộng thưởng duyệt bình luận (idempotent theo commentId). Trả về {credited, reason}.
+async function creditCommentBonus({ uid, commentId, text, list, amount }) {
+  const token = process.env.GITHUB_TOKEN || '';
+  const amt = Math.max(1, Math.min(50, parseInt(amount, 10) || 5));
+  if (!uid || !commentId) return { credited: false, reason: 'no_uid' };
+  const chk = bonusEligible({ text, uid, list, excludeId: commentId });
+  if (!chk.ok) return { credited: false, reason: chk.reason };
+  if (!token) return { credited: false, reason: 'no_store' };
+  const key = keyOf(uid, null);
+  for (let attempt = 0; attempt < 2; attempt++) {
+    memCache.at = 0;
+    let map, sha;
+    try {
+      ({ map, sha } = await readLive(token));
+    } catch (e) {
+      continue;
+    }
+    const rec = cleanRec(map[key]);
+    if (rec.bonus[commentId]) return { credited: false, reason: 'done' };
+    rec.bonus[commentId] = 1;
+    rec.bal += amt;
+    if (!Array.isArray(rec.owned)) rec.owned = [];
+    map[key] = rec;
+    try {
+      const put = await writeLive(token, map, sha, `[skip ci] economy: comment bonus +${amt} (${key})`);
+      if (put.code === 200 || put.code === 201) {
+        memCache = { at: Date.now(), map, sha: JSON.parse(put.body).content.sha };
+        return { credited: true, amount: amt };
+      }
+      if (put.code === 409 || put.code === 422) continue;
+      return { credited: false, reason: 'store_failed' };
+    } catch (e) {
+      continue;
+    }
+  }
+  return { credited: false, reason: 'conflict' };
+}
+
 // Trừ tiền vé. Trả về {ok:true, owned} hoặc {ok:false, reason:'low_exp', need, bal}.
 // Không có token ghi file (hosting chưa cấu hình) -> cho qua miễn phí để không chặn tải.
 async function chargeForDownload({ uid, cid, gameId, cost }) {
@@ -280,6 +366,8 @@ module.exports = async (req, res) => {
 };
 
 module.exports.chargeForDownload = chargeForDownload;
+module.exports.creditCommentBonus = creditCommentBonus;
+module.exports.bonusEligible = bonusEligible;
 module.exports.dayStr = dayStr;
 module.exports.costOf = (g) => {
   const v = parseInt(g && g.dl_cost, 10);

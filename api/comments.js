@@ -11,6 +11,7 @@ const path = require('path');
 const https = require('https');
 const { bearerToken, verifySbToken } = require('./_sb');
 const { checkComment, isAutoApprove } = require('./_moderate');
+const { creditCommentBonus } = require('./economy');
 
 const REPO = process.env.GITHUB_REPO || 'bichchixanh-collab/blog';
 const BRANCH = process.env.GITHUB_BRANCH || 'main';
@@ -348,7 +349,16 @@ module.exports = async (req, res) => {
         });
         if (put.code === 200 || put.code === 201) {
           memCache = { at: Date.now(), list, sha: JSON.parse(put.body).content.sha };
-          return send(res, 200, { ok: true, status: nextStatus, reason: chk.reason || undefined }, 0);
+          // Thưởng EXP nếu auto-duyệt ngay + đạt chuẩn chống farm (không chặn response).
+          let xpBonus = false;
+          if (nextStatus === 'approved' && cmtUid) {
+            try {
+              const newId = list[list.length - 1].id;
+              const bc = await creditCommentBonus({ uid: cmtUid, commentId: newId, text, list });
+              xpBonus = !!bc.credited;
+            } catch (e) {}
+          }
+          return send(res, 200, { ok: true, status: nextStatus, reason: chk.reason || undefined, xpBonus }, 0);
         }
         if (put.code === 409 || put.code === 422) {
           lastErr = new Error(`conflict ${put.code}`);

@@ -523,6 +523,38 @@ if (!empty($_SESSION['admin_logged'])) {
     $bannedWords = cmt_load_banned();
     $modCfg = cmt_load_config();
 }
+// Luật thưởng EXP bình luận (gương với api/economy.js): đủ dài, không spam,
+// không trùng, tối đa 2 lượt/ngày/uid. Không đạt thì vẫn duyệt hiển thị, chỉ không cộng tiền.
+function cmt_norm_vn($s){
+    $s=mb_strtolower(strval($s),'UTF-8');
+    $s=preg_replace('/[^a-z0-9àáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđ ]/u',' ',$s);
+    return trim(preg_replace('/\s+/u',' ',$s));
+}
+function cmt_bigrams($s){
+    $out=[]; $len=mb_strlen($s,'UTF-8');
+    for($i=0;$i+1<$len;$i++){ $b=mb_substr($s,$i,2,'UTF-8'); if(mb_substr($b,0,1,'UTF-8')!==' '||mb_substr($b,1,1,'UTF-8')!==' ') $out[$b]=1; }
+    return $out;
+}
+function cmt_bonus_ok($text,$uid,$cid,$list){
+    if($uid===''||$cid==='')return false;
+    $t=trim(strval($text));
+    if(mb_strlen($t,'UTF-8')<12)return false;
+    preg_match_all('/[A-Za-zÀ-ỹđ]/u',$t,$m);
+    if(count($m[0])/max(1,mb_strlen($t,'UTF-8'))<0.4)return false;
+    if(preg_match('/(.)\1{5,}/u',$t))return false;
+    $mine=[]; $today=gmdate('Y-m-d',time()+7*3600);
+    foreach($list as $c){ if(($c['status']??'')==='approved'&&($c['uid']??'')===$uid&&($c['id']??'')!==$cid)$mine[]=$c; }
+    $mine=array_slice($mine,-60);
+    $todayN=0; foreach($mine as $c){ if(substr(strval($c['created_at']??''),0,10)===$today)$todayN++; }
+    if($todayN>=2)return false;
+    $nb=cmt_bigrams(cmt_norm_vn($t));
+    if($nb){ foreach(array_slice($mine,-30) as $c){
+        $cb=cmt_bigrams(cmt_norm_vn($c['text']??''));
+        if(!$cb)continue;
+        if(count(array_intersect_key($nb,$cb))/min(count($nb),count($cb))>0.8)return false;
+    }}
+    return true;
+}
 if (isset($_POST['cmt_action'])) {
     if(!check_csrf()){ $msg='Token bảo mật không hợp lệ.'; $msgType='error'; }
     else{
@@ -532,13 +564,13 @@ if (isset($_POST['cmt_action'])) {
         if($got['error']){ $msg='❌ '.$got['error']; $msgType='error'; }
         else{
             $list=is_array($got['data'])?$got['data']:[];
-            $apprUid=''; $wasPending=false;
-            foreach($list as $c){ if(($c['id']??'')===$cid){ $wasPending=(($c['status']??'')!=='approved'); if(!empty($c['uid']))$apprUid=(string)$c['uid']; } }
+            $apprUid=''; $apprText=''; $wasPending=false;
+            foreach($list as $c){ if(($c['id']??'')===$cid){ $wasPending=(($c['status']??'')!=='approved'); if(!empty($c['uid']))$apprUid=(string)$c['uid']; $apprText=(string)($c['text']??''); } }
             if($act==='delete') $list=array_values(array_filter($list,fn($c)=>($c['id']??'')!==$cid));
             else foreach($list as &$c){ if(($c['id']??'')===$cid) $c['status']='approved'; } unset($c);
             $ok=githubPutFile($config,'data/comments.json',$list,'moderate comment '.$cid.' ('.$act.')',$syncMsg);
-            // Thưởng +5 EXP cho chủ bình luận có tài khoản (mỗi bình luận 1 lần)
-            if($ok && $act==='approve' && $wasPending && $apprUid!==''){
+            // Thưởng +5 EXP cho chủ bình luận có tài khoản (mỗi bình luận 1 lần, phải đạt chuẩn chống farm)
+            if($ok && $act==='approve' && $wasPending && $apprUid!=='' && cmt_bonus_ok($apprText,$apprUid,$cid,$list)){
                 $eGot=githubGetFile($config,'data/economy.json');
                 if(!$eGot['error']){
                     $emap=is_array($eGot['data'])?$eGot['data']:[];
@@ -572,7 +604,7 @@ if (isset($_POST['cmt_auto_approve'])) {
             $cnt=0; $skip=0; $bonusUids=[];
             foreach($list as &$c){ if(($c['status']??'')==='pending'){
                 $chk=cmt_check($c['text']??'', $c['name']??'');
-                if($chk['ok']){ $c['status']='approved'; $cnt++; if(!empty($c['uid']))$bonusUids[(string)$c['uid']][]=(string)($c['id']??''); } else { $skip++; if(!isset($c['mod_reason'])) $c['mod_reason']=$chk['reason']; }
+                if($chk['ok']){ $c['status']='approved'; $cnt++; if(!empty($c['uid'])&&cmt_bonus_ok($c['text']??'',(string)$c['uid'],(string)($c['id']??''),$list))$bonusUids[(string)$c['uid']][]=(string)($c['id']??''); } else { $skip++; if(!isset($c['mod_reason'])) $c['mod_reason']=$chk['reason']; }
             }} unset($c);
             if($cnt>0){
                 $ok=githubPutFile($config,'data/comments.json',$list,'auto-approve '.$cnt.' comments',$syncMsg);
