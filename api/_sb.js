@@ -86,8 +86,10 @@ async function verifyEs256(h, b, sig, head) {
       try {
         if (!k || k.kty !== 'EC') continue;
         // Chỉ đưa 4 trường chuẩn cho createPublicKey (bỏ alg/use/key_ops/ext/kid).
+        // Chữ ký JWS là raw R||S nên verify phải dùng dsaEncoding ieee-p1363
+        // (mặc định của Node là DER — để mặc định là rớt hết token ES256 thật).
         const pub = crypto.createPublicKey({ key: { kty: 'EC', crv: k.crv, x: k.x, y: k.y }, format: 'jwk' });
-        if (crypto.verify('sha256', data, pub, sigBuf)) return true;
+        if (crypto.verify('sha256', data, { key: pub, dsaEncoding: 'ieee-p1363' }, sigBuf)) return true;
       } catch (e) {}
     }
     dbgSet({ step: 'bad-sig', kid: kid || '', nkeys: keys.length });
