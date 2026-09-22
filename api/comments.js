@@ -9,7 +9,7 @@
 const fs = require('fs');
 const path = require('path');
 const https = require('https');
-const { bearerToken, verifySbTokenAsync } = require('./_sb');
+const { bearerToken, verifySbTokenAsync, getLastAuthDbg } = require('./_sb');
 const { checkComment, isAutoApprove } = require('./_moderate');
 const { creditCommentBonus } = require('./economy');
 
@@ -275,7 +275,7 @@ module.exports = async (req, res) => {
         } catch (e) {}
         const names = String((req.query && req.query.names) || '').split(',').map((s) => s.trim()).filter(Boolean).slice(0, 5);
         if (names.some((s) => s.length > 30)) return send(res, 400, { error: 'bad names' });
-        if (!me && !names.length) return send(res, 400, { error: 'missing names', alg: seenAlg || undefined });
+        if (!me && !names.length) return send(res, 400, { error: 'missing names', alg: seenAlg || undefined, dbg: getLastAuthDbg() });
         const n = await countApproved(names, me ? me.uid : null);
         return send(res, 200, { mine: n, hard: !!me, alg: seenAlg || undefined }, 60);
       }

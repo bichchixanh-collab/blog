@@ -48,6 +48,10 @@ function verifySbToken(token) {
 // Bản async: thử HS256 trước (nhanh, sync), rớt mới thử ES256 qua JWKS của
 // Supabase (project mới ký ES256 — không cần thêm lib, dùng crypto có sẵn).
 let _jwksCache = { at: 0, keys: null };
+// Chẩn đoán lần verify gần nhất (không chứa secret/token — an toàn trả về client khi cần).
+let _lastDbg = {};
+function dbgSet(o) { try { _lastDbg = o || {}; } catch (e) {} }
+function getLastAuthDbg() { try { return Object.assign({}, _lastDbg); } catch (e) { return {}; } }
 async function getJwks() {
   const now = Date.now();
   if (_jwksCache.keys && _jwksCache.keys.length && now - _jwksCache.at < 10 * 60 * 1000) return _jwksCache.keys;
@@ -67,14 +71,17 @@ function b64ToBuf(u) {
 }
 async function verifyEs256(h, b, sig, head) {
   try {
-    const keys = await getJwks();
+    let keys = [];
+    try { keys = await getJwks(); }
+    catch (e) { dbgSet({ step: 'jwks-fetch-fail' }); return false; }
+    if (!keys.length) { dbgSet({ step: 'jwks-empty' }); return false; }
     const kid = head && head.kid;
     const data = Buffer.from(`${h}.${b}`, 'utf8');
     const sigBuf = b64ToBuf(sig);
-    if (!sigBuf) return false;
+    if (!sigBuf) { dbgSet({ step: 'bad-sig-enc' }); return false; }
     // Lọc theo kid; nếu kid lạ (vừa xoay khóa) thì thử hết để tự phục hồi.
     let list = kid ? keys.filter((k) => k && k.kid === kid) : keys;
-    if (!list.length) list = keys;
+    if (!list.length) { dbgSet({ step: 'unknown-kid', kid: kid || '', nkeys: keys.length }); list = keys; }
     for (const k of list) {
       try {
         if (!k || k.kty !== 'EC') continue;
@@ -83,25 +90,27 @@ async function verifyEs256(h, b, sig, head) {
         if (crypto.verify('sha256', data, pub, sigBuf)) return true;
       } catch (e) {}
     }
-  } catch (e) {}
+    dbgSet({ step: 'bad-sig', kid: kid || '', nkeys: keys.length });
+  } catch (e) { dbgSet({ step: 'exception' }); }
   return false;
 }
 async function verifySbTokenAsync(token) {
   try {
     const fast = verifySbToken(token);
-    if (fast) return fast;
-    if (!token || typeof token !== 'string') return null;
+    if (fast) { dbgSet({ step: 'hs256-ok' }); return fast; }
+    if (!token || typeof token !== 'string') { dbgSet({ step: 'no-token' }); return null; }
     const p = token.split('.');
-    if (p.length !== 3) return null;
+    if (p.length !== 3) { dbgSet({ step: 'bad-shape' }); return null; }
     const head = b64uJson(p[0]);
-    if (!head || String(head.alg || '').toUpperCase() !== 'ES256') return null;
+    if (!head || String(head.alg || '').toUpperCase() !== 'ES256') { dbgSet({ step: 'alg-unsupported', alg: (head && head.alg) || '' }); return null; }
     const ok = await verifyEs256(p[0], p[1], p[2], head);
-    if (!ok) return null;
+    if (!ok) return null; // verifyEs256 đã ghi dbg chi tiết (jwks-fail / unknown-kid / bad-sig)
     const body = b64uJson(p[1]);
-    if (!body || !body.sub) return null;
-    if (typeof body.exp === 'number' && Date.now() / 1000 > body.exp + 30) return null;
+    if (!body || !body.sub) { dbgSet({ step: 'no-sub' }); return null; }
+    if (typeof body.exp === 'number' && Date.now() / 1000 > body.exp + 30) { dbgSet({ step: 'expired' }); return null; }
+    dbgSet({ step: 'es256-ok', kid: head.kid || '' });
     return { uid: String(body.sub), email: body.email || '' };
-  } catch { return null; }
+  } catch { dbgSet({ step: 'exception' }); return null; }
 }
 async function sbFetch(path, opts) {
   const key = serviceKey();
@@ -210,4 +219,4 @@ async function eventUserStats(uid, ev) {
     return null;
   } catch { return null; }
 }
-module.exports = { SB_URL, jwtSecret, serviceKey, bearerToken, verifySbToken, verifySbTokenAsync, getUserStats, getSenpai, eventUserStats };
+module.exports = { SB_URL, jwtSecret, serviceKey, bearerToken, verifySbToken, verifySbTokenAsync, getLastAuthDbg, getUserStats, getSenpai, eventUserStats };
