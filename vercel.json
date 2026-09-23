@@ -17,6 +17,18 @@
       ]
     },
     { "source": "/data/games.json", "headers": [{ "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }] },
-    { "source": "/assets/(.*)", "headers": [{ "key": "Cache-Control", "value": "public, max-age=604800, immutable" }] }
+    { "source": "/assets/(.*)", "headers": [{ "key": "Cache-Control", "value": "public, max-age=604800, immutable" }] },
+    {
+      "source": "/game.html",
+      "headers": [
+        { "key": "Content-Security-Policy", "value": "default-src 'self'; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self'; connect-src 'self' https://pmotbltodyyilarnvtpn.supabase.co; frame-ancestors 'self'; base-uri 'self'; form-action 'self'" }
+      ]
+    },
+    {
+      "source": "/game/(.*)",
+      "headers": [
+        { "key": "Content-Security-Policy", "value": "default-src 'self'; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self'; connect-src 'self' https://pmotbltodyyilarnvtpn.supabase.co; frame-ancestors 'self'; base-uri 'self'; form-action 'self'" }
+      ]
+    }
   ]
 }

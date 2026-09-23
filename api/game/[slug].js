@@ -70,6 +70,11 @@ module.exports = async (req, res) => {
     set('REL', R.relatedHtml(games, game, siteUrl));
     html = html.replace(/(<b id="bcName">)[\s\S]*?(<\/b>)/, `$1${R.esc(game.name)}$2`);
     html = html.replace('<div id="relatedBox" class="kawaii-i" style="display:none">', '<div id="relatedBox" class="kawaii-i">');
+    // Trang serve tại /game/:slug — đường dẫn assets tương đối sẽ vỡ (/game/assets/...)
+    // nên viết lại thành tuyệt đối từ root (deploy Vercel luôn ở root).
+    // Lookbehind (?<![\w-]) để KHÔNG chạm vào data-root-src="assets/..." (giữ cho XAMPP).
+    html = html.replace(/(?<![\w-])(src|href)="assets\//g, '$1="/assets/');
+    html = html.split('href="manifest.webmanifest"').join('href="/manifest.webmanifest"');
 
     res.statusCode = 200;
     res.setHeader('Content-Type', 'text/html; charset=utf-8');

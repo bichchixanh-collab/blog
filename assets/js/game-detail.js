@@ -1,0 +1,398 @@
+// game-detail
+// LÆ°u Ã½: phÃºt online cá»§a khÃ¡ch Ä‘Æ°á»£c server xÃ¡c minh qua presence chain Ä‘Ã£ kÃ½;
+// like/phÃ¡ Ä‘áº£o váº«n lÃ  sá»‘ local (khÃ³a má»m) â€” Ä‘á»§ cháº·n link copy tay qua proof.
+function __gate(g){
+  var gt=g&&g.gate&&g.gate.type;
+  if(!gt||gt==='none')return null;
+  if(gt==='xp'){var x=0;try{var o=JSON.parse(localStorage.getItem('j2me_xp')||'{"xp":0}');x=o.xp||0;}catch(e){}var nx=Math.max(1,parseInt(g.gate.xp||100,10)||100);return x>=nx?null:{label:cmtT('g_gateXp','Tá»•ng {n} XP').replace('{n}',nx),need:cmtT('g_gateXpHas','Ä‘ang cÃ³ {x} XP').replace('{x}',x)};}
+  return null;
+}
+function __proof(g){
+  try{
+    var st={min:0,likes:0,done:0,names:[]};
+    try{st.min=stMinutes();}catch(e){}
+    try{st.likes=stLikes();}catch(e){}
+    try{st.done=stDone();}catch(e){}
+    try{st.names=stNames();}catch(e){}
+    var o={id:g.id,day:new Date().toISOString().slice(0,10),st:st};
+    try{var pr=stPresence();if(pr)o.presence=pr.tok;}catch(e){}
+    try{if(typeof stCid==='function'){var _cid=stCid();if(_cid)o.cid=_cid;}}catch(e){}
+    return btoa(unescape(encodeURIComponent(JSON.stringify(o)))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+  }catch(e){return '';}
+}
+// --- KhÃ³a táº£i kiá»ƒu stats: phÃºt online / bÃ¬nh luáº­n duyá»‡t / like / phÃ¡ Ä‘áº£o (gá»™p AND) ---
+// ÄÃ£ Ä‘Äƒng nháº­p: hiá»ƒn thá»‹ theo Sá» SERVER (ustats theo tÃ i khoáº£n) cho khá»›p vá»›i
+// thá»© server dÃ¹ng Ä‘á»ƒ cáº¥p vÃ©; khÃ¡ch vÃ£ng lai: dÃ¹ng presence chain + sá»‘ local.
+let __srvVals=null;
+function __pullSrvVals(cb){
+  __srvVals=null;
+  var tk=''; try{tk=stToken();}catch(e){}
+  if(!tk){ if(cb)cb(); return; }
+  fetch(apiRoot()+'/api/ustats',{headers:{'Authorization':'Bearer '+tk},cache:'no-store'})
+    .then(function(r){return r.ok?r.json():null;})
+    .then(function(j){
+      if(j&&typeof j.minutes==='number'){
+        var num=function(v){return (typeof v==='number'&&isFinite(v))?v:0;};
+        __srvVals={min:num(j.minutes),likes:num(j.likes),done:num(j.completed)};
+      }
+      if(cb)cb();
+    }).catch(function(){ if(cb)cb(); });
+}
+function __statVals(){if(__srvVals)return __srvVals;var o={min:0,likes:0,done:0};try{o.min=stVerifiedMin();}catch(e){}try{o.likes=stLikes();}catch(e){}try{o.done=stDone();}catch(e){}return o;}
+function __statsRows(g,apprN){
+  var rq=(g.gate&&g.gate.require)||{},rows=[],v=__statVals();
+  if(rq.minutes!=null)rows.push({k:'m',need:+rq.minutes,has:v.min,ok:v.min>=+rq.minutes,label:cmtT('go_req_min','Online Ä‘á»§ {n} phÃºt').replace('{n}',rq.minutes),hint:'<small>'+cmtT('go_auto','má»Ÿ web lÃ  tá»± tÃ­nh')+'</small>'});
+  if(rq.likes!=null)rows.push({k:'l',need:+rq.likes,has:v.likes,ok:v.likes>=+rq.likes,label:cmtT('go_req_like','ThÃ­ch {n} game').replace('{n}',rq.likes),hint:'<a href="'+apiRoot()+'/index.html" style="color:#0066cc">'+cmtT('go_likeNow','â†’ thÃ­ch ngay')+'</a>'});
+  if(rq.completed!=null)rows.push({k:'d',need:+rq.completed,has:v.done,ok:v.done>=+rq.completed,label:cmtT('go_req_done','PhÃ¡ Ä‘áº£o {n} game').replace('{n}',rq.completed),hint:'<small>'+cmtT('go_doneHint','báº¥m "PhÃ¡ Ä‘áº£o?" á»Ÿ trang game')+'</small>'});
+  if(rq.comments!=null){
+    var pend=(apprN==null);
+    var who='';
+    try{
+      if(stLogged()){who=cmtT('g_whoAcc','theo tÃ i khoáº£n');}
+      else{var _nm=stNames();who=_nm.length?(cmtT('g_whoNames','theo tÃªn: ')+_nm.map(function(x){return escHtml(x);}).join(', ')):cmtT('g_whoNone','chÆ°a tháº¥y tÃªn nÃ o â€” hÃ£y bÃ¬nh luáº­n 1 cÃ¡i');}
+    }catch(e){}
+    rows.push({k:'c',need:+rq.comments,has:pend?-1:apprN,ok:!pend&&apprN>=+rq.comments,pending:pend,label:cmtT('go_req_cmt','CÃ³ {n} bÃ¬nh luáº­n Ä‘Æ°á»£c duyá»‡t').replace('{n}',rq.comments),hint:'<small>'+cmtT('g_cmtBelow','bÃ¬nh luáº­n bÃªn dÆ°á»›i, chá» duyá»‡t (')+who+')</small>'});
+  }
+  return rows;
+}
+function __statsPass(rows){for(var i=0;i<rows.length;i++)if(!rows[i].ok)return false;return true;}
+function __statsRowsHtml(rows){
+  return rows.map(function(r){
+    var ic=r.pending?'â€¦':(r.ok?'âœ“':'âœ—'),cls=r.pending?'':(r.ok?'ok':'bad');
+    var pr=r.pending?cmtT('go_checking2','Ä‘ang kiá»ƒm tra...'):(r.has+'/'+r.need);
+    return '<div class="lockrow '+cls+'"><span>'+ic+'</span><span>'+r.label+'</span><b>'+pr+'</b>'+(r.ok?'':(r.hint||''))+'</div>';
+  }).join('');
+}
+// Live refresh há»™p khÃ³a trong modal: cáº­p nháº­t sá»‘ phÃºt realtime (10s/láº§n),
+// tá»± xin vÃ© + sang trang táº£i ngay khi Ä‘á»§ Ä‘iá»u kiá»‡n. Dá»«ng khi Ä‘Ã³ng modal.
+let __lockTimer=null, __lockAppr=null, __lockTick=0, __lockFailMin=0;
+function __lockStop(){ try{ if(__lockTimer){ clearInterval(__lockTimer); __lockTimer=null; } }catch(e){} }
+function __lockHead(){
+  var hardNow=false; try{hardNow=stLogged();}catch(e){}
+  return 'ðŸ”’ <b>'+cmtT('g_cond','ChÆ°a Ä‘á»§ Ä‘iá»u kiá»‡n')+'</b>'
+    +(hardNow?'':'<br><small><a href="'+apiRoot()+'/dang-nhap.html" style="color:#0066cc">'+cmtT('li_in','ÄÄƒng nháº­p')+'</a> '+cmtT('go_saveProg','Ä‘á»ƒ lÆ°u tiáº¿n Ä‘á»™ theo tÃ i khoáº£n')+'</small>');
+}
+function __lockPaint(msg,rows,head,foot){ try{ msg.innerHTML=(head||__lockHead())+'<div style="margin-top:6px;text-align:left">'+__statsRowsHtml(rows)+'</div>'+(foot||''); }catch(e){} }
+function __lockLive(gid,gm,msg,res,head,foot){
+  __lockStop(); __lockTick=0;
+  __lockTimer=setInterval(function(){
+    try{
+      if(!document.body.contains(msg)||document.getElementById('dlModal').classList.contains('hidden')){ __lockStop(); return; }
+      __lockTick++;
+      var doPaint=function(){
+        var rows=__statsRows(gm,__lockAppr);
+        var needCmt=rows.some(function(r){return r.k==='c';});
+        var paint=function(rr){
+          __lockPaint(msg,rr,head,foot);
+          if(__statsPass(rr)){ __lockStop(); msg.textContent=cmtT('g_getting','Äá»§ Ä‘iá»u kiá»‡n! Äang láº¥y vÃ©...'); __ticketAndGo(gid,res,msg,true); }
+        };
+        if(needCmt&&(__lockTick%3===0)){ try{stApprovedCount(function(n){__lockAppr=n;paint(__statsRows(gm,n));});}catch(e){paint(rows);} }
+        else paint(rows);
+      };
+      // Má»—i ~30s Ä‘á»“ng bá»™ láº¡i sá»‘ server (náº¿u Ä‘Ã£ Ä‘Äƒng nháº­p) rá»“i má»›i váº½
+      if(__lockTick%3===0){ try{__pullSrvVals(doPaint);}catch(e){doPaint();} }
+      else doPaint();
+    }catch(e){}
+  },10000);
+}
+function __ticketAndGo(gid,res,msgEl,wasPassing){
+  __lockStop();
+  msgEl.textContent=cmtT('g_ticket','Äang láº¥y vÃ© táº£i...');
+  var gm=(GAMES_MAP||{})[gid]||{id:gid};
+  stFreshToken().then(function(_tk){
+    var _hh={}; try{if(_tk)_hh={'Authorization':'Bearer '+_tk};}catch(e){}
+    fetch(apiRoot()+'/api/ticket?id='+encodeURIComponent(gid)+'&res='+encodeURIComponent(res)+'&proof='+encodeURIComponent(__proof(gm)),{cache:'no-store',headers:_hh})
+    .then(function(r){return r.json().then(function(j){return {st:r.status,j:j};});})
+    .then(function(o){
+      if(o.st===200&&o.j&&o.j.ticket){__lockFailMin=0;ECO.owned=true;try{ecoRender();}catch(e){}try{countDownload(gid);}catch(e2){}location.href=apiRoot()+'/go.html?ticket='+encodeURIComponent(o.j.ticket);}
+      else if(o.st===402){
+        var need=(o.j&&o.j.need)||ECO.cost, bal=(o.j&&typeof o.j.bal==='number')?o.j.bal:ECO.bal;
+        ECO.retry=true; ECO.bal=bal;
+        try{ecoRender();}catch(e){}
+        var short=Math.max(0,need-bal);
+        var acts='<div style="margin-top:8px;display:grid;gap:6px">'
+          +'<button data-eco-comment="1" class="dl-btn" style="font-size:11px;justify-content:center">'+cmtT('g_actComment','ðŸ’¬ BÃ¬nh luáº­n game nÃ y (+5 EXP khi duyá»‡t)')+'</button>';
+        if(short>5) acts+='<small style="color:#4a7a9a">'+cmtT('g_actStreak','ðŸ”¥ Giá»¯ chuá»—i Ä‘iá»ƒm danh Ä‘á»ƒ nháº­n thÆ°á»Ÿng lá»›n')+'</small>';
+        acts+='</div>';
+        msgEl.innerHTML='ðŸ”’ <b>'+cmtT('g_cond','ChÆ°a Ä‘á»§ Ä‘iá»u kiá»‡n')+'</b> ('+cmtT('g_cost','GiÃ¡ táº£i:')+' '+need+' EXP). '+cmtT('g_lowexp','Thiáº¿u {n} EXP â€” Ä‘iá»ƒm danh má»—i ngÃ y Ä‘á»ƒ tÃ­ch nhÃ©').replace('{n}',short)+acts;
+      }
+      else if(o.st===403){
+        var reason=(o.j&&o.j.reason)||'';
+        // Hiá»ƒn thá»‹ Ä‘á»§ mÃ  vÃ© váº«n rá»›t 'minutes' nhiá»u láº§n liÃªn tiáº¿p = chain cÅ© (Ä‘á»•i IP/dáº£i máº¡ng):
+        // dá»«ng auto-retry, hiá»‡n nÃºt Ä‘áº¿m láº¡i thay vÃ¬ káº¹t 4/5, 32/5 mÃ£i.
+        if(reason==='minutes'&&wasPassing){__lockFailMin=(__lockFailMin||0)+1;}else{__lockFailMin=0;}
+        if(__lockFailMin>=3){
+          msgEl.innerHTML='ðŸ”’ <b>'+cmtT('g_cond','ChÆ°a Ä‘á»§ Ä‘iá»u kiá»‡n')+'</b> (<b>minutes</b>). '+cmtT('g_ipStuck','Máº¡ng cá»§a báº¡n vá»«a Ä‘á»•i IP nÃªn vÃ© cÅ© khÃ´ng cÃ²n hiá»‡u lá»±c.')
+            +'<div style="margin-top:8px;text-align:center"><button data-relock="1" class="dl-btn" style="font-size:11px">'+cmtT('g_recount','ðŸ”„ Äáº¿m láº¡i tá»« Ä‘áº§u')+'</button></div>';
+          return;
+        }
+        var rs0=__statsRows(gm,null);var needC0=rs0.some(function(r){return r.k==='c';});var hd='ðŸ”’ <b>'+cmtT('g_cond','ChÆ°a Ä‘á»§ Ä‘iá»u kiá»‡n')+'</b>'+(reason?' (<b>'+escHtml(reason)+'</b>)':'')+'. '+cmtT('g_srv','Server vá»«a kiá»ƒm tra â€” sá»‘ bÃªn dÆ°á»›i lÃ  má»›i nháº¥t:');var ft='<div style="margin-top:6px"><small>'+cmtT('g_hang','Treo trang thÃªm cho Ä‘á»§ rá»“i báº¥m Táº£i láº¡i (khÃ´ng cáº§n F5).')+'</small></div>';var paint=function(rr){__lockPaint(msgEl,rr,hd,ft);};__pullSrvVals(function(){var rs=__statsRows(gm,null);var nc=rs.some(function(r){return r.k==='c';});paint(rs);if(nc){try{stApprovedCount(function(n){__lockAppr=n;paint(__statsRows(gm,n));__lockLive(gid,gm,msgEl,res,hd,ft);});}catch(e){__lockLive(gid,gm,msgEl,res,hd,ft);}}else{__lockLive(gid,gm,msgEl,res,hd,ft);}});}
+      else{msgEl.textContent=cmtT('g_noTicket2','KhÃ´ng láº¥y Ä‘Æ°á»£c vÃ© (')+o.st+')'+((o.j&&o.j.error)?' ['+o.j.error+((o.j&&o.j.miss)?':'+o.j.miss:'')+']':'');}
+    }).catch(function(){msgEl.textContent=cmtT('g_offline','Máº¥t máº¡ng, thá»­ láº¡i sau.');});
+  }).catch(function(){msgEl.textContent=cmtT('g_offline','Máº¥t máº¡ng, thá»­ láº¡i sau.');});
+}
+async function renderDetail(){
+  const qs=new URLSearchParams(location.search);
+  let GAMES=null,id='',g=null,isPreview=false;
+  if(qs.get('preview')==='1'){
+    try{ g=JSON.parse(sessionStorage.getItem('game_preview')||'null'); }catch(e){ g=null; }
+    if(!g||!g.name){ document.querySelector('.body-text').innerHTML='<p class="note">'+escHtml(cmtT('g_noPreview','KhÃ´ng cÃ³ dá»¯ liá»‡u xem trÆ°á»›c. HÃ£y báº¥m nÃºt "Xem trÆ°á»›c" trong trang admin.'))+'</p>'; return; }
+    isPreview=true; id=g.id||'preview';
+  }else{
+    id=getId();
+    try{const _em=document.getElementById('__GAME_DATA__');if(_em){const _g=JSON.parse(_em.textContent);if(_g&&_g.id===id){g=_g;GAMES={};GAMES[id]=_g;/* KHÃ”NG seed GAMES_MAP báº±ng 1 game: loadMap(force) pháº£i táº£i full danh má»¥c, náº¿u khÃ´ng related luÃ´n rá»—ng vÃ  ghi Ä‘Ã¨ HTML do server render */loadMap(true).then(function(m){GAMES=m;try{Object.assign(GAMES_MAP||{},m);}catch(e){}try{if(!isPreview)renderRelatedList();}catch(e){}}).catch(function(){});}}}catch(e){}
+    if(!g){GAMES=await loadMap();g=GAMES[id];}
+  }
+  if(!g){const nf=document.querySelector('.kawaii-d')||document.querySelector('.wrap'); if(nf)nf.innerHTML=`<div style="padding:20px;text-align:center"><h2>${cmtT('g_notfound','KhÃ´ng tÃ¬m tháº¥y game!')}</h2><p><a href="${apiRoot()}/index.html">${cmtT('back_home','â€¹ Vá» trang chá»§')}</a></p></div>`; return;}
+  if(!isPreview){try{xpBump('visit',id);}catch(e){}}
+  document.title=g.name+cmtT('g_titleMid',' - Táº£i Game Java ')+g.res[0]+' | J2ME.VERCEL.APP';
+  const bc2=document.getElementById('bcName'); if(bc2) bc2.textContent=g.name;
+  const can=document.querySelector('link[rel="canonical"]'); if(can) can.href=location.origin+`/game/${id}.html`;
+  const ogUrl=document.querySelector('meta[property="og:url"]'); if(ogUrl) ogUrl.content=location.origin+`/game/${id}.html`;
+  const ogTitle=document.querySelector('meta[property="og:title"]'); if(ogTitle) ogTitle.content=g.name+' - Game Java';
+  const ogImg=document.querySelector('meta[property="og:image"]'); if(ogImg&&g.thumb) ogImg.content=g.thumb;
+  const metaDesc=document.querySelector('meta[name="description"]');   if(metaDesc) metaDesc.content=cmtT('g_metaA','Táº£i ')+g.name+cmtT('g_metaB',' cho Java J2ME. ')+`${String(g.desc||'').replace(/\[credit\][\s\S]*?\[\/credit\]/gi,' ').slice(0,120)}`+cmtT('g_metaC',' Há»— trá»£ ')+`${(g.res||[]).join(', ')}.`;
+  if(!isPreview&&location.search.includes('id=')){ history.replaceState(null,'',apiRoot()+`/game/${id}.html`); }
+  const bc=document.getElementById('bcName'); if(bc) bc.textContent=g.name;
+  if(isPreview){document.getElementById('breadcrumb').insertAdjacentHTML('afterend','<p class="note">'+escHtml(cmtT('g_preview','ÄANG XEM TRÆ¯á»šC â€” báº¥m LÆ°u trong admin Ä‘á»ƒ Ä‘Äƒng tháº­t.'))+'</p>');}
+  // detail-head (kÃ¨m ngÃ y Ä‘Äƒng náº¿u bÃ i cÃ³ lÆ°u created_at)
+  let dateStr='';
+  try{ if(g.created_at){ const dd=new Date(g.created_at); if(!isNaN(dd)) dateStr=dd.toLocaleDateString('vi-VN',{day:'2-digit',month:'2-digit',year:'numeric'}); } }catch(e){}
+  // LÆ°á»£t táº£i tháº­t tá»« api/stats (rá»›t thÃ¬ dÃ¹ng sá»‘ tÄ©nh trong JSON)
+  let dlCount=(typeof g.downloads==='number'&&g.downloads>0)?g.downloads:null;
+  if(!isPreview){
+    try{
+      const sr=await fetch(apiRoot()+'/api/stats?id='+encodeURIComponent(id),{cache:'no-store'});
+      if(sr.ok){const sj=await sr.json(); if(sj&&typeof sj.downloads==='number')dlCount=sj.downloads;}
+    }catch(e){}
+  }
+  const head=document.querySelector('.detail-head');
+  head.innerHTML=`<img src="${escHtml(g.thumb)}" alt="${escHtml(g.name)} thumb" width="84" height="84" decoding="async" fetchpriority="high"><div><h2>${escHtml(g.name)} ${g.hot?'<span style="background:#0066cc;color:#fff;font-size:8px;padding:2px 5px;border-radius:8px">HOT</span>':''} ${g.vi?'<span style="background:#0a9c4a;color:#fff;font-size:8px;padding:2px 5px;border-radius:8px">VIá»†T HÃ“A</span>':''}</h2><table class="info-table"><tr><th>${cmtT('g_thr_genre','Thá»ƒ loáº¡i')}</th><td><a href="${apiRoot()}/category.html?cat=${encodeURIComponent(g.cat||'')}" style="color:#0066cc">${escHtml(g.cat)}</a></td></tr><tr><th>${cmtT('g_thr_size','Dung lÆ°á»£ng')}</th><td>${escHtml(g.size)}</td></tr><tr><th>${cmtT('g_thr_res','MÃ n hÃ¬nh')}</th><td>${(g.res||[]).map(r=>`<span class="res-tag">${escHtml(r)}</span>`).join(' ')}</td></tr>${dateStr?`<tr><th>${cmtT('g_thr_date','NgÃ y Ä‘Äƒng')}</th><td>${dateStr}</td></tr>`:''}${dlCount!=null?`<tr><th>${cmtT('g_thr_dl','LÆ°á»£t táº£i')}</th><td>${Number(dlCount).toLocaleString('vi-VN')}</td></tr>`:''}</table></div>`;
+  // dl
+  document.querySelector('.dl-grid').innerHTML=(g.res||[]).map(r=>`<div class="dl-option"><b>${escHtml(r)}</b><br><small style="color:#4a7a9a;font-size:10px">${escHtml(g.size)} â€¢ ${String(r).includes('240')?'QVGA':'QCIF'}</small><br><a href="${escHtml(apiRoot()+'/api/dl?id='+encodeURIComponent(g.id)+'&res='+encodeURIComponent(r))}" class="dl-btn" data-dl-btn="1" data-name="${escHtml(g.name)}" data-res="${escHtml(r)}">${cmtT('dl','â¬‡ Táº£i JAR')}</a></div>`).join('');
+  // Chia sáº» + QR + yÃªu thÃ­ch
+  try{
+    const pageUrl=isPreview?location.href:('https://J2ME.VERCEL.APP/game/'+id+'.html');
+    let shareBox=document.getElementById('shareBox');
+    if(!shareBox){const de=document.querySelector('.kawaii-e'); if(de){shareBox=document.createElement('div');shareBox.id='shareBox';shareBox.className='kawaii-f';de.after(shareBox);}}
+    if(shareBox){
+      const favOn=favHas(id);
+      shareBox.innerHTML=`<div class="kawaii-title">${cmtT('g_share','Chia sáº»')}</div><div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">`
+      +`<a href="https://zalo.me/share?url=${encodeURIComponent(pageUrl)}" target="_blank" rel="noopener" class="dl-btn" style="font-size:11px">Zalo</a>`
+      +`<a href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(pageUrl)}" target="_blank" rel="noopener" class="dl-btn" style="font-size:11px">Facebook</a>`
+      +`<button id="copyLinkBtn" class="dl-btn" style="font-size:11px">${cmtT('g_copy','Copy link')}</button>`
+      +`<button id="qrBtn" class="dl-btn" style="font-size:11px">${cmtT('g_qr','QR')}</button>`
+      +`<button id="favBtn" class="dl-btn" style="font-size:11px">${favOn?cmtT('g_favOn','â™¥ ÄÃ£ thÃ­ch'):cmtT('g_favOff','â™¡ ThÃ­ch')}</button>`
+      +`<button id="doneBtn" class="dl-btn" style="font-size:11px">${(function(){try{return JSON.parse(localStorage.getItem('j2me_done')||'[]').indexOf(id)>=0;}catch(e){return false;}})()?cmtT('g_doneOn','âœ“ ÄÃ£ phÃ¡ Ä‘áº£o'):cmtT('g_doneOff','PhÃ¡ Ä‘áº£o?')}</button></div>`
+      +`<div id="qrWrap" style="display:none;text-align:center;margin-top:8px"><img id="qrImg" alt="QR má»Ÿ trÃªn Ä‘iá»‡n thoáº¡i" width="160" height="160" style="width:160px;height:160px;border:2px solid #b8d8f8;border-radius:12px;background:#fff"><br><small style="color:#4a7a9a;font-size:10px">${cmtT('g_qrNote','QuÃ©t Ä‘á»ƒ má»Ÿ trÃªn Ä‘iá»‡n thoáº¡i')}</small></div>`;
+      document.getElementById('copyLinkBtn').onclick=function(){copyPageUrl(pageUrl,this);};
+      document.getElementById('qrBtn').onclick=function(){const w=document.getElementById('qrWrap');const im=document.getElementById('qrImg');if(w.style.display==='none'){if(!im.src)im.src='https://api.qrserver.com/v1/create-qr-code/?size=160x160&data='+encodeURIComponent(pageUrl);w.style.display='block';}else{w.style.display='none';}};
+      document.getElementById('favBtn').onclick=function(){const on=favToggle(id);this.textContent=favHas(id)?cmtT('g_favOn','â™¥ ÄÃ£ thÃ­ch'):cmtT('g_favOff','â™¡ ThÃ­ch');if(on){xpBump('fav');}};
+      document.getElementById('doneBtn').onclick=function(){try{let a=JSON.parse(localStorage.getItem('j2me_done')||'[]');const has=a.indexOf(id)>=0;a=has?a.filter(function(x){return x!==id;}):a.concat([id]);localStorage.setItem('j2me_done',JSON.stringify(a.slice(0,500)));this.textContent=has?cmtT('g_doneOff','PhÃ¡ Ä‘áº£o?'):cmtT('g_doneOn','âœ“ ÄÃ£ phÃ¡ Ä‘áº£o');try{stEvent(has?'uncomplete':'complete',id);}catch(e){}}catch(e){}};
+    }
+  }catch(e){}
+  // body â€” lÆ°á»›i demo tá»± cÃ¢n theo sá»‘ lÆ°á»£ng áº£nh: 1 áº£nh cÄƒn giá»¯a khá»• lá»›n, 2 áº£nh chia Ä‘Ã´i,
+  // tá»« 3 áº£nh trá»Ÿ lÃªn 3 áº£nh/hÃ ng, hÃ ng cuá»‘i láº» tá»± cÄƒn giá»¯a (flex + justify-content:center)
+  const shots=(g.shots||[]);
+  const shotCls=shots.length===1?' count-1':shots.length===2?' count-2':'';
+  const shotsHtml=shots.length?`<div class="shot-grid${shotCls}">${shots.map((s,i)=>`<img src="${escHtml(s)}" alt="${cmtT('g_shotAlt','áº¢nh demo ')}${i+1}" width="240" height="320" loading="lazy" decoding="async" data-idx="${i}" class="shot-img" style="cursor:pointer">`).join('')}</div>`:`<p class="note">${cmtT('g_noShots','ChÆ°a cÃ³ áº£nh demo cho game nÃ y.')}</p>`;
+  document.querySelector('.body-text').innerHTML=`<h3>${cmtT('g_intro','ðŸ“ Giá»›i thiá»‡u')}</h3><div style="white-space:pre-line">${renderDesc(g.desc||'')}</div><h3>${cmtT('g_shots','ðŸ–¼ï¸ HÃ¬nh áº£nh')}</h3>${shotsHtml}<h3>${cmtT('g_req','âš™ï¸ YÃªu cáº§u')}</h3><p style="font-size:13px">â€¢ <b>MIDP 2.0</b> â€¢ ${cmtT('g_thr_res','MÃ n hÃ¬nh')} <b>${escHtml((g.res||[]).join(', '))}</b> â€¢ Trá»‘ng â‰¥<b>${escHtml(g.size)}</b> â€¢ Opera Mini</p>`;
+  CURRENT_SHOTS=shots;
+  document.querySelectorAll('.shot-img').forEach(img=>{
+    img.addEventListener('click',()=>openLightbox(parseInt(img.dataset.idx,10)));
+  });
+  // related: cÃ¹ng chuyÃªn má»¥c trÆ°á»›c, thiáº¿u má»›i bÃ¹ game khÃ¡c (áº©n khi xem trÆ°á»›c).
+  // Náº¿u full danh má»¥c chÆ°a táº£i xong thÃ¬ GIá»® NGUYÃŠN HTML do server render, khÃ´ng ghi Ä‘Ã¨ rá»—ng.
+  function renderRelatedList(){
+  const allGames=Object.values(GAMES||{}).filter(x=>x&&x.id!==g.id);
+  if(!allGames.length) return;
+  const sameCat=allGames.filter(x=>x.cat&&g.cat&&x.cat===g.cat);
+  const restCat=allGames.filter(x=>!(x.cat&&g.cat&&x.cat===g.cat));
+  const rel=sameCat.concat(restCat).slice(0,6);
+  if(!rel.length) return;
+  document.getElementById('relatedBox').style.display='block';
+  document.getElementById('relatedGrid').innerHTML=rel.map(x=>`<a href="${apiRoot()}/game/${escHtml(x.id)}.html" style="background:#fff;border:1.5px solid #b8d8f8;border-radius:10px;padding:6px;text-align:center;text-decoration:none"><img src="${escHtml(x.thumb)}" width="48" height="48" loading="lazy" decoding="async" alt="${escHtml(x.name)}" style="width:48px;height:48px;border-radius:8px;margin:0 auto;object-fit:cover"><span style="font-size:10px;font-weight:700;display:block;color:#1a3a5c">${escHtml(String(x.name||'').split('[')[0].slice(0,14))}</span><small style="font-size:9px;color:#4a7a9a">${escHtml((x.res||[])[0]||'')}</small></a>`).join('');
+  }
+  if(!isPreview){try{renderRelatedList();}catch(e){}}
+  if(!isPreview){ try{loadComments(id);}catch(e){} }
+}
+// DÃ¹ng chung 1 AudioContext (singleton) thay vÃ¬ táº¡o má»›i má»—i láº§n -> trÃ¡nh treo trÃ¬nh duyá»‡t do vÆ°á»£t giá»›i háº¡n AudioContext
+let SHARED_AC=null;
+function getAC(){
+  try{
+    if(!SHARED_AC) SHARED_AC=new (window.AudioContext||window.webkitAudioContext)();
+    if(SHARED_AC.state==='suspended') SHARED_AC.resume().catch(()=>{});
+    return SHARED_AC;
+  }catch(e){ return null; }
+}
+function playClick(f=880,d=0.12,v=0.22){try{const c=getAC(); if(!c) return; const o=c.createOscillator(),g=c.createGain();o.type='sine';o.frequency.value=f;g.gain.value=v;o.connect(g);g.connect(c.destination);o.start();g.gain.exponentialRampToValueAtTime(0.0001,c.currentTime+d);o.stop(c.currentTime+d)}catch(e){}}
+function playGlitch(){try{const c=getAC(); if(!c) return; const o=c.createOscillator(),g=c.createGain(),f=c.createBiquadFilter();o.type='square';o.frequency.value=120+Math.random()*300;f.type='bandpass';f.frequency.value=900;f.Q.value=8;g.gain.value=0.12;o.connect(f);f.connect(g);g.connect(c.destination);o.start();g.gain.exponentialRampToValueAtTime(0.0001,c.currentTime+0.18);o.stop(c.currentTime+0.18)}catch(e){}}
+const ANIME_POOL=['/assets/anime-girl.png','/assets/anime-1.png','/assets/anime-2.png','/assets/anime-3.png','/assets/anime-4.png','/assets/anime-5.png','/assets/anime-6.png','/assets/anime-7.png','/assets/anime-8.png'];
+let pending={href:'#',name:'',res:''};
+function doDownload(name,res){
+  playClick(); const gid=getId(); const gm=(GAMES_MAP||{})[gid];
+  try{ ecoLoad(ecoCost(gm||{}),gid||''); }catch(e){}
+  const hasRes=!!(gm&&Array.isArray(gm.res)&&gm.res.indexOf(res)>=0);
+  const gt=gm&&gm.gate&&gm.gate.type;
+  const mc0=document.getElementById('modalConfirm');
+  const msg=document.getElementById('modalMsg');
+  if(!hasRes){pending={href:'#',gid:'',name:name,res:res};if(mc0)mc0.style.display='none';msg.textContent=cmtT('g_modalDemo','âš  Link demo - vÃ o admin.php nháº­p link tháº­t nhÃ©!');document.getElementById('dlModal').classList.remove('hidden');document.body.style.overflow='hidden';return false;}
+  // BÃ i báº¯t Ä‘Äƒng nháº­p (type login hoáº·c cá» login): chÆ°a login thÃ¬ cháº·n ngay á»Ÿ modal
+  var needLogin=!!(gm&&gm.gate&&(gt==='login'||gm.gate.login));
+  var loggedNow=false; try{loggedNow=stLogged();}catch(e){}
+  if(needLogin&&!loggedNow){
+    pending={href:'#',gid:gid,name:name,res:res};
+    if(mc0)mc0.style.display='none';
+    msg.innerHTML=cmtT('g_memOnly','ðŸ”’ BÃ i nÃ y <b>chá»‰ dÃ nh cho thÃ nh viÃªn</b>')+'<br><a href="'+apiRoot()+'/dang-nhap.html" style="color:#0066cc;font-weight:700">'+cmtT('g_loginNow','â†’ ÄÄƒng nháº­p ngay')+'</a><br><small style="color:#4a7a9a">'+cmtT('g_lockNote','1 tÃ i khoáº£n, má»Ÿ khÃ³a theo Ä‘Ãºng cÃ y cá»§a báº¡n (chá»‘ng kÃ© mÃ¡y)')+'</small>';
+    document.getElementById('dlModal').classList.remove('hidden');document.body.style.overflow='hidden';return false;
+  }
+  // Má»i link táº£i Ä‘á»u Ä‘i qua go.html báº±ng vÃ© server (chá»‘ng soi source/crack link)
+  if(gt==='stats'){
+    pending={href:'#',gid:gid,name:name,res:res};
+    __lockAppr=null; __lockFailMin=0;
+    if(mc0)mc0.style.display='none';
+    msg.textContent=cmtT('go_checking2','Äang kiá»ƒm tra Ä‘iá»u kiá»‡n...');
+    document.getElementById('dlModal').classList.remove('hidden');document.body.style.overflow='hidden';
+    var rows0=__statsRows(gm,null);
+    var needCmt=rows0.some(function(r){return r.k==='c';});
+    var show=function(rows){
+      if(__statsPass(rows)){msg.textContent=cmtT('g_getting','Äá»§ Ä‘iá»u kiá»‡n! Äang láº¥y vÃ©...');__ticketAndGo(gid,res,msg);}
+      else{__lockPaint(msg,rows);}
+      __lockLive(gid,gm,msg,res);
+    };
+    var runShow=function(){
+      if(needCmt){try{stApprovedCount(function(n){__lockAppr=n;show(__statsRows(gm,n));});}catch(e){show(__statsRows(gm,null));}}
+      else show(__statsRows(gm,null));
+    };
+    // Váº½ khung ngay báº±ng sá»‘ local, rá»“i Ä‘á»“ng bá»™ sá»‘ server (náº¿u Ä‘Ã£ Ä‘Äƒng nháº­p) Ä‘á»ƒ khá»›p vÃ©
+    msg.innerHTML='<div style="text-align:left">'+__statsRowsHtml(rows0)+'</div>';
+    try{__pullSrvVals(runShow);}catch(e){runShow();}
+    return false;
+  }
+  const lock=gm?__gate(gm):null;
+  if(lock){
+    pending={href:'#',gid:gid,name:name,res:res};
+    msg.innerHTML=cmtT('g_locked','ðŸ”’ Game bá»‹ khÃ³a: ')+'<b>'+lock.label+'</b><br><small style="color:#4a7a9a">'+lock.need+'</small><br><a href="'+apiRoot()+'/profile.html" style="color:#0066cc;font-weight:700">'+cmtT('g_seeProfile','â†’ Xem há»“ sÆ¡ cÃ y XP')+'</a>';
+    if(mc0)mc0.style.display='none';
+    document.getElementById('dlModal').classList.remove('hidden'); document.body.style.overflow='hidden'; return false;
+  }
+  pending={href:'#',gid:gid,name:name,res:res}; if(mc0)mc0.style.display=''; msg.textContent=cmtT('g_confirmA','Báº¡n sáº¯p táº£i ')+name+' ('+res+')'+cmtT('g_confirmB',' â€” báº¥m xÃ¡c nháº­n Ä‘á»ƒ sang trang táº£i an toÃ n');
+  const img=document.querySelector('.modal-anime-img'); if(img){const ch=ANIME_POOL[Math.floor(Math.random()*ANIME_POOL.length)]; img.style.display='block'; img.src=apiRoot()+ch;}
+  const banner=document.querySelector('.modal-banner img'); if(banner){try{banner.src=(window.pickRandomBanner?window.pickRandomBanner():window.__BANNER_FALLBACK[Math.floor(Math.random()*window.__BANNER_FALLBACK.length)]);}catch(e){} if(window.getBannerList)window.getBannerList().then(function(list){try{banner.src=window.pickRandomBanner(list);}catch(e){}}).catch(function(){});}
+  document.getElementById('modalConfirm').href='#'; document.getElementById('dlModal').classList.remove('hidden'); document.body.style.overflow='hidden'; return false;
+}
+// VÃ­ EXP trong modal táº£i: sá»‘ dÆ° / giÃ¡ / sá»Ÿ há»¯u / Ä‘iá»ƒm danh (realtime, khÃ´ng reload)
+let ECO={bal:0,checked:false,streak:0,owned:false,cost:0,ready:false,retry:false};
+function ecoCost(gm){var v=parseInt(gm&&(gm.dl_cost),10);return (typeof v==='number'&&isFinite(v))?Math.max(0,Math.min(100000,v)):10;}
+function ecoAuth(){var h={};try{if(stToken())h={'Authorization':'Bearer '+stToken()};}catch(e){}var cid='';try{if(typeof stCid==='function')cid=stCid()||'';}catch(e){}return {h:h,cid:cid};}
+function ecoRender(){
+  var box=document.getElementById('ecoBox'); if(!box) return;
+  var h='<div style="background:#fffbe6;border:1.5px dashed #e6a800;border-radius:10px;padding:7px 10px;font-size:11px;line-height:1.7;margin-top:8px">âš¡ <b>'+ECO.bal+'</b> EXP';
+  if(ECO.owned) h+=' â€¢ '+cmtT('g_owned','ÄÃ£ sá»Ÿ há»¯u â€” táº£i láº¡i miá»…n phÃ­');
+  else if(ECO.cost>0) h+=' â€¢ '+cmtT('g_cost','GiÃ¡ táº£i:')+' <b>'+ECO.cost+'</b> EXP';
+  else h+=' â€¢ '+cmtT('g_dlFree','Táº£i miá»…n phÃ­');
+  if(ECO.streak>1) h+='<br><small>'+cmtT('g_streak','ðŸ”¥ Chuá»—i {n} ngÃ y').replace('{n}',ECO.streak)+'</small>';
+  h+='<br>';
+  if(ECO.checked) h+='<small>'+cmtT('g_checked','ÄÃ£ Ä‘iá»ƒm danh hÃ´m nay âœ“')+'</small>';
+  else h+='<button id="ecoCheckBtn" class="dl-btn" style="font-size:11px;padding:6px 14px">'+cmtT('g_checkin','ðŸŽ² Äiá»ƒm danh hÃ´m nay')+'</button>';
+  h+='</div>';
+  box.innerHTML=h;
+  var b=document.getElementById('ecoCheckBtn'); if(b) b.onclick=function(){ecoCheckin();};
+}
+function ecoEnsureBox(){
+  var box=document.getElementById('ecoBox');
+  if(!box){
+    var msg=document.getElementById('modalMsg');
+    if(!msg) return null;
+    box=document.createElement('div'); box.id='ecoBox';
+    msg.after(box);
+    box=document.getElementById('ecoBox');
+  }
+  return box;
+}
+function ecoLoad(cost,gid){
+  ECO.cost=cost; ECO.ready=false; ECO.retry=false;
+  try{ if(!ecoEnsureBox()) return; }catch(e){ return; }
+  ecoRender();
+  var a=ecoAuth();
+  stFreshToken().then(function(_tk){
+    var hh={}; try{for(var k in a.h)hh[k]=a.h[k];}catch(e){}
+    try{if(_tk)hh['Authorization']='Bearer '+_tk;}catch(e){}
+    fetch(apiRoot()+'/api/economy?cid='+encodeURIComponent(a.cid),{headers:hh,cache:'no-store'})
+    .then(function(r){return r.ok?r.json():null;})
+    .then(function(j){
+      if(!j) return;
+      ECO.bal=+(j.bal||0); ECO.checked=!!j.checked; ECO.streak=+(j.streak||0);
+      ECO.owned=!!(j.owned&&j.owned.indexOf(gid)>=0); ECO.ready=true;
+      ecoRender();
+    }).catch(function(){});
+  }).catch(function(){});
+}
+function ecoCheckin(){
+  var b=document.getElementById('ecoCheckBtn'); if(b){b.disabled=true;b.textContent='â€¦';}
+  var a=ecoAuth();
+  var hh={'Content-Type':'application/json'};
+  try{var _tk00=stToken();if(_tk00)hh['Authorization']='Bearer '+_tk00;}catch(e){}
+  stFreshToken().then(function(_tk){
+    try{if(_tk)hh['Authorization']='Bearer '+_tk;}catch(e){}
+    fetch(apiRoot()+'/api/economy',{method:'POST',headers:hh,body:JSON.stringify({op:'checkin',cid:a.cid,sbt:(function(){try{return stToken();}catch(e){return '';}})()})})
+    .then(function(r){return r.json().then(function(j){return {st:r.status,j:j};});})
+    .then(function(o){
+      var j=o.j||{};
+      if(j&&typeof j.bal==='number'){ECO.bal=j.bal;}
+      if(j&&(j.ok||j.reason==='done')){ECO.checked=true;ECO.streak=+(j.streak||ECO.streak);}
+      ECO.ready=true;
+      ecoRender();
+      if(j&&j.ok){
+        var msg=document.getElementById('modalMsg');
+        if(msg)msg.textContent=cmtT('g_got','ðŸŽ² +{n} EXP!').replace('{n}',j.got||0);
+        // Äiá»ƒm danh xong mÃ  modal Ä‘ang káº¹t thiáº¿u EXP vÃ  giá» Ä‘Ã£ Ä‘á»§ -> tá»± cháº¡y tiáº¿p
+        try{
+          if(ECO.retry&&!document.getElementById('dlModal').classList.contains('hidden')&&pending&&pending.gid&&pending.res&&(ECO.owned||ECO.bal>=ECO.cost)){
+            ECO.retry=false;
+            __ticketAndGo(pending.gid,pending.res,document.getElementById('modalMsg'));
+          }
+        }catch(e){}
+      }
+    })
+    .catch(function(){ecoRender();});
+    }).catch(function(){ecoRender();});
+}
+// NÃºt táº£i render Ä‘á»™ng dÃ¹ng data-attr (khÃ´ng inline onclick â†’ trÃ¡nh XSS qua tÃªn game)
+document.addEventListener('click',function(e){const b=e.target&&e.target.closest?e.target.closest('[data-dl-btn]'):null; if(!b) return; e.preventDefault(); try{doDownload(b.dataset.name||'',b.dataset.res||'');}catch(err){}});
+(function(){
+  const modal=document.getElementById('dlModal');
+  const close=()=>{
+    try{ playClick(520,0.1,0.15); }catch(e){}
+    try{ if(typeof __lockStop==='function') __lockStop(); }catch(e){}
+    try{ __lockFailMin=0; }catch(e){}
+    modal.classList.add('hidden');
+    document.body.style.overflow='';
+  };
+  document.getElementById('modalClose')?.addEventListener('click',close);
+  document.getElementById('modalCancel')?.addEventListener('click',close);
+  modal?.addEventListener('click',e=>{if(e.target===modal)close()});
+  document.addEventListener('keydown',e=>{ if(e.key==='Escape' && !modal.classList.contains('hidden')) close(); });
+  document.querySelector('.modal-anime')?.addEventListener('mouseenter',()=>{ try{ playGlitch(); }catch(e){} });
+  document.getElementById('modalConfirm')?.addEventListener('click',e=>{
+    e.preventDefault();
+    const p=pending;
+    if(!p||!p.gid||!p.res){
+      document.getElementById('modalMsg').textContent=cmtT('g_modalDemo','âš  Link demo - vÃ o admin.php nháº­p link tháº­t nhÃ©!');
+      setTimeout(close,1400);
+      return;
+    }
+    try{ playClick(1040,0.14,0.25); }catch(e){}
+    // Má»i link táº£i Ä‘á»u qua go.html: xin vÃ© server rá»“i chuyá»ƒn trang (chá»‘ng crack/soi source)
+    __ticketAndGo(p.gid,p.res,document.getElementById('modalMsg'));
+  });
+})();
+renderDetail();
+// Váº½ láº¡i cÃ¡c tháº» Ä‘á»™ng (chi tiáº¿t/chia sáº»/bÃ¬nh luáº­n/vÃ­) khi i18n sáºµn sÃ ng / Ä‘á»•i ngÃ´n ngá»¯
+document.addEventListener('i18n-ready',function(){
+  try{
+    if(!(window.I18N&&I18N.lang&&I18N.lang()!=='vi')) return;
+    if(typeof renderDetail==='function'){ renderDetail(); }
+  }catch(e){}
+  try{ if(document.getElementById('ecoBox')&&typeof ecoRender==='function'){ ecoRender(); } }catch(e){}
+});
