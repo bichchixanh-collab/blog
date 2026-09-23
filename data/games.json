@@ -1,5 +1,39 @@
 [
     {
+        "id": "tam-quoc-truyen-ky-lu-bo-truyen",
+        "name": "Tam Quốc Truyền Kỳ - Lữ Bố Truyện",
+        "cat": "Nhập vai",
+        "size": "",
+        "res": [
+            "240x320"
+        ],
+        "hot": false,
+        "vi": true,
+        "new": false,
+        "gate": {
+            "type": "none",
+            "lines": 1,
+            "level": 3,
+            "badge": "rare",
+            "xp": 100
+        },
+        "dl_cost": 10,
+        "desc": "Trò chơi lấy bối cảnh thời Tam Quốc, cốt truyện tập trung vào các trận chiến của các anh hùng và tương tác giữa các nhân vật, bao gồm các yếu tố chinh phục và tương tác, với phong cách đối thoại tương đối nhẹ nhàng. Nội dung trò chơi đưa người chơi và nhân vật trong game cùng nhau trải nghiệm câu chuyện thời Tam Quốc.\r\n\r\nTrong trò chơi này, người chơi có thể sống lại thời Tam Quốc kinh điển với những anh hùng, mỹ nhân xinh đẹp.\r\n\r\n\"Tam Quốc Truyền Thuyết: Ma Thần Lữ Bố\" là một game nhập vai hành động với lối chơi cốt lõi kết hợp các yếu tố của chiến lược theo lượt. Người chơi có thể tham gia chiến đấu chiến lược theo nhiều phong cách cảnh chiến đấu khác nhau. Hệ thống chiến đấu bao gồm các hiệu ứng đặc biệt và tương tác trong bối cảnh, đồng thời cũng có các kỹ năng chiến đấu \"ngựa\". Trò chơi bao gồm nhiều hệ thống độc đáo như phép thuật, chế tạo thuốc, khai thác và thu thập kỹ năng sống.\r\n\r\n© NGUỒN: J2ME.VERCEL.APP\r\n[credit]Game java hay - vào ngay https:\/\/J2ME.VERCEL.APP\r\nVui lòng ghi thêm 2 dòng này khi chia sẻ lại bài viết.[\/credit]",
+        "thumb": "https:\/\/i.ibb.co\/675KPQ10\/wm-1790130204343.jpg",
+        "shots": [
+            "https:\/\/i.ibb.co\/675KPQ10\/wm-1790130204343.jpg",
+            "https:\/\/i.ibb.co\/cXVDSGdk\/wm-1790130205878.jpg",
+            "https:\/\/i.ibb.co\/bMv4NxDJ\/wm-1790130206469.jpg",
+            "https:\/\/i.ibb.co\/ZRhfCb6g\/wm-1790130207099.jpg"
+        ],
+        "jar": {
+            "240x320": "https:\/\/sfile.co\/AZ5XpUUDxFE"
+        },
+        "downloads": 0,
+        "created_at": "2026-09-23T04:32:50+02:00",
+        "updated_at": "2026-09-23T04:32:50+02:00"
+    },
+    {
         "id": "kisah-tiga-negara-gui-shen-lu-bu",
         "name": "Kisah Tiga Negara - Gui Shen Lu Bu",
         "cat": "Nhập vai",
