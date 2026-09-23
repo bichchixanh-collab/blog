@@ -12,7 +12,7 @@ async function loadComments(gameId, page){
   try{var _cn=document.getElementById('cmtName');if(_cn&&!_cn.value){var _nm=stNames();if(_nm.length)_cn.value=_nm[_nm.length-1];}}catch(e){}
   const sum=document.getElementById('cmtSummary'), list=document.getElementById('cmtList'), msg=document.getElementById('cmtMsg');
   const pager=document.getElementById('cmtPager');
-  sum.textContent=cmtT('cmt_loading','Äang táº£i bÃ¬nh luáº­n...'); list.innerHTML=''; msg.textContent='';
+  sum.textContent=cmtT('cmt_loading',"Đang tải bình luận..."); list.innerHTML=''; msg.textContent='';
   if(pager) pager.innerHTML='';
   try{
     const r=await fetch(apiRoot()+'/api/comments?game='+encodeURIComponent(gameId)+'&page='+CMT_PAGE+'&limit='+CMT_LIMIT,{cache:'no-store'});
@@ -20,9 +20,9 @@ async function loadComments(gameId, page){
     const j=await r.json();
     CMT_TOTAL=j.total||0; CMT_PAGES=j.pages||1; CMT_PAGE=j.page||1;
     if(CMT_KNOWN===0) CMT_KNOWN=CMT_TOTAL;
-    sum.innerHTML=CMT_TOTAL?('â˜… <b>'+escHtml(String(j.avg))+'</b> â€” '+CMT_TOTAL+' '+cmtT('cmt_reviews','Ä‘Ã¡nh giÃ¡')+' â€” '+cmtT('cmt_page','trang')+' '+CMT_PAGE+'/'+CMT_PAGES):cmtT('cmt_empty','ChÆ°a cÃ³ Ä‘Ã¡nh giÃ¡ nÃ o. HÃ£y lÃ  ngÆ°á»i Ä‘áº§u tiÃªn!');
+    sum.innerHTML=CMT_TOTAL?('��& <b>'+escHtml(String(j.avg))+'</b> � '+CMT_TOTAL+' '+cmtT('cmt_reviews',"�nh gi�")+' � '+cmtT('cmt_page',"trang")+' '+CMT_PAGE+'/'+CMT_PAGES):cmtT('cmt_empty',"Ch�a c� �nh gi� n�o. H�y l� ng��i �u ti�n!");
     window._cmtReplyTo=null;
-    const replyLbl=cmtT('cmt_reply','â†³ Tráº£ lá»i');
+    const replyLbl=cmtT('cmt_reply',"↳ Trả lời");
     const itemHtml=function(c,reply){
       const st=reply?'':('<div class="stars">'+'â˜…'.repeat(c.stars)+'â˜†'.repeat(5-c.stars)+'</div>');
       return '<div class="cmt-item"'+(reply?' style="margin:6px 0 0 18px;border-style:dashed"':'')+'>'+st+'<b>'+escHtml(c.name)+'</b> <small>'+escHtml(fmtDT(c.created_at))+'</small><div>'+escHtml(c.text)+'</div>'
@@ -30,13 +30,13 @@ async function loadComments(gameId, page){
     };
     list.innerHTML=(j.comments||[]).map(function(c){
       return itemHtml(c,false)+((c.replies||[]).map(function(x){return itemHtml(x,true);}).join(''));
-    }).join('') || ('<p class="note">'+escHtml(cmtT('cmt_empty_page','Trang nÃ y chÆ°a cÃ³ bÃ¬nh luáº­n.'))+'</p>');
+    }).join('') || ('<p class="note">'+escHtml(cmtT('cmt_empty_page',"Trang này chưa có bình luận."))+'</p>');
     list.querySelectorAll('[data-reply]').forEach(function(b){
       b.onclick=function(){
         window._cmtReplyTo={id:b.getAttribute('data-reply'),name:b.getAttribute('data-rname')};
         let tag=document.getElementById('replyTag');
         if(!tag){tag=document.createElement('div');tag.id='replyTag';tag.style.cssText='font-size:11px;color:#0066cc';form.insertBefore(tag,form.firstChild);}
-        tag.innerHTML=cmtT('cmt_replying','Äang tráº£ lá»i')+' <b></b> <a href="#" id="replyCancel" style="color:#4a7a9a">[há»§y]</a>';
+        tag.innerHTML=cmtT('cmt_replying',"Đang trả lời")+' <b></b> <a href="#" id="replyCancel" style="color:#4a7a9a">[há»§y]</a>';
         tag.querySelector('b').textContent=window._cmtReplyTo.name;
         tag.querySelector('#replyCancel').onclick=function(e){e.preventDefault();window._cmtReplyTo=null;tag.remove();};
         document.getElementById('cmtText').focus();
@@ -52,27 +52,27 @@ async function loadComments(gameId, page){
     }
     const hint=document.getElementById('cmtNewHint'); if(hint) hint.style.display='none';
     startCmtPolling();
-  }catch(e){ sum.textContent=String((e&&e.message)||'').indexOf('403')>=0?cmtT('cmt_403','KhÃ´ng táº£i Ä‘Æ°á»£c bÃ¬nh luáº­n (bá»‹ cháº·n 403).'):cmtT('cmt_err','KhÃ´ng táº£i Ä‘Æ°á»£c bÃ¬nh luáº­n lÃºc nÃ y.'); }
+  }catch(e){ sum.textContent=String((e&&e.message)||'').indexOf('403')>=0?cmtT('cmt_403',"Không tải được bình luận (bị chặn 403 — báo admin kiểm tra Vercel Deployment Protection)."):cmtT('cmt_err',"Không tải được bình luận lúc này."); }
   const form=document.getElementById('cmtForm');
   form.onsubmit=function(ev){
     ev.preventDefault();
-    msg.textContent=cmtT('cmt_sending','Äang gá»­i...');
-    try{const last=+localStorage.getItem('cmt_last')||0; if(Date.now()-last<5*60*1000){msg.textContent=cmtT('cmt_fast','Báº¡n gá»­i quÃ¡ nhanh, thá»­ láº¡i sau vÃ i phÃºt.');return;}}catch(e){}
+    msg.textContent=cmtT('cmt_sending',"Đang gửi...");
+    try{const last=+localStorage.getItem('cmt_last')||0; if(Date.now()-last<5*60*1000){msg.textContent=cmtT('cmt_fast',"Bạn gửi quá nhanh, thử lại sau vài phút.");return;}}catch(e){}
     const payload={game:gameId,name:document.getElementById('cmtName').value,stars:document.getElementById('cmtStars').value,text:document.getElementById('cmtText').value,website:document.getElementById('cmtWeb').value,sbt:''};
     if(window._cmtReplyTo&&window._cmtReplyTo.id)payload.replyTo=window._cmtReplyTo.id;
-    // Refresh token trÆ°á»›c khi gá»­i Ä‘á»ƒ server nháº­n Ä‘Ãºng tÃ i khoáº£n (láº¥y +5 EXP / Ä‘áº¿m duyá»‡t)
+    // Refresh token trư�:c khi gửi �Ồ server nhận �úng tài khoản (lấy +5 EXP / �ếm duy�!t)
     stFreshToken().then(function(tk){ payload.sbt=tk||'';
     fetch(apiRoot()+'/api/comments',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)})
       .then(function(r){return r.text().then(function(t){let j={};try{j=JSON.parse(t);}catch(e){}return {st:r.status,j:j};});})
       .then(function(o){
-        if(o.st===200&&o.j.ok){msg.textContent=cmtT('cmt_sent','ÄÃ£ gá»­i! BÃ¬nh luáº­n hiá»‡n sau khi admin duyá»‡t.')+(o.j.xpBonus?' (+5 EXP)':(o.j.auth==='stale'?' ('+cmtT('g_relogin','PhiÃªn háº¿t háº¡n â€” Ä‘Äƒng nháº­p láº¡i Ä‘á»ƒ nháº­n EXP')+')':(o.j.xpReason==='no_uid'?' ('+cmtT('g_loginBonus','ÄÄƒng nháº­p Ä‘á»ƒ nháº­n +5 EXP khi bÃ¬nh luáº­n')+')':'')));document.getElementById('cmtText').value='';window._cmtReplyTo=null;const tg=document.getElementById('replyTag');if(tg)tg.remove();try{localStorage.setItem('cmt_last',String(Date.now()));}catch(e){}try{xpBump('comment');}catch(e){}try{stSaveName(document.getElementById('cmtName').value);}catch(e){}try{_stApprCache={at:0,n:-1};}catch(e){}try{if(o.j.xpBonus)ECO.bal+=5;}catch(e){}}
-        else if(o.st===503){msg.textContent=cmtT('cmt_nohost','Chá»©c nÄƒng bÃ¬nh luáº­n chÆ°a Ä‘Æ°á»£c báº­t trÃªn hosting nÃ y.');}
-        else if(o.st===429){msg.textContent=cmtT('cmt_fast','Báº¡n gá»­i quÃ¡ nhanh, thá»­ láº¡i sau vÃ i phÃºt.');}
-        else if(o.st===403){msg.textContent=cmtT('cmt_403post','Bá»‹ cháº·n (403): táº£i láº¡i trang rá»“i gá»­i láº¡i.');}
-        else{var _e=(o.j&&o.j.error)||'';if(_e==='cross-origin denied')_e=cmtT('cmt_cross','bá»‹ cháº·n cross-origin, táº£i láº¡i trang rá»“i thá»­ láº¡i');if(_e==='duplicate comment')_e=cmtT('g_dupCmt','Báº¡n vá»«a gá»­i bÃ¬nh luáº­n nÃ y rá»“i, thá»­ láº¡i sau nhÃ©');msg.textContent=cmtT('cmt_errPre','Lá»—i: ')+(_e||cmtT('cmt_code','mÃ£ {s}, thá»­ láº¡i sau').replace('{s}',o.st));}
+        if(o.st===200&&o.j.ok){msg.textContent=cmtT('cmt_sent',"Đã gửi! Bình luận hiện sau khi admin duyệt.")+(o.j.xpBonus?' (+5 EXP)':(o.j.auth==='stale'?' ('+cmtT('g_relogin',"Phiên hết hạn — đăng nhập lại để nhận EXP")+')':(o.j.xpReason==='no_uid'?' ('+cmtT('g_loginBonus',"Đăng nhập để nhận +5 EXP khi bình luận")+')':'')));document.getElementById('cmtText').value='';window._cmtReplyTo=null;const tg=document.getElementById('replyTag');if(tg)tg.remove();try{localStorage.setItem('cmt_last',String(Date.now()));}catch(e){}try{xpBump('comment');}catch(e){}try{stSaveName(document.getElementById('cmtName').value);}catch(e){}try{_stApprCache={at:0,n:-1};}catch(e){}try{if(o.j.xpBonus)ECO.bal+=5;}catch(e){}}
+        else if(o.st===503){msg.textContent=cmtT('cmt_nohost',"Chức năng bình luận chưa được bật trên hosting này.");}
+        else if(o.st===429){msg.textContent=cmtT('cmt_fast',"Bạn gửi quá nhanh, thử lại sau vài phút.");}
+        else if(o.st===403){msg.textContent=cmtT('cmt_403post',"Bị chặn (403): tải lại trang rồi gửi lại. Nếu vẫn lỗi, báo admin kiểm tra Vercel Deployment Protection / Firewall.");}
+        else{var _e=(o.j&&o.j.error)||'';if(_e==='cross-origin denied')_e=cmtT('cmt_cross',"bị chặn cross-origin, tải lại trang rồi thử lại");if(_e==='duplicate comment')_e=cmtT('g_dupCmt',"Bạn vừa gửi bình luận này rồi, thử lại sau nhé");msg.textContent=cmtT('cmt_errPre',"Lỗi: ")+(_e||cmtT('cmt_code',"mã {s}, thử lại sau").replace('{s}',o.st));}
       })
-      .catch(function(){msg.textContent=cmtT('cmt_neterr','KhÃ´ng gá»­i Ä‘Æ°á»£c. Kiá»ƒm tra máº¡ng rá»“i thá»­ láº¡i.');});
-    }).catch(function(){msg.textContent=cmtT('cmt_neterr','KhÃ´ng gá»­i Ä‘Æ°á»£c. Kiá»ƒm tra máº¡ng rá»“i thá»­ láº¡i.');});
+      .catch(function(){msg.textContent=cmtT('cmt_neterr',"Không gửi được. Kiểm tra mạng rồi thử lại.");});
+    }).catch(function(){msg.textContent=cmtT('cmt_neterr',"Không gửi được. Kiểm tra mạng rồi thử lại.");});
   };
 }
 function startCmtPolling(){

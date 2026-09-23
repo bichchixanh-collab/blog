@@ -1,6 +1,6 @@
 // game-ui
 (function(){
-  // Random toÃ n bá»™ áº£nh trong assets/banners (.png/.jpg/...): quÃ©t qua API, khÃ´ng fix cá»©ng tÃªn/sá»‘ lÆ°á»£ng.
+  // Random toàn b�" ảnh trong assets/banners (.png/.jpg/...): quét qua API, không fix cứng tên/s� lượng.
   // ThÃªm/xÃ³a áº£nh chá»‰ cáº§n copy file vÃ o assets/banners.
   // API chá»‰ tráº£ TÃŠN FILE; JS tá»± dá»±ng URL theo Ä‘Ãºng subfolder (http://localhost/blog hay domain root Ä‘á»u Ä‘Ãºng).
   var FALLBACK_NAMES=['banner1.png','banner2.png','banner3.png','banner4.png','banner5.png','banner6.png','banner7.png','banner8.png'];
@@ -60,7 +60,7 @@
     window.__BANNER_CACHE=FALLBACK_URLS;
     return FALLBACK_URLS;
   };
-  // Random nhÆ°ng KHÃ”NG trÃ¹ng áº£nh vá»«a hiá»‡n láº§n trÆ°á»›c (lÆ°u tÃªn file vÃ o localStorage).
+  // Random nhưng KH�NG trùng ảnh vừa hi�!n lần trư�:c (lưu tên file vào localStorage).
   function bannerName(u){try{return decodeURIComponent(String(u||'').split('?')[0].split('#')[0].split('/').pop());}catch(e){return '';}}
   function lastBanner(){try{return localStorage.getItem('j2me_last_banner')||'';}catch(e){return '';}}
   function saveBanner(n){try{if(n)localStorage.setItem('j2me_last_banner',n);}catch(e){}}
@@ -136,7 +136,7 @@ lbTrack.addEventListener('touchend',()=>{
   else if(touchDeltaX<-threshold) lbGoto(LB_INDEX+1);
   else updateLightboxPos(true);
 });
-// Cáº£nh bÃ¡o trÆ°á»›c khi má»Ÿ link ngoÃ i trong mÃ´ táº£
+// Cảnh báo trư�:c khi m�x link ngoài trong mô tả
 document.addEventListener('click',function(e){
   const a=e.target&&e.target.closest?e.target.closest('.body-text a[target="_blank"]'):null;
   if(!a) return;
