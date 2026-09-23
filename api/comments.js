@@ -341,6 +341,21 @@ module.exports = async (req, res) => {
           }
           parentId = parent.id;
         }
+        // Chặn gửi trùng khít 24h (bấm 2 lần / copy-paste): cùng game + cùng người
+        // (uid hoặc tên) + cùng nội dung trong 24h qua -> 409, khỏi tốn lượt duyệt.
+        try {
+          const nowMs = Date.now();
+          const normN = String(name).trim().toLowerCase();
+          const dup = (Array.isArray(list) ? list : []).some((c) => {
+            if (!c || c.game !== game) return false;
+            if (String(c.text || '').trim() !== text) return false;
+            const t = Date.parse(c.created_at || '') || 0;
+            if (!t || nowMs - t > 24 * 3600 * 1000) return false;
+            if (cmtUid) return c.uid === cmtUid;
+            return !c.uid && String(c.name || '').trim().toLowerCase() === normN;
+          });
+          if (dup) return send(res, 409, { error: 'duplicate comment' });
+        } catch (e) {}
         // Auto-duyệt combo: công tắc admin (data/moderate_config.json) + env dự phòng.
         // Local sync trước, Perspective AI sau nếu admin bật ai_enabled và có key ở Vercel.
         const autoOn = isAutoApprove();

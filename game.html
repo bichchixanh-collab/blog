@@ -999,7 +999,7 @@ async function loadComments(gameId, page){
         else if(o.st===503){msg.textContent=cmtT('cmt_nohost','Chức năng bình luận chưa được bật trên hosting này.');}
         else if(o.st===429){msg.textContent=cmtT('cmt_fast','Bạn gửi quá nhanh, thử lại sau vài phút.');}
         else if(o.st===403){msg.textContent=cmtT('cmt_403post','Bị chặn (403): tải lại trang rồi gửi lại.');}
-        else{var _e=(o.j&&o.j.error)||'';if(_e==='cross-origin denied')_e=cmtT('cmt_cross','bị chặn cross-origin, tải lại trang rồi thử lại');msg.textContent=cmtT('cmt_errPre','Lỗi: ')+(_e||cmtT('cmt_code','mã {s}, thử lại sau').replace('{s}',o.st));}
+        else{var _e=(o.j&&o.j.error)||'';if(_e==='cross-origin denied')_e=cmtT('cmt_cross','bị chặn cross-origin, tải lại trang rồi thử lại');if(_e==='duplicate comment')_e=cmtT('g_dupCmt','Bạn vừa gửi bình luận này rồi, thử lại sau nhé');msg.textContent=cmtT('cmt_errPre','Lỗi: ')+(_e||cmtT('cmt_code','mã {s}, thử lại sau').replace('{s}',o.st));}
       })
       .catch(function(){msg.textContent=cmtT('cmt_neterr','Không gửi được. Kiểm tra mạng rồi thử lại.');});
     }).catch(function(){msg.textContent=cmtT('cmt_neterr','Không gửi được. Kiểm tra mạng rồi thử lại.');});
