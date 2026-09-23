@@ -4,7 +4,6 @@
 // - Service-role REST (SUPABASE_SERVICE_KEY, không bao giờ lộ client) đọc/ghi
 //   bảng public.user_stats (xem supabase-gating.sql).
 const crypto = require('crypto');
-const { isoWeek } = require('./_bingo');
 
 const SB_URL = (process.env.SUPABASE_URL || 'https://pmotbltodyyilarnvtpn.supabase.co').replace(/\/$/, '');
 function jwtSecret() {
@@ -201,23 +200,6 @@ async function eventUserStats(uid, ev) {
       if ((t === 'like' || t === 'complete') && at < 0) arr.push(id);
       if ((t === 'unlike' || t === 'uncomplete') && at >= 0) arr.splice(at, 1);
       if (t === 'like' || t === 'unlike') likes = arr.slice(-500); else completed = arr.slice(-500);
-    } else if (t === 'bingo') {
-      // Hợp nhất ô bingo đã đánh (idempotent): {week:{actionId:1}}.
-      // Thiếu week hợp lệ thì dùng tuần hiện tại (server UTC, xem _bingo).
-      let w = String((ev && ev.week) || '').slice(0, 8);
-      if (!/^\d{4}-W\d{2}$/.test(w)) w = isoWeek(new Date());
-      const ids = Array.isArray(ev && ev.ids) ? ev.ids : ((ev && ev.id) ? [ev.id] : []);
-      if (!/^\d{4}-W\d{2}$/.test(w)) return cur;
-      const set = Object.assign({}, bingo[w] || {});
-      for (const raw of ids.slice(0, 24)) {
-        const k = String(raw || '');
-        if (/^[a-z0-9_]{1,24}$/i.test(k)) set[k] = 1;
-      }
-      bingo = Object.assign({}, bingo, { [w]: set });
-    } else if (t === 'petxp') {
-      // EXP pet chỉ tăng (max-merge, chống ghi đè ngược)
-      const v = Math.max(0, Math.min(10000000, parseInt(ev && ev.exp, 10) || 0));
-      if (v > pet_xp) pet_xp = v;
     } else {
       return cur;
     }

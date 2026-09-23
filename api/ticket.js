@@ -8,7 +8,6 @@ const { mintTicket, checkProofExtended } = require('./_lock');
 const { countApproved } = require('./comments');
 const { bearerToken, verifySbTokenAsync, getUserStats, getSenpai } = require('./_sb');
 const { chargeForDownload, costOf } = require('./economy');
-const { countLinesMax, petLevel } = require('./_bingo');
 // Gom số server-side theo tài khoản cho khóa CỨNG. null = hạ tầng lỗi (fail-closed).
 async function resolveServerStats(uid) {
   try {
@@ -20,9 +19,6 @@ async function resolveServerStats(uid) {
       likes: st.likes.length,
       done: st.completed.length,
       approved: appr,
-      bingoLines: countLinesMax(st.bingo, st.likes.length > 0),
-      petLv: petLevel(st.pet_xp),
-      badges: sen.badges.length > 0,
       xp: sen.xp,
     };
   } catch { return null; }

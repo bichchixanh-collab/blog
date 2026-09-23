@@ -1,6 +1,6 @@
 // api/user-data.js — đồng bộ TOÀN BỘ dữ liệu cá nhân lên Supabase (thay localStorage).
 // Khi đã đăng nhập, Supabase là nguồn chính; localStorage chỉ là cache offline.
-// GET  -> {senpai:{xp,data}, stats:{minutes,likes,completed,bingo,pet_xp}} (cần Bearer)
+// GET  -> {senpai:{xp,data}, stats:{minutes,likes,completed}} (cần Bearer)
 // POST -> body {senpai:{xp,data}} hợp nhất lên server (union/max, không mất data)
 const { bearerToken, verifySbTokenAsync, getUserStats } = require('./_sb');
 const { check, ipOf } = require('./_rate');
@@ -74,7 +74,7 @@ module.exports = async (req, res) => {
         if (rt > Date.now() - 30000 && cur.data) {
           // merge nông: giữ các key mới từ local nếu server thiếu
           finalData = Object.assign({}, cur.data, data);
-          // pet, gacha giữ max/union đã xử lý ở client, ở đây chỉ merge
+          // data blob giữ max/union đã xử lý ở client, ở đây chỉ merge
         }
       }
       const r = await serviceFetch('/rest/v1/senpai?on_conflict=user_id', {

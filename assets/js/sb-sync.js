@@ -1,4 +1,4 @@
-/* sb-sync.js — đồng bộ pet/bingo/XP lên Supabase (nấc 2).
+/* sb-sync.js — đồng bộ XP + dữ liệu tài khoản lên Supabase (nấc 2).
    Bảng public.senpai(user_id, xp, data, updated_at), RLS: mỗi người chỉ thấy hàng của mình.
    Chiến lược merge đơn giản, an toàn: xp lấy max 2 bên; blob data lấy bản mới hơn
    (theo updated_at). Không có xung đột kiểu mất tài khoản như JSON-auth. */
@@ -78,7 +78,7 @@ async function push(xp, data) {
 }
 let timer = null;
 window.SBSync = {
-  // Đẩy nền, gom 15s/lần — gọi từ save() của senpai.js, không chặn UI.
+  // Đẩy nền, gom 15s/lần — gọi khi XP/dữ liệu đổi, không chặn UI.
   // Khi đã đăng nhập, Supabase là nguồn chính; local chỉ là cache.
   schedule() {
     if (timer) return;

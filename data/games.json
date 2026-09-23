@@ -320,10 +320,7 @@
         "vi": false,
         "new": false,
         "gate": {
-            "type": "pet",
-            "lines": 1,
-            "level": 2,
-            "badge": "rare",
+            "type": "none",
             "xp": 100
         },
         "desc": "game chơi offline theo thời gian thực, bạn nuôi gà con thời gian 4h là lớn  thì bạn thoát ra nó vẫn tự chạy, ví dụ 4 tiếng sau vào thì nó sẽ lớn thành gà truởng thành. Game có chế độ hàng xóm, có thể sang ăn trộm được( nhanh kiếm tiền hơn là tự chăn nuôi)",

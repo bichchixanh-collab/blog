@@ -5,7 +5,7 @@
 //  - Luồng chính: go.html?ticket=... (vé HMAC 15 phút, ràng buộc đúng gate lúc cấp).
 //  - Luồng cũ ?id=&res=&proof= vẫn chạy (tương thích), proof đã mở rộng kiểm tra stats.
 const fs = require('fs'), path = require('path');
-const { check, ipOf } = require('./_rate');
+const { check, ipOf, consumeOnce } = require('./_rate');
 const { countDl } = require('./_store');
 const { verifyTicket, gateHash, mintTicket, resolveJarUrl, checkProofExtended } = require('./_lock');
 const { countApproved } = require('./comments');
@@ -17,7 +17,7 @@ function loadGames() {
 function siteOf(req) {
   return `${req.headers['x-forwarded-proto'] || 'https'}://${req.headers['x-forwarded-host'] || req.headers.host}`;
 }
-// Game có gate yêu cầu proof: server kiểm đúng game + ngày tươi + bingo lines +
+// Game có gate yêu cầu proof: server kiểm đúng game + ngày tươi +
 // số bình luận duyệt (đếm chéo DB) + phút online qua presence chain đã ký.
 // Like/phá đảo vẫn là số local (khóa mềm); chỉ phút online là siết cứng cho cả khách.
 async function checkProofLegacy(p, id, gate, req) {
@@ -31,10 +31,6 @@ async function checkProofLegacy(p, id, gate, req) {
     const dayMs = Date.parse(o.day + 'T00:00:00Z');
     if (isNaN(dayMs)) return false;
     if (Math.abs(Date.now() - dayMs) > 2 * 864e5) return false;
-    if (gate.type === 'bingo') {
-      const need = Math.max(1, parseInt(gate.lines || 1, 10) || 1);
-      if (!(o.lines >= need)) return false;
-    }
     if (gate.type === 'stats') {
       const chk = await checkProofExtended(p, id, gate, countApproved, null, false, req ? ipOf(req) : '');
       if (!chk.ok) return false;
@@ -61,6 +57,9 @@ module.exports = async (req, res) => {
     }
     const resList = Array.isArray(g.res) ? g.res : [];
     if (resList.indexOf(t.res) < 0) { res.statusCode = 400; res.end('res invalid'); return; }
+    // Vé dùng một lần: chống share link dl cho máy khác (Redis SET NX khi có Upstash).
+    const consumed = await consumeOnce(`ticket:${q.ticket}`, 15 * 60);
+    if (!consumed) { res.statusCode = 410; res.end('ticket already used or unavailable'); return; }
     await finishDl(req, res, g, t.res);
     return;
   }

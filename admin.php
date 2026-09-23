@@ -350,13 +350,10 @@ if (isset($_POST['save'])) {
             $shots=array_values(array_unique($shots));
             // Thời gian đăng: giữ nguyên khi sửa; luôn cập nhật "sửa lần cuối"; giữ lượt tải cũ
             // Khóa tải: admin đặt điều kiện, người xem đủ mới bấm Tải được (khóa mềm, xem docs trong dl.js)
-            $gateTypes = ['none','bingo','pet','badge','xp','stats','login'];
+            $gateTypes = ['none','xp','stats','login'];
             $gateType = $_POST['gate_type'] ?? 'none';
             if (!in_array($gateType, $gateTypes, true)) $gateType = 'none';
             $gate = ['type' => $gateType,
-                'lines' => max(1, min(8, (int)($_POST['gate_lines'] ?? 1))),
-                'level' => max(1, min(99, (int)($_POST['gate_level'] ?? 3))),
-                'badge' => 'rare',
                 'xp' => max(1, (int)($_POST['gate_xp'] ?? 100))];
             if ($gateType === 'stats') {
                 // Mỗi điều kiện tách riêng, tích nhiều = phải đủ TẤT CẢ (AND)
@@ -453,8 +450,8 @@ if (isset($_POST['import'])) {
                 $it['hot']=!empty($it['hot']); $it['vi']=!empty($it['vi']); $it['new']=!empty($it['new']);
                 $it['downloads']=(int)($it['downloads']??0);
                 $gt=is_array($it['gate']??null)?$it['gate']:[];
-                $gtT=in_array($gt['type']??'none',['none','bingo','pet','badge','xp','stats','login'],true)?$gt['type']:'none';
-                $it['gate']=['type'=>$gtT,'lines'=>max(1,min(8,(int)($gt['lines']??1))),'level'=>max(1,min(99,(int)($gt['level']??3))),'badge'=>'rare','xp'=>max(1,(int)($gt['xp']??100))];
+                $gtT=in_array($gt['type']??'none',['none','xp','stats','login'],true)?$gt['type']:'none';
+                $it['gate']=['type'=>$gtT,'xp'=>max(1,(int)($gt['xp']??100))];
                 if($gtT==='stats'){ $rq=[]; if(isset($gt['require']['minutes']))$rq['minutes']=max(1,min(100000,(int)$gt['require']['minutes'])); if(isset($gt['require']['likes']))$rq['likes']=max(1,min(10000,(int)$gt['require']['likes'])); if(isset($gt['require']['completed']))$rq['completed']=max(1,min(10000,(int)$gt['require']['completed'])); if(isset($gt['require']['comments']))$rq['comments']=max(1,min(10000,(int)$gt['require']['comments'])); $it['gate']['require']=$rq; }
                 if(!empty($gt['login']))$it['gate']['login']=1;
                 if(empty($it['created_at'])) $it['created_at']=date('c');
@@ -863,11 +860,9 @@ hr{border:none;border-top:1px dashed #d6deea;margin:12px 0}
       <div style="background:#fffbe6;border:1px solid #e6c87a;border-radius:6px;padding:8px;display:grid;gap:6px">
         <?php $eg=$editGame['gate']??['type'=>'none']; if(!is_array($eg))$eg=['type'=>'none']; $egT=$eg['type']??'none'; ?>
         <select name="gate_type" onchange="gateTypeChanged(this.value)">
-          <?php foreach(['none'=>'Mở tự do','bingo'=>'Cần line Bingo tuần','pet'=>'Pet đạt level','badge'=>'Có huy hiệu gacha','xp'=>'Đủ tổng XP','stats'=>'Khóa theo chỉ số (tích nhiều điều kiện)','login'=>'Bắt đăng nhập (khóa cứng)'] as $k=>$lb){ $s=($egT===$k?'selected':''); echo "<option value='$k' $s>$lb</option>"; } ?>
+          <?php foreach(['none'=>'Mở tự do','xp'=>'Đủ tổng XP','stats'=>'Khóa theo chỉ số (tích nhiều điều kiện)','login'=>'Bắt đăng nhập (khóa cứng)'] as $k=>$lb){ $s=($egT===$k?'selected':''); echo "<option value='$k' $s>$lb</option>"; } ?>
         </select>
         <div id="gateOpts" style="display:<?=($egT==='none'?'none':'grid')?>;gap:6px;grid-template-columns:1fr 1fr">
-          <div><small>Số line bingo</small><input type="number" name="gate_lines" min="1" max="8" value="<?=htmlspecialchars($eg['lines']??1)?>"></div>
-          <div><small>Pet level</small><input type="number" name="gate_level" min="1" max="99" value="<?=htmlspecialchars($eg['level']??3)?>"></div>
           <div><small>Tổng XP</small><input type="number" name="gate_xp" min="1" value="<?=htmlspecialchars($eg['xp']??100)?>"></div>
         </div>
         <?php $egR=is_array($eg['require']??null)?$eg['require']:[]; ?>
@@ -881,7 +876,7 @@ hr{border:none;border-top:1px dashed #d6deea;margin:12px 0}
         <div id="gateLoginRow" style="display:<?=($egT==='none'?'none':'block')?>"><label style="font-size:11px"><input type="checkbox" name="gate_login" <?=!empty($eg['login'])?'checked':''?>> 🔐 Bắt buộc đăng nhập (áp dụng mọi loại khóa — khách không tải được)</label></div>
         <div style="margin-top:6px"><small>💰 Giá tải (EXP)</small><input type="number" name="dl_cost" min="0" max="100000" value="<?=htmlspecialchars($editGame['dl_cost']??10)?>" style="width:100px"> <small style="color:#5a6b87">tải lại game đã sở hữu thì miễn phí • gợi ý: kho cũ ~5, game mới ~15</small></div>
         <script>function gateTypeChanged(v){try{document.getElementById('gateOpts').style.display=v==='none'?'none':'grid';document.getElementById('gateStats').style.display=v==='stats'?'grid':'none';document.getElementById('gateLoginRow').style.display=v==='none'?'none':'block';}catch(e){}}</script>
-        <small style="color:#5a6b87">Khóa mềm: chặn nút tải + link copy tay (proof theo ngày). Ngoài web hiện ổ khóa + đường dẫn sang Góc Senpai.</small>
+        <small style="color:#5a6b87">Khóa mềm: chặn nút tải + link copy tay (proof theo ngày). Ngoài web hiện ổ khóa + đường dẫn sang Hồ sơ.</small>
         <br><small>🔑 Mã hóa link: <?=lock_secret()!==null?'<b style="color:#0a9c4a">đã bật (AES-GCM)</b>':'<b style="color:#c43c64">CHƯA — link lưu plaintext, dễ soi source</b>'?> — đặt LOCK_SECRET (≥16 ký tự) trong env hoặc config.php, và thêm cùng giá trị vào Vercel env.</small>
       </div>
       <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
@@ -1148,7 +1143,7 @@ const g={
       hot:ck('hot'), vi:ck('vi'), new:ck('new'),
       desc:String(fd.get('desc')||''), thumb:String(fd.get('thumb')||''),
       dl_cost:Math.max(0,Math.min(100000,parseInt(fd.get('dl_cost')||'10',10)||0)),
-      gate:(function(){var t=String(fd.get('gate_type')||'none');var g={type:t,lines:+(fd.get('gate_lines')||1),level:+(fd.get('gate_level')||3),xp:+(fd.get('gate_xp')||100)};if(t==='stats'){var rq={};if(ck('rq_minutes_on'))rq.minutes=+(fd.get('rq_minutes')||1);if(ck('rq_likes_on'))rq.likes=+(fd.get('rq_likes')||1);if(ck('rq_completed_on'))rq.completed=+(fd.get('rq_completed')||1);if(ck('rq_comments_on'))rq.comments=+(fd.get('rq_comments')||1);g.require=rq;}if(t!=='none'&&ck('gate_login'))g.login=1;return g;})(),
+      gate:(function(){var t=String(fd.get('gate_type')||'none');var g={type:t,xp:+(fd.get('gate_xp')||100)};if(t==='stats'){var rq={};if(ck('rq_minutes_on'))rq.minutes=+(fd.get('rq_minutes')||1);if(ck('rq_likes_on'))rq.likes=+(fd.get('rq_likes')||1);if(ck('rq_completed_on'))rq.completed=+(fd.get('rq_completed')||1);if(ck('rq_comments_on'))rq.comments=+(fd.get('rq_comments')||1);g.require=rq;}if(t!=='none'&&ck('gate_login'))g.login=1;return g;})(),
       shots:shots, jar:jar, created_at:new Date().toISOString()
     };
   try{sessionStorage.setItem('game_preview',JSON.stringify(g));}catch(e){alert('Trình duyệt chặn sessionStorage, không xem trước được.');return;}

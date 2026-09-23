@@ -44,6 +44,38 @@ function memCheck(key, limit, windowMs) {
   return true;
 }
 
+// Vé dùng một lần (one-time ticket): true = vé còn hiệu lực và vừa bị đốt.
+// Upstash: SET NX nguyên tử (bền qua cold-start). Không Upstash: memory theo instance.
+// Lưu ý: Upstash lỗi -> false (fail-closed, vé không dùng được trong lúc gián đoạn).
+const onceMem = new Map();
+async function consumeOnce(key, ttlS) {
+  const k = String(key || '').slice(0, 240);
+  const ttl = Math.max(1, Math.min(86400, parseInt(ttlS, 10) || 900));
+  if (!k) return false;
+  if (upstash) {
+    try {
+      const r = await fetch(`${upstash.url}/set/${encodeURIComponent(k)}/1/NX/EX/${ttl}`, {
+        method: 'POST', signal: timeoutSignal(3000),
+        headers: { Authorization: `Bearer ${upstash.token}` },
+      });
+      if (!r.ok) throw new Error('upstash http ' + r.status);
+      const j = await r.json();
+      return !!(j && j.result === 'OK');
+    } catch (e) {
+      try { console.error('[once] Upstash lỗi:', e && e.message); } catch {}
+      return false;
+    }
+  }
+  const now = Date.now();
+  const old = onceMem.get(k);
+  if (old && old > now) return false;
+  onceMem.set(k, now + ttl * 1000);
+  if (onceMem.size > 5000) {
+    for (const [mk, exp] of onceMem) if (exp <= now) onceMem.delete(mk);
+  }
+  return true;
+}
+
 async function check({ ip, route, limit, windowS }) {
   const key = `rl:${route}:${ip}`;
 
@@ -71,4 +103,4 @@ function ipOf(req) {
   return String(f).split(',')[0].trim() || (req.socket && req.socket.remoteAddress) || 'unknown';
 }
 
-module.exports = { check, ipOf, usingUpstash: () => !!upstash };
+module.exports = { check, ipOf, consumeOnce, usingUpstash: () => !!upstash };

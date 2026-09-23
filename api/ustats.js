@@ -1,12 +1,10 @@
 // api/ustats.js — đếm server-side cho khóa tải CỨNG (chỉ người đã đăng nhập).
 // Client gửi EVENT kèm Bearer access_token (không gửi số tự khai):
 //   heartbeat (+1 phút nếu cách lần trước ≥50s) | like/unlike/complete/uncomplete {id}
-//   bingo {week, ids[]} (hợp nhất ô đã đánh) | petxp {exp} (max-merge)
-// GET  /api/ustats            -> {uid, minutes, likes, completed, bingoLines, petLv}
+// GET  /api/ustats            -> {uid, minutes, likes, completed}
 // POST /api/ustats {t, ...}   -> {ok, minutes, likes, completed}
 const { check, ipOf } = require('./_rate');
 const { bearerToken, verifySbTokenAsync, getUserStats, eventUserStats } = require('./_sb');
-const { countLinesMax, petLevel } = require('./_bingo');
 
 function send(res, code, obj) {
   res.statusCode = code;
@@ -19,8 +17,6 @@ function counts(st) {
     minutes: st.minutes,
     likes: st.likes.length,
     completed: st.completed.length,
-    bingoLines: countLinesMax(st.bingo, st.likes.length > 0),
-    petLv: petLevel(st.pet_xp),
   };
 }
 function readJsonBody(req) {
@@ -45,15 +41,15 @@ module.exports = async (req, res) => {
       if (!await check({ ip: ipOf(req), route: 'ustats-get', limit: 60, windowS: 60 })) { send(res, 429, { error: 'slow down' }); return; }
       const st = await getUserStats(me.uid);
       if (!st) { send(res, 503, { error: 'stats unavailable' }); return; }
-      send(res, 200, Object.assign({ uid: me.uid, bingo: st.bingo, petExp: st.pet_xp }, counts(st)));
+      send(res, 200, Object.assign({ uid: me.uid }, counts(st)));
       return;
     }
     if (req.method === 'POST') {
       if (!await check({ ip: ipOf(req), route: 'ustats-post', limit: 120, windowS: 60 })) { send(res, 429, { error: 'slow down' }); return; }
       const p = (await readJsonBody(req)) || {};
       const t = String(p.t || '');
-      if (['heartbeat', 'like', 'unlike', 'complete', 'uncomplete', 'bingo', 'petxp'].indexOf(t) < 0) { send(res, 400, { error: 'bad event' }); return; }
-      const st = await eventUserStats(me.uid, { t, id: p.id, week: p.week, ids: p.ids, exp: p.exp });
+      if (['heartbeat', 'like', 'unlike', 'complete', 'uncomplete'].indexOf(t) < 0) { send(res, 400, { error: 'bad event' }); return; }
+      const st = await eventUserStats(me.uid, { t, id: p.id });
       if (!st) { send(res, 503, { error: 'stats unavailable' }); return; }
       send(res, 200, Object.assign({ ok: true }, counts(st)));
       return;

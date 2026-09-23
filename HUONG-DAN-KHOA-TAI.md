@@ -11,7 +11,6 @@ Tài liệu đầy đủ cho hệ thống điều kiện tải + chống crack l
 | Ai | Không cần tài khoản | Phải đăng nhập ở `dang-nhap.html` |
 | Số liệu | localStorage trên máy (sửa devtools được) | Server đếm theo `uid` Supabase (sửa máy vô ích) |
 | Bình luận | Đếm theo tên đã dùng | Đếm chính xác theo tài khoản |
-| Bingo/Pet | Tiến trình máy | Server hợp nhất (union/max), server tự tính lines/level |
 | Vé tải | Vẫn cần vé + proof | Vé `hard:1`, kiểm fail-closed |
 
 Quy tắc chung: **mọi nút Tải đều đi qua `go.html` bằng vé server** (`/api/ticket` → `go.html?ticket=` → `/api/dl?ticket=` → 302 file). Không vé hợp lệ thì không tải được bài khóa, dù biết URL API.
@@ -23,9 +22,6 @@ Quy tắc chung: **mọi nút Tải đều đi qua `go.html` bằng vé server**
 | `type` | Ý nghĩa | Tham số |
 |---|---|---|
 | `none` | Mở tự do | — |
-| `bingo` | Line Bingo tuần | `lines` (1–8) |
-| `pet` | Pet đạt level | `level` |
-| `badge` | Có huy hiệu gacha | (cờ `badge:'rare'`) |
 | `xp` | Đủ tổng XP | `xp` |
 | `stats` | **Khóa theo chỉ số, tích nhiều điều kiện (AND)** | `require:{minutes,likes,completed,comments}` — chỉ field nào admin tick mới áp dụng |
 | `login` | **Bắt đăng nhập** (không cần chỉ số gì thêm) | — |
@@ -36,7 +32,6 @@ Ví dụ:
 ```json
 "gate": { "type": "stats", "login": 1, "require": { "minutes": 30, "likes": 5, "completed": 3, "comments": 3 } }
 "gate": { "type": "login" }
-"gate": { "type": "pet", "level": 5, "login": 1 }
 ```
 
 4 chỉ số stats lấy ở đâu:
@@ -64,7 +59,7 @@ Ví dụ:
 
 ## 4. Thiết lập bắt buộc (làm 1 lần)
 
-### 4.1. Supabase (cho khóa cứng + bingo/pet server)
+### 4.1. Supabase (cho khóa cứng)
 
 1. Supabase Dashboard → **SQL Editor** → dán toàn bộ `blog-v2/supabase-gating.sql` → Run.
    - Tạo bảng `public.user_stats(uid, minutes, likes, completed, bingo, pet_xp, updated_at)`.
@@ -83,7 +78,7 @@ Ví dụ:
   $config['LOCK_SECRET'] = '...giá trị giống Vercel...';
   ```
 - `admin.php` hiện trạng thái ngay dưới mục khóa tải: xanh = đã bật, đỏ = link lưu plaintext.
-- **Thiếu secret** = mọi thứ vẫn chạy ở chế độ mềm (như khóa bingo/pet cũ), vé ký khóa mặc định.
+- **Thiếu secret** = mọi thứ vẫn chạy ở chế độ mềm, vé ký khóa mặc định.
 
 ---
 
@@ -93,7 +88,7 @@ Ví dụ:
 [trang game] bấm Tải
   → modal: kiểm tra local (khóa mềm) / hiện checklist ✓/✗ từng điều kiện
   → bấm xác nhận → GET /api/ticket?id&res&proof (+ Authorization nếu login)
-      → server: game tồn tại? gate? (login? stats? bingo/pet/badge/xp?)
+      → server: game tồn tại? gate? (login? stats? xp?)
       → đủ → {ticket} (HMAC, hết hạn 15 phút, ràng buộc đúng gate lúc cấp)
   → chuyển go.html?ticket=
       → GET /api/meta?ticket= → {tên game, hostname (KHÔNG có URL), gate}
@@ -110,18 +105,9 @@ Ví dụ:
 
 ---
 
-## 6. Bingo/Pet lên Supabase (người đã login)
+## 6. Giới hạn trung thực (đọc kỹ)
 
-- Mọi lần `save()` pet/bingo (`senpai.js`, `__bm` ở game.html) đều đẩy nền lên `/api/ustats`: `bingo {week, ids[]}` (hợp nhất, idempotent), `petxp {exp}` (max-merge, không tụt).
-- Mở Góc Senpai khi đã login: tự kéo server về **hợp nhất** (union ô bingo, max pet exp) — không mất tiến trình offline.
-- Server tự tính **số line** (port y hệt board client: FNV-1a + PRNG + 8 patterns, đã test khớp tuyệt đối) và **pet level** (`floor(exp/100)`) để kiểm gate bingo/pet cứng.
-- localStorage vẫn giữ làm **cache offline**; khi login, server thắng mọi xung đột. Khách (chưa login) dùng local như cũ.
-
----
-
-## 7. Giới hạn trung thực (đọc kỹ)
-
-1. **Khách = khóa mềm**: số local sửa devtools được (ngang gate bingo/pet cũ). Muốn cứng 100% → bật cờ `login` (bắt đăng nhập).
+1. **Khách = khóa mềm**: số local sửa devtools được. Muốn cứng 100% → bật cờ `login` (bắt đăng nhập).
 2. **Tên bình luận của khách** ké được (không tài khoản thì không có danh tính thật). Thành viên thì đếm theo `uid`, hết ké.
 3. **Heartbeat farm**: user treo tab vẫn +phút (đúng định nghĩa "online"). Server chặn gọi dồn (<50s/lần).
 4. **Supabase Free pause** sau 1 tuần không hoạt động → request đầu chậm 10–30s; user cứng có thể thấy `503 stats unavailable` 1 lần rồi thử lại là qua.
@@ -130,7 +116,7 @@ Ví dụ:
 
 ---
 
-## 8. Xử lý sự cố
+## 7. Xử lý sự cố
 
 | Hiện tượng | Nguyên nhân likely | Cách xử |
 |---|---|---|
@@ -139,7 +125,7 @@ Ví dụ:
 | `503 stats unavailable` | Supabase ngủ/lỗi | Đợi 30s thử lại; kiểm tra env service key |
 | `Vé hết hạn` ở go.html | Vé quá 15 phút | Về trang game bấm Tải lại |
 | Admin báo đỏ "CHƯA mã hóa" | Thiếu `LOCK_SECRET` local | Set env hoặc `config.php` |
-| Vẫn thấy code cũ sau deploy | SW/HTTP cache | Ctrl+F5; SW đã bump `j2me-v6` tự purge |
-| Test nhanh server | — | `node api` syntax + file test đã chạy: board 12/12, JWT+ustats 21/21, ticket hard 10/10 |
+| Vẫn thấy code cũ sau deploy | SW/HTTP cache | Ctrl+F5; SW đã bump `j2me-v8` tự purge |
+| Test nhanh server | — | `node --check api/*.js` trước mọi commit |
 
-File liên quan: `api/_lock.js`, `api/_sb.js`, `api/_bingo.js`, `api/ustats.js`, `api/ticket.js`, `api/meta.js`, `api/dl.js`, `api/comments.js`, `api/game/[slug].js`, `shared/render.mjs`, `game.html`, `go.html`, `index.html`, `category.html`, `profile.html`, `goc-senpai.html`, `assets/js/senpai.js`, `admin.php`, `supabase-gating.sql`.
+File liên quan: `api/_lock.js`, `api/_sb.js`, `api/ustats.js`, `api/ticket.js`, `api/meta.js`, `api/dl.js`, `api/comments.js`, `api/game/[slug].js`, `shared/render.mjs`, `game.html`, `go.html`, `index.html`, `category.html`, `profile.html`, `admin.php`, `supabase-gating.sql`.

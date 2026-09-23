@@ -190,7 +190,7 @@ function verifyPresence(tok, ip, cid) {
     return null;
   } catch { return null; }
 }
-// Kiểm tra proof client ký (tương thích proof cũ {id,day,lines} + proof mới có st).
+// Kiểm tra proof client ký (proof mới có st).
 // Trả về {ok, reason}.
 // - serverStats != null: KHÓA CỨNG — dùng số server-side theo tài khoản, bỏ qua tự khai.
 // - serverStats == null: phút online ƯU TIÊN presence chain đã ký (fail-closed khi có
@@ -211,29 +211,11 @@ async function checkProofExtended(p, id, gate, countApproved, serverStats, authe
     if (type === 'login') return authed ? { ok: true, hard: true } : { ok: false, reason: 'login required' };
     if (serverStats) {
       // KHÓA CỨNG mọi loại gate khi có số server-side theo tài khoản
-      if (type === 'bingo') {
-        const need = Math.max(1, parseInt(gate.lines || 1, 10) || 1);
-        if (!(serverStats.bingoLines >= need)) return { ok: false, reason: 'bingo lines' };
-        return { ok: true, hard: true };
-      }
-      if (type === 'pet') {
-        const need = Math.max(1, parseInt(gate.level || 3, 10) || 3);
-        if (!(serverStats.petLv >= need)) return { ok: false, reason: 'pet level' };
-        return { ok: true, hard: true };
-      }
-      if (type === 'badge') {
-        if (!serverStats.badges) return { ok: false, reason: 'badge' };
-        return { ok: true, hard: true };
-      }
       if (type === 'xp') {
         const need = Math.max(1, parseInt(gate.xp || 100, 10) || 100);
         if (!(serverStats.xp >= need)) return { ok: false, reason: 'xp' };
         return { ok: true, hard: true };
       }
-    }
-    if (type === 'bingo') {
-      const need = Math.max(1, parseInt(gate.lines || 1, 10) || 1);
-      if (!(o.lines >= need)) return { ok: false, reason: 'bingo lines' };
     }
     if (type === 'stats') {
       const rq = (gate && gate.require) || {};

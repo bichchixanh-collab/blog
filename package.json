@@ -1,0 +1,14 @@
+{
+  "name": "j2me-vercel-app",
+  "private": true,
+  "version": "1.0.0",
+  "description": "J2ME game blog / download gateway",
+  "engines": { "node": ">=18" },
+  "scripts": {
+    "validate": "node scripts/validate.mjs",
+    "check-syntax": "node scripts/check-syntax.mjs",
+    "build:css": "node scripts/build-css.mjs",
+    "mincss": "node scripts/mincss.mjs",
+    "migrate": "node scripts/migrate-to-supabase.js"
+  }
+}
