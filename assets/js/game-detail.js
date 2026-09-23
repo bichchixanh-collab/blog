@@ -1,6 +1,23 @@
 // game-detail
 // LÆ°u Ã½: phÃºt online cá»§a khÃ¡ch Ä‘Æ°á»£c server xÃ¡c minh qua presence chain Ä‘Ã£ kÃ½;
 // like/phÃ¡ Ä‘áº£o váº«n lÃ  sá»‘ local (khÃ³a má»m) â€” Ä‘á»§ cháº·n link copy tay qua proof.
+// Vé đọc bài: đếm thời gian mở trang (dừng khi tab ẩn), vé do server ký lúc mở trang.
+let READ={need:10,rz:'',t0:0,hideAcc:0,hideStart:0};
+function readSecsOf(g){var v=parseInt(g&&(g.read_secs),10);return (typeof v==='number'&&isFinite(v))?Math.max(1,Math.min(3600,v)):10;}
+function readStart(gid,need){READ={need:need,rz:'',t0:Date.now(),hideAcc:0,hideStart:0,ui:null,lastTry:0};try{window.__readRZ='';}catch(e){}fetch(apiRoot()+'/api/read?id='+encodeURIComponent(gid),{cache:'no-store'}).then(function(r){return r.ok?r.json():null;}).then(function(j){if(j&&j.rz){READ.rz=j.rz;try{window.__readRZ=j.rz;}catch(e){}}}).catch(function(){});try{if(READ.ui)clearInterval(READ.ui);}catch(e){}try{READ.ui=setInterval(readUI,1000);}catch(e){}}
+function readUI(){
+  try{
+    var s=Math.floor(readElapsed()/1000), need=READ.need||10;
+    var note=document.getElementById('readNote');
+    if(note){
+      note.textContent = s>=need
+        ? cmtT('g_readDone','Đã đọc đủ — bấm Tải để tiếp tục')
+        : cmtT('g_readWait','Đã đọc {s}/{n}s…').replace('{s}',s).replace('{n}',need);
+    }
+  }catch(e){}
+}
+function readElapsed(){try{var now=Date.now();var extra=(READ.hideStart?now-READ.hideStart:0);return Math.max(0,now-READ.t0-READ.hideAcc-extra);}catch(e){return 0;}}
+document.addEventListener('visibilitychange',function(){try{if(document.hidden){READ.hideStart=Date.now();}else if(READ.hideStart){READ.hideAcc+=Date.now()-READ.hideStart;READ.hideStart=0;}}catch(e){}});
 function __gate(g){
   var gt=g&&g.gate&&g.gate.type;
   if(!gt||gt==='none')return null;
@@ -62,8 +79,8 @@ function __statsRowsHtml(rows){
     return '<div class="lockrow '+cls+'"><span>'+ic+'</span><span>'+r.label+'</span><b>'+pr+'</b>'+(r.ok?'':(r.hint||''))+'</div>';
   }).join('');
 }
-// Live refresh há»™p khÃ³a trong modal: cáº­p nháº­t sá»‘ phÃºt realtime (10s/láº§n),
-// tá»± xin vÃ© + sang trang táº£i ngay khi Ä‘á»§ Ä‘iá»u kiá»‡n. Dá»«ng khi Ä‘Ã³ng modal.
+// Live refresh hộp khóa trong modal: vẽ lại số liệu mỗi 2s (realtime),
+// tự xin vé + sang trang tải ngay khi đủ điều kiện (vé cách nhau ≥10s). Dừng khi đóng modal.
 let __lockTimer=null, __lockAppr=null, __lockTick=0;
 function __lockStop(){ try{ if(__lockTimer){ clearInterval(__lockTimer); __lockTimer=null; } }catch(e){} }
 function __lockHead(){
@@ -73,7 +90,7 @@ function __lockHead(){
 }
 function __lockPaint(msg,rows,head,foot){ try{ msg.innerHTML=(head||__lockHead())+'<div style="margin-top:6px;text-align:left">'+__statsRowsHtml(rows)+'</div>'+(foot||''); }catch(e){} }
 function __lockLive(gid,gm,msg,res,head,foot){
-  __lockStop(); __lockTick=0;
+  __lockStop(); __lockTick=0; __lockLastTry=0;
   __lockTimer=setInterval(function(){
     try{
       if(!document.body.contains(msg)||document.getElementById('dlModal').classList.contains('hidden')){ __lockStop(); return; }
@@ -83,7 +100,8 @@ function __lockLive(gid,gm,msg,res,head,foot){
         var needCmt=rows.some(function(r){return r.k==='c';});
         var paint=function(rr){
           __lockPaint(msg,rr,head,foot);
-          if(__statsPass(rr)){ __lockStop(); msg.textContent=cmtT('g_getting','Äá»§ Ä‘iá»u kiá»‡n! Äang láº¥y vÃ©...'); __ticketAndGo(gid,res,msg,true); }
+          var now=Date.now();
+          if(__statsPass(rr)&&(!READ.lastTry||now-READ.lastTry>10000)){ try{READ.lastTry=now;}catch(e){} __lockStop(); msg.textContent=cmtT('g_getting','Đủ điều kiện! Đang lấy vé...'); __ticketAndGo(gid,res,msg,true); }
         };
         if(needCmt&&(__lockTick%3===0)){ try{stApprovedCount(function(n){__lockAppr=n;paint(__statsRows(gm,n));});}catch(e){paint(rows);} }
         else paint(rows);
@@ -92,7 +110,7 @@ function __lockLive(gid,gm,msg,res,head,foot){
       if(__lockTick%3===0){ try{__pullSrvVals(doPaint);}catch(e){doPaint();} }
       else doPaint();
     }catch(e){}
-  },10000);
+  },2000);
 }
 function __ticketAndGo(gid,res,msgEl,wasPassing){
   __lockStop();
@@ -388,9 +406,3 @@ document.addEventListener('i18n-ready',function(){
   }catch(e){}
   try{ if(document.getElementById('ecoBox')&&typeof ecoRender==='function'){ ecoRender(); } }catch(e){}
 });
-// Vé đọc bài: đếm thời gian mở trang (dừng khi tab ẩn), vé do server ký lúc mở trang.
-let READ={need:10,rz:'',t0:0,hideAcc:0,hideStart:0};
-function readSecsOf(g){var v=parseInt(g&&(g.read_secs),10);return (typeof v==='number'&&isFinite(v))?Math.max(1,Math.min(3600,v)):10;}
-function readStart(gid,need){READ={need:need,rz:'',t0:Date.now(),hideAcc:0,hideStart:0};try{window.__readRZ='';}catch(e){}fetch(apiRoot()+'/api/read?id='+encodeURIComponent(gid),{cache:'no-store'}).then(function(r){return r.ok?r.json():null;}).then(function(j){if(j&&j.rz){READ.rz=j.rz;try{window.__readRZ=j.rz;}catch(e){}}}).catch(function(){});}
-function readElapsed(){try{var now=Date.now();var extra=(READ.hideStart?now-READ.hideStart:0);return Math.max(0,now-READ.t0-READ.hideAcc-extra);}catch(e){return 0;}}
-document.addEventListener('visibilitychange',function(){try{if(document.hidden){READ.hideStart=Date.now();}else if(READ.hideStart){READ.hideAcc+=Date.now()-READ.hideStart;READ.hideStart=0;}}catch(e){}});
