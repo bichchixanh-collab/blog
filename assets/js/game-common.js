@@ -38,7 +38,6 @@ function renderCreditBox(inner,headerHtml){
   +'<div style="margin-top:8px"><button type="button" data-credit-copy="1" style="background:#7a5a00;color:#fff;border:none;border-radius:6px;padding:5px 12px;font-size:11px;font-weight:700;cursor:pointer">'+cmtT('g_creditCopy','ðŸ“‹ ChÃ©p credit')+'</button></div></div>';
 }
 document.addEventListener('click',function(e){var b=e.target&&e.target.closest?e.target.closest('[data-credit-copy]'):null;if(!b)return;try{navigator.clipboard.writeText(b.parentNode.parentNode.innerText).then(function(){b.textContent=cmtT('g_creditCopied','âœ“ ÄÃ£ chÃ©p!');}).catch(function(){});}catch(err){}});
-document.addEventListener('click',function(e){var b=e.target&&e.target.closest?e.target.closest('[data-relock]'):null;if(!b)return;try{localStorage.removeItem('j2me_presence');}catch(err){}location.reload();});
 document.addEventListener('click',function(e){
   var b=e.target&&e.target.closest?e.target.closest('[data-eco-comment]'):null;if(!b)return;
   try{var mc=document.getElementById('modalCancel');if(mc)mc.click();}catch(err){}
@@ -114,11 +113,6 @@ try{document.querySelectorAll('.js-year').forEach(function(el){el.textContent=ne
 // Stats local cho khÃ³a táº£i: phÃºt online + lÆ°á»£t thÃ­ch + phÃ¡ Ä‘áº£o + tÃªn bÃ¬nh luáº­n
 function stGet(k,d){try{var v=localStorage.getItem(k);return v==null?d:JSON.parse(v);}catch(e){return d;}}
 function stSet(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
-function stMinutes(){return Math.floor((+stGet('j2me_online_ms',0))/60000);}
-// Sá»‘ phÃºt Ä‘Ã£ kÃ½ bá»Ÿi server (presence chain) â€” Ä‘Ã¢y má»›i lÃ  sá»‘ Ä‘Æ°á»£c cháº¥p nháº­n khi xin vÃ©.
-// ChÆ°a cÃ³ chain thÃ¬ rá»›t vá» sá»‘ local Ä‘á»ƒ hiá»ƒn thá»‹; server siáº¿t: thiáº¿u chain há»£p lá»‡ lÃ  rá»›t vÃ©.
-function stPresence(){try{var p=JSON.parse(localStorage.getItem('j2me_presence')||'null');if(p&&typeof p.tok==='string'&&p.tok)return {tok:p.tok,n:Math.max(0,parseInt(p.n||0,10)||0)};}catch(e){}return null;}
-function stVerifiedMin(){var pr=stPresence();return pr?pr.n:stMinutes();}
 function stLikes(){var a=stGet('j2me_favs',[]);return Array.isArray(a)?a.length:0;}
 function stDone(){var a=stGet('j2me_done',[]);return Array.isArray(a)?a.length:0;}
 function stNames(){var a=stGet('j2me_names',[]);return Array.isArray(a)?a.filter(Boolean).slice(0,5):[];}
@@ -135,7 +129,6 @@ function stEvent(t,id){try{var tk=stToken();if(!tk)return;fetch(stApiRoot()+'/ap
 var _stApprCache={at:0,n:-1};
 function stCid(){try{var c=localStorage.getItem('j2me_cid');if(typeof c==='string'&&/^[0-9a-f]{24}$/.test(c))return c;c='';var ch='0123456789abcdef';for(var i=0;i<24;i++)c+=ch[Math.floor(Math.random()*16)];try{localStorage.setItem('j2me_cid',c);}catch(e){}return c;}catch(e){return '';}}
 function stApprovedCount(cb){var now=Date.now();if(_stApprCache.n>=0&&now-_stApprCache.at<60000){cb(_stApprCache.n);return;}var tk='';try{tk=stToken();}catch(e){}var names=stNames();if(!tk&&!names.length){cb(0);return;}var url=stApiRoot()+'/api/comments?mine=1'+(names.length?'&names='+encodeURIComponent(names.join(',')):'');var hh=tk?{'Authorization':'Bearer '+tk}:{};fetch(url,{headers:hh,cache:'no-store'}).then(function(r){return r.json();}).then(function(j){var n=+(j&&j.mine)||0;_stApprCache={at:now,n:n};cb(n);}).catch(function(){cb(_stApprCache.n>=0?_stApprCache.n:0);});}
-(function(){try{setInterval(function(){try{if(document.hidden)return;var ms=+localStorage.getItem('j2me_online_ms')||0;localStorage.setItem('j2me_online_ms',String(ms+60000));}catch(e){}try{var tk=stToken();if(tk)fetch(stApiRoot()+'/api/ustats',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+tk},body:JSON.stringify({t:'heartbeat'}),keepalive:true}).catch(function(){});}catch(e){}try{var pr=null;try{pr=JSON.parse(localStorage.getItem('j2me_presence')||'null');}catch(e){}fetch(stApiRoot()+'/api/presence',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({tok:(pr&&pr.tok)||'',cid:stCid()}),keepalive:true}).then(function(r){return r.json();}).then(function(j){if(j&&j.tok)try{localStorage.setItem('j2me_presence',JSON.stringify({tok:j.tok,n:j.n||0}));}catch(e){}}).catch(function(){});}catch(e){}},60000);}catch(e){}})();
 
 // Cai app PWA (thay onclick inline de dat CSP strict).
 document.addEventListener('click',function(e){var b=e.target&&e.target.closest?e.target.closest('[data-pwa-install]'):null;if(!b)return;e.preventDefault();try{installApp();}catch(err){}});

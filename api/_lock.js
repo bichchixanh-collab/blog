@@ -1,9 +1,6 @@
-// api/_lock.js — dùng chung cho khóa tải: vé HMAC, mã hóa URL, proof mở rộng.
-// Phút online của khách được chứng minh bằng presence chain (HMAC, stateless):
-// mỗi link cách nhau ≥50s nên không thể bịa số phút mà không chờ thời gian thật.
+// api/_lock.js — dùng chung cho khóa tải: vé HMAC, mã hóa URL, proof mở rộng, vé đọc bài.
 // Like/phá đảo vẫn là số local (khóa mềm); bình luận duyệt được server đếm chéo.
-// Cần LOCK_SECRET (Vercel env + local admin) để vé/URL/presence chống giả thật sự;
-// thiếu secret thì phút online rớt về chế độ mềm cũ (tin st.min tự khai).
+// Cần LOCK_SECRET (Vercel env + local admin) để vé/URL/vé đọc chống giả thật sự.
 const crypto = require('crypto');
 
 function lockSecret() {
@@ -86,117 +83,46 @@ function resolveJarUrl(jar, resName, gameId) {
   if (stored.startsWith('ENC:')) return decryptUrl(stored, gameId);
   return /^https?:\/\//i.test(stored) ? stored : null;
 }
-// --- Presence chain: chứng minh phút online của khách, không tài khoản, không DB ---
-// Token = {v,n,iat,iph} + HMAC(LOCK_SECRET). Mỗi link nối tiếp yêu cầu link trước
-// hợp lệ và cách nhau ≥50s (thời gian lấy từ iat đã ký — client không bịa được).
-// Song song bao nhiêu tab cũng không tăng nhanh hơn 1 link/50s vì iat neo theo link mới nhất.
-// iph = hash IP: share token sang IP khác thì rớt (chấp nhận phần dư cùng NAT).
-const PRESENCE_MIN_MS = 50 * 1000;
-const PRESENCE_MAX_AGE_MS = 48 * 3600 * 1000; // khớp cửa sổ proof day (±2 ngày)
-function presenceIpHash(ip) {
-  try { return crypto.createHash('sha256').update(String(ip || ''), 'utf8').digest('hex').slice(0, 16); }
-  catch { return ''; }
-}
-// cidh = hash device-id của client: cùng máy thì nối chuỗi bất kể đổi IP;
-// khác máy (kể cả copy token) thì không nối được vì không nêu đúng cid.
-function presenceCidHash(cid) {
+// --- Vé đọc bài (reading nonce): chứng minh đã mở trang đủ lâu, stateless ---
+// Server ký mốc mở trang (HMAC theo game + thời điểm); lúc xin vé kiểm tra
+// thời gian đã trôi qua có đủ số giây yêu cầu không. Không bịa được vì HMAC,
+// không phụ thuộc IP/máy (đổi mạng giữa chừng vẫn pass).
+const READ_NONCE_MAX_AGE_MS = 2 * 3600 * 1000;
+function mintReadNonce(id) {
   try {
-    const s = String(cid || '').trim();
-    if (!s) return '';
-    return crypto.createHash('sha256').update('cid/' + s, 'utf8').digest('hex').slice(0, 16);
+    const t0 = Date.now();
+    const body = `${id}.${t0}`;
+    const sig = crypto.createHmac('sha256', hkey('read')).update(body, 'utf8').digest('hex').slice(0, 32);
+    return b64uEncode(Buffer.from(`${body}.${sig}`, 'utf8'));
   } catch { return ''; }
 }
-// Gắn chain theo SUBNET (IPv4 /24, IPv6 /64) thay vì IP đầy đủ: mạng di động
-// đổi IP trong cùng dải vẫn giữ chuỗi (khỏi kẹt vé oan), khác dải vẫn rớt.
-function presenceNetHash(ip) {
+function verifyReadNonce(rz, id, needSecs) {
   try {
-    const s = String(ip || '').trim();
-    if (s.includes(':')) {
-      const parts = s.split(':').filter(Boolean);
-      const prefix = parts.slice(0, 4).join(':').toLowerCase();
-      return crypto.createHash('sha256').update('v6/' + prefix, 'utf8').digest('hex').slice(0, 16);
-    }
-    const m = s.match(/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.\d{1,3}$/);
-    const key = m ? `v4/${m[1]}.${m[2]}.${m[3]}` : `raw/${s}`;
-    return crypto.createHash('sha256').update(key, 'utf8').digest('hex').slice(0, 16);
-  } catch { return ''; }
-}
-function signPresence(o) {
-  const body = b64uEncode(JSON.stringify(o));
-  const sig = crypto.createHmac('sha256', hkey('presence')).update(body, 'utf8').digest('hex');
-  return `${body}.${sig}`;
-}
-function readPresence(tok) {
-  try {
-    if (!tok || typeof tok !== 'string') return null;
-    const parts = tok.split('.');
-    if (parts.length !== 2) return null;
-    const [body, sig] = parts;
-    const want = crypto.createHmac('sha256', hkey('presence')).update(body, 'utf8').digest('hex');
-    const a = Buffer.from(String(sig).toLowerCase(), 'utf8');
-    const b = Buffer.from(want, 'utf8');
-    if (a.length !== b.length || !crypto.timingSafeEqual(a, b)) return null;
-    const raw = b64uDecode(body);
-    if (!raw) return null;
-    const o = JSON.parse(raw.toString('utf8'));
-    if (!o || o.v !== 1 || typeof o.n !== 'number' || typeof o.iat !== 'number') return null;
-    if (o.cidh != null && typeof o.cidh !== 'string') return null;
-    return o;
-  } catch { return null; }
-}
-// Đổi link mới. Trả về token (mới hoặc giữ nguyên nếu gọi quá sớm — idempotent).
-// Ưu tiên nối theo device-id (đổi IP thoải mái); token cũ chưa có cidh thì nối
-// theo subnet 1 lần để migrate (không bắt đếm lại), rồi gắn cid mới từ đó.
-function mintPresence(prevTok, ip, cid) {
-  try {
+    const raw = b64uDecode(rz);
+    if (!raw) return false;
+    const parts = raw.toString('utf8').split('.');
+    if (parts.length !== 3) return false;
+    const [rid, t0s, sig] = parts;
+    if (!rid || rid !== id) return false;
+    const t0 = parseInt(t0s, 10);
+    if (!Number.isFinite(t0)) return false;
     const now = Date.now();
-    const cidh = presenceCidHash(cid);
-    const curNet = presenceNetHash(ip);
-    const prev = readPresence(prevTok);
-    const fresh = !!(prev && !(prev.iat > now + 120 * 1000));
-    let cont = false;
-    if (prev && fresh) {
-      if (cidh && prev.cidh === cidh) cont = true; // cùng máy: bỏ qua IP
-      else if (!prev.cidh && prev.iph && (prev.iph === curNet || prev.iph === presenceIpHash(ip))) cont = true; // token cũ: theo subnet
-      else if (!cidh && prev.cidh && prev.iph && (prev.iph === curNet || prev.iph === presenceIpHash(ip))) cont = true; // client cũ không gửi cid
-    }
-    if (cont) {
-      if (now - prev.iat < PRESENCE_MIN_MS) return prevTok; // quá sớm: giữ nguyên, không lỗi
-      const base = Math.max(0, Math.floor(prev.n) || 0);
-      const o = { v: 1, n: Math.min(99999, base + 1), iat: now, iph: prev.iph || curNet };
-      if (cidh) o.cidh = cidh; else if (prev.cidh) o.cidh = prev.cidh;
-      return signPresence(o);
-    }
-    const o0 = { v: 1, n: 0, iat: now, iph: curNet };
-    if (cidh) o0.cidh = cidh;
-    return signPresence(o0);
-  } catch { return null; }
-}
-// Verify token nộp kèm proof. Trả về {n} hoặc null.
-function verifyPresence(tok, ip, cid) {
-  try {
-    const o = readPresence(tok);
-    if (!o) return null;
-    const now = Date.now();
-    if (o.iat > now + 120 * 1000) return null;
-    if (now - o.iat > PRESENCE_MAX_AGE_MS) return null;
-    const n = Math.floor(o.n);
-    if (!Number.isFinite(n) || n < 0 || n > 99999) return null;
-    const cidh = presenceCidHash(cid);
-    if (o.cidh && cidh && o.cidh === cidh) return { n }; // cùng máy: bỏ qua IP
-    if (o.cidh && !cidh) return null; // token gắn máy khác mà không nêu cid
-    // Token cũ chưa gắn máy: chấp nhận cả iph subnet mới lẫn iph IP-cũ (tương thích trước deploy)
-    if (!o.cidh && (o.iph === presenceNetHash(ip) || o.iph === presenceIpHash(ip))) return { n };
-    return null;
-  } catch { return null; }
+    if (t0 > now + 60000) return false;
+    if (now - t0 > READ_NONCE_MAX_AGE_MS) return false;
+    const want = crypto.createHmac('sha256', hkey('read')).update(`${rid}.${t0s}`, 'utf8').digest('hex').slice(0, 32);
+    const a = Buffer.from(String(sig), 'utf8'), b = Buffer.from(want, 'utf8');
+    if (a.length !== b.length || !crypto.timingSafeEqual(a, b)) return false;
+    const need = Math.max(1, Math.min(3600, parseInt(needSecs, 10) || 10));
+    return (now - t0) >= need * 1000;
+  } catch { return false; }
 }
 // Kiểm tra proof client ký (proof mới có st).
 // Trả về {ok, reason}.
+// - readSecs > 0: BẮT BUỘC với mọi lượt xin vé (kể cả gate none) — phải mở trang
+//   đủ số giây (vé đọc do server ký lúc mở trang, không bịa được, không phụ thuộc IP).
 // - serverStats != null: KHÓA CỨNG — dùng số server-side theo tài khoản, bỏ qua tự khai.
-// - serverStats == null: phút online ƯU TIÊN presence chain đã ký (fail-closed khi có
-//   LOCK_SECRET); chỉ rớt về st.min tự khai khi thiếu secret (chế độ dev).
 //   Like/phá đảo vẫn mềm; bình luận duyệt đếm chéo theo tên.
-async function checkProofExtended(p, id, gate, countApproved, serverStats, authed, clientIp) {
+async function checkProofExtended(p, id, gate, countApproved, serverStats, authed, clientIp, readSecs) {
   try {
     if (!p) return { ok: false, reason: 'missing proof' };
     const raw = b64uDecode(p);
@@ -206,6 +132,13 @@ async function checkProofExtended(p, id, gate, countApproved, serverStats, authe
     const dayMs = Date.parse(`${o.day}T00:00:00Z`);
     if (Number.isNaN(dayMs)) return { ok: false, reason: 'bad proof' };
     if (Math.abs(Date.now() - dayMs) > 2 * 864e5) return { ok: false, reason: 'stale proof' };
+    const needRead = readSecs === 0 || readSecs === '0'
+      ? 0
+      : (() => { const v = parseInt(readSecs, 10); return Number.isFinite(v) ? Math.max(1, Math.min(3600, v)) : 10; })();
+    if (needRead > 0) {
+      const rz = o && typeof o.rz === 'string' ? o.rz.slice(0, 512) : '';
+      if (!verifyReadNonce(rz, id, needRead)) return { ok: false, reason: 'read' };
+    }
     const type = gate && gate.type;
     // Chỉ bắt đăng nhập: chỉ pass khi caller đã xác thực token (authed), fail-closed
     if (type === 'login') return authed ? { ok: true, hard: true } : { ok: false, reason: 'login required' };
@@ -220,7 +153,6 @@ async function checkProofExtended(p, id, gate, countApproved, serverStats, authe
     if (type === 'stats') {
       const rq = (gate && gate.require) || {};
       if (serverStats) {
-        if (rq.minutes != null && !(serverStats.min >= rq.minutes)) return { ok: false, reason: 'minutes' };
         if (rq.likes != null && !(serverStats.likes >= rq.likes)) return { ok: false, reason: 'likes' };
         if (rq.completed != null && !(serverStats.done >= rq.completed)) return { ok: false, reason: 'completed' };
         if (rq.comments != null && !(serverStats.approved >= rq.comments)) return { ok: false, reason: 'comments' };
@@ -228,19 +160,6 @@ async function checkProofExtended(p, id, gate, countApproved, serverStats, authe
       }
       const st = (o && o.st) || {};
       const num = (v) => (typeof v === 'number' && Number.isFinite(v) ? v : -1);
-      if (rq.minutes != null) {
-        // Ưu tiên presence chain đã ký — gắn theo máy (cid), đổi IP thoải mái;
-        // không bịa được nếu không có LOCK_SECRET. Token cũ chưa có cid thì theo subnet.
-        const cid = o && typeof o.cid === 'string' ? o.cid.slice(0, 64) : '';
-        const pv = verifyPresence(o.presence, clientIp, cid);
-        if (pv) {
-          if (!(pv.n >= rq.minutes)) return { ok: false, reason: 'minutes' };
-        } else if (lockSecret()) {
-          return { ok: false, reason: 'minutes' }; // siết: có secret mà không có chain hợp lệ
-        } else if (!(num(st.min) >= rq.minutes)) {
-          return { ok: false, reason: 'minutes' }; // thiếu secret: giữ chế độ mềm cũ
-        }
-      }
       if (rq.likes != null && !(num(st.likes) >= rq.likes)) return { ok: false, reason: 'likes' };
       if (rq.completed != null && !(num(st.done) >= rq.completed)) return { ok: false, reason: 'completed' };
       if (rq.comments != null) {
@@ -254,4 +173,9 @@ async function checkProofExtended(p, id, gate, countApproved, serverStats, authe
     return { ok: true };
   } catch { return { ok: false, reason: 'bad proof' }; }
 }
-module.exports = { lockSecret, hkey, b64uEncode, b64uDecode, gateHash, stableGate, mintTicket, verifyTicket, decryptUrl, resolveJarUrl, checkProofExtended, mintPresence, verifyPresence, readPresence, presenceIpHash, TICKET_TTL_MS };
+// Số giây đọc bài yêu cầu của 1 game (admin set tùy ý, mặc định 10).
+function readSecsOf(g) {
+  const v = parseInt(g && g.read_secs, 10);
+  return Number.isFinite(v) ? Math.max(1, Math.min(3600, v)) : 10;
+}
+module.exports = { lockSecret, hkey, b64uEncode, b64uDecode, gateHash, stableGate, mintTicket, verifyTicket, decryptUrl, resolveJarUrl, checkProofExtended, mintReadNonce, verifyReadNonce, readSecsOf, TICKET_TTL_MS };

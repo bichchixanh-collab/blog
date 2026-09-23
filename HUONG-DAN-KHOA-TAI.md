@@ -34,11 +34,12 @@ Ví dụ:
 "gate": { "type": "login" }
 ```
 
-4 chỉ số stats lấy ở đâu:
-- **minutes**: heartbeat 60s/tab đang mở (local `j2me_online_ms` + server `user_stats.minutes` nếu đã login).
+3 chỉ số stats lấy ở đâu:
 - **likes**: nút Thích/♥ (`j2me_favs` + server khi login).
 - **completed**: nút "Phá đảo?" (`j2me_done` + server khi login).
-- **comments**: bình luận **đã duyệt** — khách đếm theo tên đã dùng, thành viên đếm theo tài khoản.
+- **comments**: bình luận **đã duyệt và đạt chuẩn** (≥12 ký tự, không spam) — khách đếm theo tên đã dùng, thành viên đếm theo tài khoản.
+
+Ngoài ra mọi lượt tải đều cần **đọc bài đủ số giây** (`read_secs` từng bài, mặc định 10): mở trang là server ký vé đọc, xin vé tải thì đối chiếu thời gian — không phụ thuộc IP/máy.
 
 ---
 
@@ -109,7 +110,7 @@ Ví dụ:
 
 1. **Khách = khóa mềm**: số local sửa devtools được. Muốn cứng 100% → bật cờ `login` (bắt đăng nhập).
 2. **Tên bình luận của khách** ké được (không tài khoản thì không có danh tính thật). Thành viên thì đếm theo `uid`, hết ké.
-3. **Heartbeat farm**: user treo tab vẫn +phút (đúng định nghĩa "online"). Server chặn gọi dồn (<50s/lần).
+3. **Treo tab**: không còn tác dụng cày giờ — điều kiện đọc tính theo thời gian mở trang bài đó (tab ẩn không tính).
 4. **Supabase Free pause** sau 1 tuần không hoạt động → request đầu chậm 10–30s; user cứng có thể thấy `503 stats unavailable` 1 lần rồi thử lại là qua.
 5. **Vercel Hobby**: mỗi lượt tải = 3 invocations (ticket+meta+dl, mỗi cái vài chục ms) trong quota 1M/tháng; heartbeat 60/user-giờ. Supabase Free: unlimited API requests. Không chạm GitHub (vé không ghi commit nào).
 6. Đổi `LOCK_SECRET`/`SUPABASE_*` → vé cũ chết hàng loạt là **đúng thiết kế**, user bấm Tải lại là có vé mới.

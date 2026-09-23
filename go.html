@@ -81,10 +81,9 @@ var el=document.getElementById('clock');if(el)el.textContent=new Date().toLocale
     }).join('');
   }
   function goRows(gate,appr,sv){
-    var rq=(gate&&gate.require)||{},rows=[],mn=0,lk=0,dn=0;
-    if(sv){mn=+sv.minutes||0;lk=+sv.likes||0;dn=+sv.completed||0;}
-    else{try{mn=stVerifiedMin();}catch(e){} try{lk=stLikes();}catch(e){} try{dn=stDone();}catch(e){}}
-    if(rq.minutes!=null)rows.push({need:+rq.minutes,has:mn,ok:mn>=+rq.minutes,pending:false,label:T('go_req_min','Online đủ {n} phút').replace('{n}',rq.minutes),hint:'<small>'+T('go_auto','mở web là tự tính')+'</small>'});
+    var rq=(gate&&gate.require)||{},rows=[],lk=0,dn=0;
+    if(sv){lk=+sv.likes||0;dn=+sv.completed||0;}
+    else{try{lk=stLikes();}catch(e){} try{dn=stDone();}catch(e){}}
     if(rq.likes!=null)rows.push({need:+rq.likes,has:lk,ok:lk>=+rq.likes,pending:false,label:T('go_req_like','Thích {n} game').replace('{n}',rq.likes),hint:'<a href="'+root()+'/index.html" style="color:#0066cc">'+T('go_likeNow','→ thích ngay')+'</a>'});
     if(rq.completed!=null)rows.push({need:+rq.completed,has:dn,ok:dn>=+rq.completed,pending:false,label:T('go_req_done','Phá đảo {n} game').replace('{n}',rq.completed),hint:'<small>'+T('go_doneHint','bấm "Phá đảo?" ở trang game')+'</small>'});
     if(rq.comments!=null){var pend=(appr==null);rows.push({need:+rq.comments,has:pend?-1:appr,ok:!pend&&appr>=+rq.comments,pending:pend,label:T('go_req_cmt','Có {n} bình luận được duyệt').replace('{n}',rq.comments),hint:'<small>'+T('go_cmtHint','bình luận ở trang game, chờ duyệt')+'</small>'});}
@@ -120,7 +119,7 @@ var el=document.getElementById('clock');if(el)el.textContent=new Date().toLocale
       // Đã đăng nhập: lấy số server-side cho hiển thị (server đã kiểm cứng lúc cấp vé)
       function withVals(cb){
         if(!hardNow){cb(null);return;}
-        try{fetch(root()+'/api/ustats',{headers:{'Authorization':'Bearer '+stToken()},cache:'no-store'}).then(function(r){return r.json();}).then(function(j){cb(j&&typeof j.minutes==='number'?j:null);}).catch(function(){cb(null);});}catch(e){cb(null);}
+        try{fetch(root()+'/api/ustats',{headers:{'Authorization':'Bearer '+stToken()},cache:'no-store'}).then(function(r){return r.json();}).then(function(j){cb(j&&typeof j.likes==='number'?j:null);}).catch(function(){cb(null);});}catch(e){cb(null);}
       }
       withVals(function(sv){
         var rows0=goRows(gate,null,sv);
@@ -151,20 +150,17 @@ var el=document.getElementById('clock');if(el)el.textContent=new Date().toLocale
       });
     }).catch(function(){fail(T('go_nocheck','Không kiểm tra được vé lúc này.'));});
   }
-  if(typeof stMinutes==='function')boot();
-  else document.addEventListener('DOMContentLoaded',boot,{once:true});
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});
+  else boot();
   // Vẽ lại khi i18n sẵn sàng / đổi ngôn ngữ (vé đọc từ URL nên boot lại an toàn)
   document.addEventListener('i18n-ready',function(){try{if(window.I18N&&I18N.lang&&I18N.lang()!=='vi')boot();}catch(e){}});
 })();
 </script>
 <script>try{document.querySelectorAll('.js-year').forEach(function(el){el.textContent=new Date().getFullYear();});}catch(e){}</script>
 <script>
-// Stats local cho khóa tải: phút online + lượt thích + phá đảo + tên bình luận
+// Stats local cho khoa tai: luot thich + pha dao + ten binh luan
 function stGet(k,d){try{var v=localStorage.getItem(k);return v==null?d:JSON.parse(v);}catch(e){return d;}}
 function stSet(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
-function stMinutes(){return Math.floor((+stGet('j2me_online_ms',0))/60000);}
-function stPresence(){try{var p=JSON.parse(localStorage.getItem('j2me_presence')||'null');if(p&&typeof p.tok==='string'&&p.tok)return {tok:p.tok,n:Math.max(0,parseInt(p.n||0,10)||0)};}catch(e){}return null;}
-function stVerifiedMin(){var pr=stPresence();return pr?pr.n:stMinutes();}
 function stLikes(){var a=stGet('j2me_favs',[]);return Array.isArray(a)?a.length:0;}
 function stDone(){var a=stGet('j2me_done',[]);return Array.isArray(a)?a.length:0;}
 function stNames(){var a=stGet('j2me_names',[]);return Array.isArray(a)?a.filter(Boolean).slice(0,5):[];}
@@ -176,9 +172,7 @@ function stLogged(){return !!stToken();}
 function stAuthHeaders(){var t=stToken();return t?{'Authorization':'Bearer '+t}:{};}
 function stEvent(t,id){try{var tk=stToken();if(!tk)return;fetch(stApiRoot()+'/api/ustats',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+tk},body:JSON.stringify({t:t,id:String(id||'').slice(0,120)}),keepalive:true}).catch(function(){});}catch(e){}}
 var _stApprCache={at:0,n:-1};
-function stCid(){try{var c=localStorage.getItem('j2me_cid');if(typeof c==='string'&&/^[0-9a-f]{24}$/.test(c))return c;c='';var ch='0123456789abcdef';for(var i=0;i<24;i++)c+=ch[Math.floor(Math.random()*16)];try{localStorage.setItem('j2me_cid',c);}catch(e){}return c;}catch(e){return '';}}
 function stApprovedCount(cb){var now=Date.now();if(_stApprCache.n>=0&&now-_stApprCache.at<60000){cb(_stApprCache.n);return;}var tk='';try{tk=stToken();}catch(e){}var names=stNames();if(!tk&&!names.length){cb(0);return;}var url=stApiRoot()+'/api/comments?mine=1'+(names.length?'&names='+encodeURIComponent(names.join(',')):'');var hh=tk?{'Authorization':'Bearer '+tk}:{};fetch(url,{headers:hh,cache:'no-store'}).then(function(r){return r.json();}).then(function(j){var n=+(j&&j.mine)||0;_stApprCache={at:now,n:n};cb(n);}).catch(function(){cb(_stApprCache.n>=0?_stApprCache.n:0);});}
-(function(){try{setInterval(function(){try{if(document.hidden)return;var ms=+localStorage.getItem('j2me_online_ms')||0;localStorage.setItem('j2me_online_ms',String(ms+60000));}catch(e){}try{var tk=stToken();if(tk)fetch(stApiRoot()+'/api/ustats',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+tk},body:JSON.stringify({t:'heartbeat'}),keepalive:true}).catch(function(){});}catch(e){}try{var pr=null;try{pr=JSON.parse(localStorage.getItem('j2me_presence')||'null');}catch(e){}fetch(stApiRoot()+'/api/presence',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({tok:(pr&&pr.tok)||'',cid:stCid()}),keepalive:true}).then(function(r){return r.json();}).then(function(j){if(j&&j.tok)try{localStorage.setItem('j2me_presence',JSON.stringify({tok:j.tok,n:j.n||0}));}catch(e){}}).catch(function(){});}catch(e){}},60000);}catch(e){}})();
 </script>
 <script src="assets/i18n.js?v=5"></script>
 </body>

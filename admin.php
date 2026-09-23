@@ -358,7 +358,6 @@ if (isset($_POST['save'])) {
             if ($gateType === 'stats') {
                 // Mỗi điều kiện tách riêng, tích nhiều = phải đủ TẤT CẢ (AND)
                 $rq = [];
-                if (isset($_POST['rq_minutes_on'])) $rq['minutes'] = max(1, min(100000, (int)($_POST['rq_minutes'] ?? 30)));
                 if (isset($_POST['rq_likes_on'])) $rq['likes'] = max(1, min(10000, (int)($_POST['rq_likes'] ?? 5)));
                 if (isset($_POST['rq_completed_on'])) $rq['completed'] = max(1, min(10000, (int)($_POST['rq_completed'] ?? 3)));
                 if (isset($_POST['rq_comments_on'])) $rq['comments'] = max(1, min(10000, (int)($_POST['rq_comments'] ?? 3)));
@@ -367,7 +366,9 @@ if (isset($_POST['save'])) {
             }
             if ($gateType !== 'none' && isset($_POST['gate_login'])) $gate['login'] = 1;
             // Giá tải EXP (admin set tùy ý; tải lại game đã sở hữu thì miễn phí)
+            // + thời gian đọc bài (giây, mặc định 10) để mở tải
             $dlCost = max(0, min(100000, (int)($_POST['dl_cost'] ?? 10)));
+            $readSecs = max(1, min(3600, (int)($_POST['read_secs'] ?? 10)));
             $createdAt = $editGame['created_at'] ?? date('c');
             $g = [
                 'id'=>$id,
@@ -380,6 +381,7 @@ if (isset($_POST['save'])) {
                 'new'=>isset($_POST['new']),
                 'gate'=>$gate,
                 'dl_cost'=>$dlCost,
+                'read_secs'=>$readSecs,
                 'desc'=>trim($_POST['desc'] ?? ''),
                 'thumb'=>$thumb,
                 'shots'=>$shots,
@@ -452,12 +454,13 @@ if (isset($_POST['import'])) {
                 $gt=is_array($it['gate']??null)?$it['gate']:[];
                 $gtT=in_array($gt['type']??'none',['none','xp','stats','login'],true)?$gt['type']:'none';
                 $it['gate']=['type'=>$gtT,'xp'=>max(1,(int)($gt['xp']??100))];
-                if($gtT==='stats'){ $rq=[]; if(isset($gt['require']['minutes']))$rq['minutes']=max(1,min(100000,(int)$gt['require']['minutes'])); if(isset($gt['require']['likes']))$rq['likes']=max(1,min(10000,(int)$gt['require']['likes'])); if(isset($gt['require']['completed']))$rq['completed']=max(1,min(10000,(int)$gt['require']['completed'])); if(isset($gt['require']['comments']))$rq['comments']=max(1,min(10000,(int)$gt['require']['comments'])); $it['gate']['require']=$rq; }
+                if($gtT==='stats'){ $rq=[]; if(isset($gt['require']['likes']))$rq['likes']=max(1,min(10000,(int)$gt['require']['likes'])); if(isset($gt['require']['completed']))$rq['completed']=max(1,min(10000,(int)$gt['require']['completed'])); if(isset($gt['require']['comments']))$rq['comments']=max(1,min(10000,(int)$gt['require']['comments'])); $it['gate']['require']=$rq; }
                 if(!empty($gt['login']))$it['gate']['login']=1;
                 if(empty($it['created_at'])) $it['created_at']=date('c');
                 $it['updated_at']=date('c');
                 foreach(['cat','size','desc','thumb'] as $k) $it[$k]=(string)($it[$k]??'');
                 $it['dl_cost']=max(0,min(100000,(int)($it['dl_cost']??10)));
+                $it['read_secs']=max(1,min(3600,(int)($it['read_secs']??10)));
                 $clean[]=$it;
             }
             if(!$clean){ $msg='Không có bài nào hợp lệ trong file.'; $msgType='error'; }
@@ -867,14 +870,14 @@ hr{border:none;border-top:1px dashed #d6deea;margin:12px 0}
         </div>
         <?php $egR=is_array($eg['require']??null)?$eg['require']:[]; ?>
         <div id="gateStats" style="display:<?=($egT==='stats'?'grid':'none')?>;gap:6px">
-          <div style="display:flex;gap:6px;align-items:center"><label style="flex:1;font-size:11px"><input type="checkbox" name="rq_minutes_on" <?=isset($egR['minutes'])?'checked':''?>> ⏱ Phút online</label><input type="number" name="rq_minutes" min="1" max="100000" value="<?=htmlspecialchars($egR['minutes']??30)?>" style="width:90px"></div>
           <div style="display:flex;gap:6px;align-items:center"><label style="flex:1;font-size:11px"><input type="checkbox" name="rq_likes_on" <?=isset($egR['likes'])?'checked':''?>> 👍 Lượt thích game</label><input type="number" name="rq_likes" min="1" max="10000" value="<?=htmlspecialchars($egR['likes']??5)?>" style="width:90px"></div>
           <div style="display:flex;gap:6px;align-items:center"><label style="flex:1;font-size:11px"><input type="checkbox" name="rq_completed_on" <?=isset($egR['completed'])?'checked':''?>> 🏆 Game phá đảo</label><input type="number" name="rq_completed" min="1" max="10000" value="<?=htmlspecialchars($egR['completed']??3)?>" style="width:90px"></div>
           <div style="display:flex;gap:6px;align-items:center"><label style="flex:1;font-size:11px"><input type="checkbox" name="rq_comments_on" <?=isset($egR['comments'])?'checked':''?>> 💬 Bình luận được duyệt</label><input type="number" name="rq_comments" min="1" max="10000" value="<?=htmlspecialchars($egR['comments']??3)?>" style="width:90px"></div>
           <small style="color:#5a6b87">Tích nhiều điều kiện = phải đủ TẤT CẢ. Bình luận tính theo tên đã dùng (server đếm chéo).</small>
         </div>
         <div id="gateLoginRow" style="display:<?=($egT==='none'?'none':'block')?>"><label style="font-size:11px"><input type="checkbox" name="gate_login" <?=!empty($eg['login'])?'checked':''?>> 🔐 Bắt buộc đăng nhập (áp dụng mọi loại khóa — khách không tải được)</label></div>
-        <div style="margin-top:6px"><small>💰 Giá tải (EXP)</small><input type="number" name="dl_cost" min="0" max="100000" value="<?=htmlspecialchars($editGame['dl_cost']??10)?>" style="width:100px"> <small style="color:#5a6b87">tải lại game đã sở hữu thì miễn phí • gợi ý: kho cũ ~5, game mới ~15</small></div>
+          <div><small>💰 Giá tải (EXP)</small><input type="number" name="dl_cost" min="0" max="100000" value="<?=htmlspecialchars($editGame['dl_cost']??10)?>" style="width:100px"> <small style="color:#5a6b87">tải lại game đã sở hữu thì miễn phí • gợi ý: kho cũ ~5, game mới ~15</small></div>
+          <div style="margin-top:6px"><small>⏱️ Thời gian đọc bài (giây)</small><input type="number" name="read_secs" min="1" max="3600" value="<?=htmlspecialchars($editGame['read_secs']??10)?>" style="width:100px"> <small style="color:#5a6b87">mở trang đủ từng này giây mới mở tải • mặc định 10</small></div>
         <script>function gateTypeChanged(v){try{document.getElementById('gateOpts').style.display=v==='none'?'none':'grid';document.getElementById('gateStats').style.display=v==='stats'?'grid':'none';document.getElementById('gateLoginRow').style.display=v==='none'?'none':'block';}catch(e){}}</script>
         <small style="color:#5a6b87">Khóa mềm: chặn nút tải + link copy tay (proof theo ngày). Ngoài web hiện ổ khóa + đường dẫn sang Hồ sơ.</small>
         <br><small>🔑 Mã hóa link: <?=lock_secret()!==null?'<b style="color:#0a9c4a">đã bật (AES-GCM)</b>':'<b style="color:#c43c64">CHƯA — link lưu plaintext, dễ soi source</b>'?> — đặt LOCK_SECRET (≥16 ký tự) trong env hoặc config.php, và thêm cùng giá trị vào Vercel env.</small>
@@ -1143,7 +1146,8 @@ const g={
       hot:ck('hot'), vi:ck('vi'), new:ck('new'),
       desc:String(fd.get('desc')||''), thumb:String(fd.get('thumb')||''),
       dl_cost:Math.max(0,Math.min(100000,parseInt(fd.get('dl_cost')||'10',10)||0)),
-      gate:(function(){var t=String(fd.get('gate_type')||'none');var g={type:t,xp:+(fd.get('gate_xp')||100)};if(t==='stats'){var rq={};if(ck('rq_minutes_on'))rq.minutes=+(fd.get('rq_minutes')||1);if(ck('rq_likes_on'))rq.likes=+(fd.get('rq_likes')||1);if(ck('rq_completed_on'))rq.completed=+(fd.get('rq_completed')||1);if(ck('rq_comments_on'))rq.comments=+(fd.get('rq_comments')||1);g.require=rq;}if(t!=='none'&&ck('gate_login'))g.login=1;return g;})(),
+      read_secs:Math.max(1,Math.min(3600,parseInt(fd.get('read_secs')||'10',10)||10)),
+      gate:(function(){var t=String(fd.get('gate_type')||'none');var g={type:t,xp:+(fd.get('gate_xp')||100)};if(t==='stats'){var rq={};if(ck('rq_likes_on'))rq.likes=+(fd.get('rq_likes')||1);if(ck('rq_completed_on'))rq.completed=+(fd.get('rq_completed')||1);if(ck('rq_comments_on'))rq.comments=+(fd.get('rq_comments')||1);g.require=rq;}if(t!=='none'&&ck('gate_login'))g.login=1;return g;})(),
       shots:shots, jar:jar, created_at:new Date().toISOString()
     };
   try{sessionStorage.setItem('game_preview',JSON.stringify(g));}catch(e){alert('Trình duyệt chặn sessionStorage, không xem trước được.');return;}

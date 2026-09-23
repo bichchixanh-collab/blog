@@ -8,6 +8,7 @@ const { mintTicket, checkProofExtended } = require('./_lock');
 const { countApproved } = require('./comments');
 const { bearerToken, verifySbTokenAsync, getUserStats, getSenpai } = require('./_sb');
 const { chargeForDownload, costOf } = require('./economy');
+const { readSecsOf } = require('./_lock');
 // Gom số server-side theo tài khoản cho khóa CỨNG. null = hạ tầng lỗi (fail-closed).
 async function resolveServerStats(uid) {
   try {
@@ -15,7 +16,6 @@ async function resolveServerStats(uid) {
     if (!st || !sen) return null;
     const appr = await countApproved([], uid);
     return {
-      min: st.minutes,
       likes: st.likes.length,
       done: st.completed.length,
       approved: appr,
@@ -66,9 +66,14 @@ module.exports = async (req, res) => {
         }
       }
       const proof = req.query && req.query.proof;
-      const chk = await checkProofExtended(proof, id, gate, countApproved, serverStats, !!me, ipOf(req));
+      const chk = await checkProofExtended(proof, id, gate, countApproved, serverStats, !!me, ipOf(req), readSecsOf(g));
       if (!chk.ok) { send(res, 403, { error: 'locked', reason: chk.reason, hard: serverStats ? 1 : 0 }); return; }
       hard = chk.hard ? 1 : 0;
+    } else {
+      // Bài mở tự do vẫn phải đọc đủ số giây (vé đọc do server ký lúc mở trang).
+      const proof = req.query && req.query.proof;
+      const chkR = await checkProofExtended(proof, id, null, countApproved, null, false, ipOf(req), readSecsOf(g));
+      if (!chkR.ok) { send(res, 403, { error: 'locked', reason: chkR.reason, hard: 0 }); return; }
     }
     // Ví EXP: trừ giá tải của bài (tải lại game đã sở hữu thì miễn phí).
     {

@@ -179,8 +179,7 @@ async function getUserStats(uid) {
     return null;
   } catch { return null; }
 }
-// Ghi event. Heartbeat chỉ +1 phút nếu lần ghi trước cách ≥50s (chống farm).
-// Trả về stats mới, hoặc null khi lỗi.
+// Ghi event like/unlike/complete/uncomplete. Trả về stats mới, hoặc null khi lỗi.
 async function eventUserStats(uid, ev) {
   try {
     const cur = await getUserStats(uid);
@@ -188,11 +187,7 @@ async function eventUserStats(uid, ev) {
     const now = new Date().toISOString();
     let { minutes, likes, completed, bingo, pet_xp } = cur;
     const t = ev && ev.t;
-    if (t === 'heartbeat') {
-      const last = Date.parse(cur.updated_at || '') || 0;
-      if (Date.now() - last < 50000) return cur; // quá nhanh, giữ nguyên
-      minutes += 1;
-    } else if (t === 'like' || t === 'unlike' || t === 'complete' || t === 'uncomplete') {
+    if (t === 'like' || t === 'unlike' || t === 'complete' || t === 'uncomplete') {
       const id = String((ev && ev.id) || '').slice(0, 120);
       if (!/^[a-z0-9][a-z0-9\-]{0,119}$/i.test(id)) return cur;
       const arr = (t === 'like' || t === 'unlike') ? likes : completed;

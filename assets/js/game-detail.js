@@ -9,13 +9,12 @@ function __gate(g){
 }
 function __proof(g){
   try{
-    var st={min:0,likes:0,done:0,names:[]};
-    try{st.min=stMinutes();}catch(e){}
+    var st={likes:0,done:0,names:[]};
     try{st.likes=stLikes();}catch(e){}
     try{st.done=stDone();}catch(e){}
     try{st.names=stNames();}catch(e){}
     var o={id:g.id,day:new Date().toISOString().slice(0,10),st:st};
-    try{var pr=stPresence();if(pr)o.presence=pr.tok;}catch(e){}
+    try{if(window.__readRZ)o.rz=window.__readRZ;}catch(e){}
     try{if(typeof stCid==='function'){var _cid=stCid();if(_cid)o.cid=_cid;}}catch(e){}
     return btoa(unescape(encodeURIComponent(JSON.stringify(o)))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
   }catch(e){return '';}
@@ -31,17 +30,17 @@ function __pullSrvVals(cb){
   fetch(apiRoot()+'/api/ustats',{headers:{'Authorization':'Bearer '+tk},cache:'no-store'})
     .then(function(r){return r.ok?r.json():null;})
     .then(function(j){
-      if(j&&typeof j.minutes==='number'){
+      if(j){
         var num=function(v){return (typeof v==='number'&&isFinite(v))?v:0;};
-        __srvVals={min:num(j.minutes),likes:num(j.likes),done:num(j.completed)};
+        __srvVals={likes:num(j.likes),done:num(j.completed)};
       }
       if(cb)cb();
     }).catch(function(){ if(cb)cb(); });
 }
-function __statVals(){if(__srvVals)return __srvVals;var o={min:0,likes:0,done:0};try{o.min=stVerifiedMin();}catch(e){}try{o.likes=stLikes();}catch(e){}try{o.done=stDone();}catch(e){}return o;}
+function __statVals(){if(__srvVals)return __srvVals;var o={likes:0,done:0};try{o.likes=stLikes();}catch(e){}try{o.done=stDone();}catch(e){}return o;}
 function __statsRows(g,apprN){
   var rq=(g.gate&&g.gate.require)||{},rows=[],v=__statVals();
-  if(rq.minutes!=null)rows.push({k:'m',need:+rq.minutes,has:v.min,ok:v.min>=+rq.minutes,label:cmtT('go_req_min','Online Ä‘á»§ {n} phÃºt').replace('{n}',rq.minutes),hint:'<small>'+cmtT('go_auto','má»Ÿ web lÃ  tá»± tÃ­nh')+'</small>'});
+  var needRead=readSecsOf(g),hasRead=Math.floor(readElapsed()/1000);rows.push({k:'r',need:needRead,has:hasRead,ok:readElapsed()>=needRead*1000,label:cmtT('g_readReq','Đọc bài {n} giây').replace('{n}',needRead),hint:'<small>'+cmtT('g_readHint','cứ mở trang là tính giờ')+'</small>'});
   if(rq.likes!=null)rows.push({k:'l',need:+rq.likes,has:v.likes,ok:v.likes>=+rq.likes,label:cmtT('go_req_like','ThÃ­ch {n} game').replace('{n}',rq.likes),hint:'<a href="'+apiRoot()+'/index.html" style="color:#0066cc">'+cmtT('go_likeNow','â†’ thÃ­ch ngay')+'</a>'});
   if(rq.completed!=null)rows.push({k:'d',need:+rq.completed,has:v.done,ok:v.done>=+rq.completed,label:cmtT('go_req_done','PhÃ¡ Ä‘áº£o {n} game').replace('{n}',rq.completed),hint:'<small>'+cmtT('go_doneHint','báº¥m "PhÃ¡ Ä‘áº£o?" á»Ÿ trang game')+'</small>'});
   if(rq.comments!=null){
@@ -65,7 +64,7 @@ function __statsRowsHtml(rows){
 }
 // Live refresh há»™p khÃ³a trong modal: cáº­p nháº­t sá»‘ phÃºt realtime (10s/láº§n),
 // tá»± xin vÃ© + sang trang táº£i ngay khi Ä‘á»§ Ä‘iá»u kiá»‡n. Dá»«ng khi Ä‘Ã³ng modal.
-let __lockTimer=null, __lockAppr=null, __lockTick=0, __lockFailMin=0;
+let __lockTimer=null, __lockAppr=null, __lockTick=0;
 function __lockStop(){ try{ if(__lockTimer){ clearInterval(__lockTimer); __lockTimer=null; } }catch(e){} }
 function __lockHead(){
   var hardNow=false; try{hardNow=stLogged();}catch(e){}
@@ -104,7 +103,7 @@ function __ticketAndGo(gid,res,msgEl,wasPassing){
     fetch(apiRoot()+'/api/ticket?id='+encodeURIComponent(gid)+'&res='+encodeURIComponent(res)+'&proof='+encodeURIComponent(__proof(gm)),{cache:'no-store',headers:_hh})
     .then(function(r){return r.json().then(function(j){return {st:r.status,j:j};});})
     .then(function(o){
-      if(o.st===200&&o.j&&o.j.ticket){__lockFailMin=0;ECO.owned=true;try{ecoRender();}catch(e){}try{countDownload(gid);}catch(e2){}location.href=apiRoot()+'/go.html?ticket='+encodeURIComponent(o.j.ticket);}
+      if(o.st===200&&o.j&&o.j.ticket){ECO.owned=true;try{ecoRender();}catch(e){}try{countDownload(gid);}catch(e2){}location.href=apiRoot()+'/go.html?ticket='+encodeURIComponent(o.j.ticket);}
       else if(o.st===402){
         var need=(o.j&&o.j.need)||ECO.cost, bal=(o.j&&typeof o.j.bal==='number')?o.j.bal:ECO.bal;
         ECO.retry=true; ECO.bal=bal;
@@ -118,14 +117,6 @@ function __ticketAndGo(gid,res,msgEl,wasPassing){
       }
       else if(o.st===403){
         var reason=(o.j&&o.j.reason)||'';
-        // Hiá»ƒn thá»‹ Ä‘á»§ mÃ  vÃ© váº«n rá»›t 'minutes' nhiá»u láº§n liÃªn tiáº¿p = chain cÅ© (Ä‘á»•i IP/dáº£i máº¡ng):
-        // dá»«ng auto-retry, hiá»‡n nÃºt Ä‘áº¿m láº¡i thay vÃ¬ káº¹t 4/5, 32/5 mÃ£i.
-        if(reason==='minutes'&&wasPassing){__lockFailMin=(__lockFailMin||0)+1;}else{__lockFailMin=0;}
-        if(__lockFailMin>=3){
-          msgEl.innerHTML='ðŸ”’ <b>'+cmtT('g_cond','ChÆ°a Ä‘á»§ Ä‘iá»u kiá»‡n')+'</b> (<b>minutes</b>). '+cmtT('g_ipStuck','Máº¡ng cá»§a báº¡n vá»«a Ä‘á»•i IP nÃªn vÃ© cÅ© khÃ´ng cÃ²n hiá»‡u lá»±c.')
-            +'<div style="margin-top:8px;text-align:center"><button data-relock="1" class="dl-btn" style="font-size:11px">'+cmtT('g_recount','ðŸ”„ Äáº¿m láº¡i tá»« Ä‘áº§u')+'</button></div>';
-          return;
-        }
         var rs0=__statsRows(gm,null);var needC0=rs0.some(function(r){return r.k==='c';});var hd='ðŸ”’ <b>'+cmtT('g_cond','ChÆ°a Ä‘á»§ Ä‘iá»u kiá»‡n')+'</b>'+(reason?' (<b>'+escHtml(reason)+'</b>)':'')+'. '+cmtT('g_srv','Server vá»«a kiá»ƒm tra â€” sá»‘ bÃªn dÆ°á»›i lÃ  má»›i nháº¥t:');var ft='<div style="margin-top:6px"><small>'+cmtT('g_hang','Treo trang thÃªm cho Ä‘á»§ rá»“i báº¥m Táº£i láº¡i (khÃ´ng cáº§n F5).')+'</small></div>';var paint=function(rr){__lockPaint(msgEl,rr,hd,ft);};__pullSrvVals(function(){var rs=__statsRows(gm,null);var nc=rs.some(function(r){return r.k==='c';});paint(rs);if(nc){try{stApprovedCount(function(n){__lockAppr=n;paint(__statsRows(gm,n));__lockLive(gid,gm,msgEl,res,hd,ft);});}catch(e){__lockLive(gid,gm,msgEl,res,hd,ft);}}else{__lockLive(gid,gm,msgEl,res,hd,ft);}});}
       else{msgEl.textContent=cmtT('g_noTicket2','KhÃ´ng láº¥y Ä‘Æ°á»£c vÃ© (')+o.st+')'+((o.j&&o.j.error)?' ['+o.j.error+((o.j&&o.j.miss)?':'+o.j.miss:'')+']':'');}
     }).catch(function(){msgEl.textContent=cmtT('g_offline','Máº¥t máº¡ng, thá»­ láº¡i sau.');});
@@ -145,6 +136,7 @@ async function renderDetail(){
   }
   if(!g){const nf=document.querySelector('.kawaii-d')||document.querySelector('.wrap'); if(nf)nf.innerHTML=`<div style="padding:20px;text-align:center"><h2>${cmtT('g_notfound','KhÃ´ng tÃ¬m tháº¥y game!')}</h2><p><a href="${apiRoot()}/index.html">${cmtT('back_home','â€¹ Vá» trang chá»§')}</a></p></div>`; return;}
   if(!isPreview){try{xpBump('visit',id);}catch(e){}}
+  if(!isPreview){try{readStart(id,readSecsOf(g));}catch(e){}}
   document.title=g.name+cmtT('g_titleMid',' - Táº£i Game Java ')+g.res[0]+' | J2ME.VERCEL.APP';
   const bc2=document.getElementById('bcName'); if(bc2) bc2.textContent=g.name;
   const can=document.querySelector('link[rel="canonical"]'); if(can) can.href=location.origin+`/game/${id}.html`;
@@ -170,6 +162,7 @@ async function renderDetail(){
   head.innerHTML=`<img src="${escHtml(g.thumb)}" alt="${escHtml(g.name)} thumb" width="84" height="84" decoding="async" fetchpriority="high"><div><h2>${escHtml(g.name)} ${g.hot?'<span style="background:#0066cc;color:#fff;font-size:8px;padding:2px 5px;border-radius:8px">HOT</span>':''} ${g.vi?'<span style="background:#0a9c4a;color:#fff;font-size:8px;padding:2px 5px;border-radius:8px">VIá»†T HÃ“A</span>':''}</h2><table class="info-table"><tr><th>${cmtT('g_thr_genre','Thá»ƒ loáº¡i')}</th><td><a href="${apiRoot()}/category.html?cat=${encodeURIComponent(g.cat||'')}" style="color:#0066cc">${escHtml(g.cat)}</a></td></tr><tr><th>${cmtT('g_thr_size','Dung lÆ°á»£ng')}</th><td>${escHtml(g.size)}</td></tr><tr><th>${cmtT('g_thr_res','MÃ n hÃ¬nh')}</th><td>${(g.res||[]).map(r=>`<span class="res-tag">${escHtml(r)}</span>`).join(' ')}</td></tr>${dateStr?`<tr><th>${cmtT('g_thr_date','NgÃ y Ä‘Äƒng')}</th><td>${dateStr}</td></tr>`:''}${dlCount!=null?`<tr><th>${cmtT('g_thr_dl','LÆ°á»£t táº£i')}</th><td>${Number(dlCount).toLocaleString('vi-VN')}</td></tr>`:''}</table></div>`;
   // dl
   document.querySelector('.dl-grid').innerHTML=(g.res||[]).map(r=>`<div class="dl-option"><b>${escHtml(r)}</b><br><small style="color:#4a7a9a;font-size:10px">${escHtml(g.size)} â€¢ ${String(r).includes('240')?'QVGA':'QCIF'}</small><br><a href="${escHtml(apiRoot()+'/api/dl?id='+encodeURIComponent(g.id)+'&res='+encodeURIComponent(r))}" class="dl-btn" data-dl-btn="1" data-name="${escHtml(g.name)}" data-res="${escHtml(r)}">${cmtT('dl','â¬‡ Táº£i JAR')}</a></div>`).join('');
+  try{var __rbox=document.querySelector('.dl-grid');if(__rbox){var __rn=document.getElementById('readNote');if(!__rn){__rn=document.createElement('div');__rn.id='readNote';__rn.className='note';__rn.style.marginTop='8px';__rbox.after(__rn);}__rn.innerHTML=cmtT('g_readNote','Mở trang {n}s để mở khóa tải').replace('{n}',readSecsOf(g));}}catch(e){}
   // Chia sáº» + QR + yÃªu thÃ­ch
   try{
     const pageUrl=isPreview?location.href:('https://J2ME.VERCEL.APP/game/'+id+'.html');
@@ -249,7 +242,7 @@ function doDownload(name,res){
   // Má»i link táº£i Ä‘á»u Ä‘i qua go.html báº±ng vÃ© server (chá»‘ng soi source/crack link)
   if(gt==='stats'){
     pending={href:'#',gid:gid,name:name,res:res};
-    __lockAppr=null; __lockFailMin=0;
+    __lockAppr=null;
     if(mc0)mc0.style.display='none';
     msg.textContent=cmtT('go_checking2','Äang kiá»ƒm tra Ä‘iá»u kiá»‡n...');
     document.getElementById('dlModal').classList.remove('hidden');document.body.style.overflow='hidden';
@@ -365,7 +358,6 @@ document.addEventListener('click',function(e){const b=e.target&&e.target.closest
   const close=()=>{
     try{ playClick(520,0.1,0.15); }catch(e){}
     try{ if(typeof __lockStop==='function') __lockStop(); }catch(e){}
-    try{ __lockFailMin=0; }catch(e){}
     modal.classList.add('hidden');
     document.body.style.overflow='';
   };
@@ -396,3 +388,9 @@ document.addEventListener('i18n-ready',function(){
   }catch(e){}
   try{ if(document.getElementById('ecoBox')&&typeof ecoRender==='function'){ ecoRender(); } }catch(e){}
 });
+// Vé đọc bài: đếm thời gian mở trang (dừng khi tab ẩn), vé do server ký lúc mở trang.
+let READ={need:10,rz:'',t0:0,hideAcc:0,hideStart:0};
+function readSecsOf(g){var v=parseInt(g&&(g.read_secs),10);return (typeof v==='number'&&isFinite(v))?Math.max(1,Math.min(3600,v)):10;}
+function readStart(gid,need){READ={need:need,rz:'',t0:Date.now(),hideAcc:0,hideStart:0};try{window.__readRZ='';}catch(e){}fetch(apiRoot()+'/api/read?id='+encodeURIComponent(gid),{cache:'no-store'}).then(function(r){return r.ok?r.json():null;}).then(function(j){if(j&&j.rz){READ.rz=j.rz;try{window.__readRZ=j.rz;}catch(e){}}}).catch(function(){});}
+function readElapsed(){try{var now=Date.now();var extra=(READ.hideStart?now-READ.hideStart:0);return Math.max(0,now-READ.t0-READ.hideAcc-extra);}catch(e){return 0;}}
+document.addEventListener('visibilitychange',function(){try{if(document.hidden){READ.hideStart=Date.now();}else if(READ.hideStart){READ.hideAcc+=Date.now()-READ.hideStart;READ.hideStart=0;}}catch(e){}});
