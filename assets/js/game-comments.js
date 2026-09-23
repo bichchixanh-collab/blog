@@ -1,8 +1,8 @@
 // game-comments
-// BÃ¬nh luáº­n + Ä‘Ã¡nh giÃ¡ sao (phÃ¢n trang 5/trang + realtime polling, giá»¯ nguyÃªn trang Ä‘ang xem)
+// Bình luận + �ánh giá sao (phân trang 5/trang + realtime polling, giữ nguyên trang �ang xem)
 let CMT_PAGE=1; const CMT_LIMIT=5; let CMT_GAME=''; let CMT_TOTAL=0, CMT_PAGES=1, CMT_TIMER=null, CMT_KNOWN=0;
 function cmtT(k,fb){ try{ if(window.I18N&&window.I18N.t){const v=window.I18N.t(k); if(v&&v!==k) return v;} }catch(e){} return fb; }
-// Hiá»ƒn thá»‹ rÃµ ngÃ y/thÃ¡ng/nÄƒm - giá»:phÃºt (vd: 20/09/2026 - 14:05)
+// HiỒn th�9 rõ ngày/tháng/nĒm - giờ:phút (vd: 20/09/2026 - 14:05)
 function fmtDT(iso){ try{ const dt=new Date(iso); if(isNaN(dt)) return ''; const p=function(n){return String(n).padStart(2,'0');}; return p(dt.getDate())+'/'+p(dt.getMonth()+1)+'/'+dt.getFullYear()+' - '+p(dt.getHours())+':'+p(dt.getMinutes()); }catch(e){ return ''; } }
 async function loadComments(gameId, page){
   const box=document.getElementById('cmtBox'); if(!box) return;

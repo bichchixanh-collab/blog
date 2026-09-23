@@ -4,7 +4,7 @@ try{if(localStorage.getItem('j2me_lite')==='1')document.documentElement.classLis
 function tick(){const el=document.getElementById('clock');if(el)el.textContent=new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'})}
 tick();setInterval(tick,30000);
 document.addEventListener('error',function(e){var t=e.target;if(!t||t.tagName!=='IMG')return;if(t.id==='wapBannerImg'){if(!t.dataset.fb1){t.dataset.fb1='1';t.src=apiRoot()+'/assets/banners/banner1.png';}else if(!t.dataset.fb){t.dataset.fb='1';t.src=apiRoot()+'/assets/anime-girl.png';}return;}if(!t.dataset.fb){t.dataset.fb='1';t.src=apiRoot()+'/assets/anime-girl.png';}},true);
-// Dynamic - giá»¯ y giao diá»‡n váº£i
+// Dynamic - giữ y giao di�!n vải
 let GAMES_MAP=null;
 async function loadMap(force){ if(GAMES_MAP&&!force) return GAMES_MAP; const r=await fetch(apiRoot()+'/data/games.json',{headers:{Accept:'application/json'}}); const arr=await r.json(); GAMES_MAP={}; arr.forEach(g=>GAMES_MAP[g.id]=g); return GAMES_MAP; }
 function getId(){
@@ -20,7 +20,7 @@ function getId(){
 // Ch�ng XSS: escape mọi dữ li�!u game trư�:c khi chèn vào HTML; linkify biến URL trong mô tả thành link bấm �ược
 function escHtml(s){return String(s==null?'':s).replace(/[&<>"']/g,function(m){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m];});}
 function linkify(s){return escHtml(s).replace(/\*\*([^*<>]+)\*\*/g,'<b>$1</b>').replace(/(https?:\/\/[^\s<>"']+)/g,'<a href="$1" target="_blank" rel="noopener">$1</a>');}
-// Tháº» [credit]...[/credit] trong mÃ´ táº£: há»™p chá»§ quyá»n ná»•i báº­t, link tuyá»‡t Ä‘á»‘i + nÃºt chÃ©p
+// Thẻ [credit]...[/credit] trong mô tả: h�"p chủ quyền n�"i bật, link tuy�!t ��i + nút chép
 // �Ồ khi bài b�9 copy �i nơi khác vẫn mang theo ngu�n. Không có thẻ thì render như cũ.
 // Dòng © NGU�N �ứng ngay trư�:c [credit] �ược g�"p làm tiêu �ề h�"p (không render 2 lần).
 function creditHeaderHtml(h){
@@ -79,12 +79,12 @@ function countDownload(gameId){
     // tránh �ếm trùng 2 lần cho 1 lượt tải.
   }catch(e){}
 }
-// YÃªu thÃ­ch (localStorage, tá»‘i Ä‘a 200 game)
+// Yêu thích (localStorage, t�i �a 200 game)
 function favGet(){try{const a=JSON.parse(localStorage.getItem('j2me_favs')||'[]');return Array.isArray(a)?a:[];}catch(e){return [];}}
 function favHas(id){try{return favGet().indexOf(id)>=0;}catch(e){return false;}}
 function favToggle(id){try{let a=favGet();a=a.indexOf(id)>=0?a.filter(function(x){return x!==id;}):a.concat([id]);localStorage.setItem('j2me_favs',JSON.stringify(a.slice(0,200)));var _fr=a.indexOf(id)>=0;try{stEvent(_fr?'like':'unlike',id);}catch(e){}return _fr;}catch(e){return false;}}
 function copyPageUrl(url,btn){function done(t){if(btn){btn.textContent=t;setTimeout(function(){btn.textContent=cmtT('g_copy',"Copy link");},1500);}}if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(url).then(function(){done(cmtT('g_copied',"Đã copy!"));}).catch(function(){done(cmtT('g_copyerr',"Copy lỗi"));});}else{try{const ta=document.createElement('textarea');ta.value=url;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);done(cmtT('g_copied',"Đã copy!"));}catch(e){done(cmtT('g_copyerr',"Copy lỗi"));}}}
-// XP + nhiá»‡m vá»¥ háº±ng ngÃ y (xem 3 game / thÃ­ch 1 / bÃ¬nh luáº­n 1, má»—i cÃ¡i +10)
+// XP + nhi�!m vụ hằng ngày (xem 3 game / thích 1 / bình luận 1, m�i cái +10)
 function xpAdd(n){try{const o=JSON.parse(localStorage.getItem('j2me_xp')||'{"xp":0}')||{xp:0};o.xp=(o.xp||0)+n;localStorage.setItem('j2me_xp',JSON.stringify(o));}catch(e){}}
 function xpBump(kind,gameId){
   try{
@@ -104,7 +104,7 @@ function qInc(kind){
     if(v>=goals[kind]&&!localStorage.getItem(dk)){localStorage.setItem(dk,'1');xpAdd(10);}
   }catch(e){}
 }
-// NÃºt cÃ i app PWA (hiá»‡n khi trÃ¬nh duyá»‡t cho phÃ©p)
+// Nút cài app PWA (hi�!n khi trình duy�!t cho phép)
 let deferredPrompt=null;
 window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();deferredPrompt=e;try{document.querySelectorAll('.pwa-install').forEach(function(b){b.style.display='';});}catch(err){}});
 function installApp(){if(deferredPrompt){try{deferredPrompt.prompt();deferredPrompt=null;}catch(e){}}else{alert(cmtT('install_msg',"Mở menu trình duyệt → \"Thêm vào màn hình chính\" để cài app."));}}
@@ -120,7 +120,7 @@ function stSaveName(n){n=String(n||'').trim().slice(0,30);if(n.length<2)return;v
 function stApiRoot(){try{var p=location.pathname||'/';var gi=p.indexOf('/game/');return gi>=0?p.slice(0,gi):'';}catch(e){return '';}}
 function stToken(){try{var s=JSON.parse(localStorage.getItem('sb_session')||'null');return (s&&s.access_token)||'';}catch(e){return '';}}
 // Token tươi: tự refresh khi sắp hết hạn (SBAuth), r�:t về token cũ nếu không refresh �ược.
-// Form bÃ¬nh luáº­n/vÃ­/vÃ© DÃ™NG HÃ€M NÃ€Y thay vÃ¬ stToken() Ä‘á»ƒ server luÃ´n nháº­n Ä‘Ãºng tÃ i khoáº£n.
+// Form bình luận/ví/vé D�"NG HìM NìY thay vì stToken() �Ồ server luôn nhận �úng tài khoản.
 async function stFreshToken(){try{if(window.SBAuth&&SBAuth.session){var s=await SBAuth.session();if(s&&s.access_token)return s.access_token;}}catch(e){}try{return stToken();}catch(e){return '';}}
 function stUid(){try{var t=stToken();if(!t)return '';var p=(t.split('.')[1]||'').replace(/-/g,'+').replace(/_/g,'/');while(p.length%4)p+='=';var j=JSON.parse(atob(p));return j.sub||'';}catch(e){return '';}}
 function stLogged(){return !!stToken();}
