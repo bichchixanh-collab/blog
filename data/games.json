@@ -318,6 +318,14 @@
         "hot": false,
         "vi": true,
         "new": false,
+        "gate": {
+            "type": "none",
+            "lines": 1,
+            "level": 3,
+            "badge": "rare",
+            "xp": 100
+        },
+        "dl_cost": 1,
         "desc": "Siêu Phẩm 🔥CHINH PHỤC CÕI THẦN VIỆT HOÁ 🔥\r\n\r\n- Thể Loại: Nhập Vai, ARPG\r\n\r\n- Màn Hình: 240x320\r\n\r\n- Việt Hoá 99,99% by me và A.I (còn 0,01% nữa là do tìm ko ra file mã hóa để việt hóa chữ \"Lên cấp\") 😂\r\n\r\n- Giới thiệu:\r\n\r\nNhững cuộc chiến giữa ánh sáng và bóng tối, giữa tình yêu và lòng thù hận, cùng hành trình kỳ vĩ đưa bạn qua nhiều vùng đất khác nhau. Hãy nỗ lực hết mình để vượt qua tất cả các thử thách đó.\r\n\r\nNhững màn giao tranh kịch tính, vô số đòn combo cùng kho vũ khí đa dạng – tất cả đều hội tụ trong tựa game này!\r\n\r\nP\/s: Gửi lời cảm ơn chân thành và sâu sắc nhất đến b Mộc Lam Ca Ca đã nhiệt tình hướng dẫn và chỉ bảo mình trong việc vh game 🥰\r\n\r\nNguồn từ FB: Thành Nam",
         "thumb": "https:\/\/i.imgur.com\/3OFRX6c.jpeg",
         "shots": [
@@ -331,7 +339,7 @@
         },
         "downloads": 0,
         "created_at": "2026-09-11T12:53:53+02:00",
-        "updated_at": "2026-09-11T12:53:53+02:00"
+        "updated_at": "2026-09-23T04:25:35+02:00"
     },
     {
         "id": "do-re-mon-tay-du-ky",
