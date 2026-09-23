@@ -11,7 +11,7 @@ const path = require('path');
 const https = require('https');
 const { bearerToken, verifySbTokenAsync, getLastAuthDbg } = require('./_sb');
 const { checkComment, isAutoApprove } = require('./_moderate');
-const { creditCommentBonus } = require('./economy');
+const { creditCommentBonus, qualityText } = require('./economy');
 
 const REPO = process.env.GITHUB_REPO || 'bichchixanh-collab/blog';
 const BRANCH = process.env.GITHUB_BRANCH || 'main';
@@ -93,10 +93,13 @@ async function countApproved(names, uid) {
     // Đếm theo uid HOẶC tên đã dùng (chống trùng id): bao cả bình luận cũ
     // đăng trước khi gắn uid, và tên user tự khai. Ké tên người khác để mở
     // khóa vẫn possible ở mức mềm — chấp nhận như thiết kế (xem HUONG-DAN).
+    // Chỉ đếm bình luận ĐẠT CHUẨN (đủ dài, không spam ký tự): rác vẫn hiện
+    // bình thường nhưng không mở được gate.
     let n = 0;
     const seen = {};
     for (const c of list) {
       if (!c || c.status !== 'approved' || !c.id || seen[c.id]) continue;
+      if (!qualityText(c.text).ok) continue;
       const byUid = !!uid && c.uid === uid;
       const byName = want.length > 0 && want.indexOf(normName(c.name)) >= 0;
       if (byUid || byName) { seen[c.id] = 1; n++; }

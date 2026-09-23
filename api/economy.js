@@ -142,13 +142,21 @@ function bigrams(s) {
   }
   return set;
 }
-function bonusEligible({ text, uid, list, excludeId }) {
-  if (!uid) return { ok: false, reason: 'no_uid' };
+// Chuẩn "bình luận chất lượng" DÙNG CHUNG cho cả thưởng EXP lẫn đếm mở gate:
+// đủ dài, đủ chữ cái, không lặp ký tự. Rác vẫn hiện bình thường, chỉ vô dụng.
+function qualityText(text) {
   const t = String(text || '').trim();
   if (t.length < BONUS_MIN_LEN) return { ok: false, reason: 'too_short' };
   const letters = (t.match(/[A-Za-zÀ-ỹđ]/g) || []).length;
   if (letters / Math.max(1, t.length) < 0.4) return { ok: false, reason: 'gibberish' };
   if (/(.)\1{5,}/.test(t)) return { ok: false, reason: 'repeat' };
+  return { ok: true };
+}
+function bonusEligible({ text, uid, list, excludeId }) {
+  if (!uid) return { ok: false, reason: 'no_uid' };
+  const q = qualityText(text);
+  if (!q.ok) return q;
+  const t = String(text || '').trim();
   const mine = (Array.isArray(list) ? list : [])
     .filter((c) => c && c.status === 'approved' && c.uid === uid && (!excludeId || c.id !== excludeId))
     .slice(-60);
@@ -368,6 +376,7 @@ module.exports = async (req, res) => {
 module.exports.chargeForDownload = chargeForDownload;
 module.exports.creditCommentBonus = creditCommentBonus;
 module.exports.bonusEligible = bonusEligible;
+module.exports.qualityText = qualityText;
 module.exports.dayStr = dayStr;
 module.exports.costOf = (g) => {
   const v = parseInt(g && g.dl_cost, 10);
