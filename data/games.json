@@ -453,6 +453,14 @@
         "hot": false,
         "vi": true,
         "new": false,
+        "gate": {
+            "type": "none",
+            "lines": 1,
+            "level": 3,
+            "badge": "rare",
+            "xp": 100
+        },
+        "dl_cost": 1,
         "desc": "🎮 [VIỆT HÓA] 苍神录外传 - 仑吾纪 | THƯƠNG THẦN LỤC NGOẠI TRUYỆN – LUÂN NGÔ KỶ\r\n Màn hình: 240x320 \r\n\r\nMột tựa game chiến thuật nhập vai mang đậm phong cách final fantasy tatics huyền thoại nay đã được Việt hóa!\r\n\r\nKHÁC BIỆT SO VỚI BẢN CHÍNH\r\n\r\nDù là ngoại truyện của 苍神录 (Thương Thần Lục), trò chơi không đi theo lối nhập vai truyền thống mà kết hợp RPG + chiến thuật, với góc nhìn Isometric 45° độc đáo.\r\n\r\nNhân vật có thể:\r\n* Nhận kinh nghiệm và lên cấp sau mỗi trận chiến.\r\n* Sử dụng nhiều loại vũ khí khác nhau.\r\n* Tung ra các tuyệt kỹ và pháp thuật với đặc tính riêng.\r\n* Tự do vận dụng chiến thuật tùy tình huống.\r\n\r\nĐặc biệt, chiến đấu không đơn thuần là \"đánh càng mạnh càng tốt\". Vị trí và địa hình đóng vai trò rất quan trọng!\r\n\r\nHướng tấn công của kẻ địch\r\nChênh lệch độ cao\r\nTương khắc thuộc tính\r\nẢnh hưởng của địa hình\r\nKỹ năng và pháp thuật\r\n\r\nTất cả kết hợp lại tạo nên những trận chiến khá căng thẳng và có nhiều cách xử lý khác nhau.\r\n\r\n📖 CỐT TRUYỆN\r\n> \r\n\r\n*“Nhật trục tinh nguyệt ánh yêu đồ,*\r\n*Phúc hữu thương lâm hiện Nữ Oa phục.*\r\n*Ngạo khí lăng vân trừ ma chướng,*\r\n*Nhân giả chấp kiếm phổ Thương Ngô.”*\r\n\r\n⏳ Thời gian là cuối thời Thương – Trụ.\r\n\r\nThiên hạ rối ren, chính sự hỗn loạn, chiến tranh liên miên khắp nơi.\r\n\r\nTại một ngôi làng bí ẩn mang tên Bách Hoàng, chàng thiếu niên Chiến Đình Nghệ – người kế thừa sức mạnh Phục Hy của tộc Bách Hoàng – từng vô tình đối đầu với thế lực Ma tộc.\r\n\r\nSau trận chiến ấy, Đình Nghệ nhận ra sức mạnh của bản thân vẫn còn quá yếu.\r\n\r\nLo sợ ngôi làng một ngày nào đó sẽ bị thế lực tà ác đe dọa, cậu quyết định rời khỏi quê hương, bắt đầu một cuộc khổ luyện để tìm kiếm sức mạnh đủ khả năng chống lại những kẻ địch mạnh mẽ.\r\n\r\nHai năm sau...\r\n\r\nĐình Nghệ đặt chân đến Từ Châu.\r\n\r\nVà cũng từ đây, một hành trình kỳ lạ bắt đầu.\r\n\r\nTHỨ TỰ CHƠI ĐỀ XUẤT CHO SERIES 苍神录 (THƯƠNG THẦN LỤC)\r\n\r\nNếu muốn trải nghiệm cốt truyện theo đúng thứ tự của series, bạn có thể chơi lần lượt:\r\n* 苍神录序・极神传 → Thương Thần Lục Tự: Cực Thần Truyện\r\n* 苍神录外传・仑吾纪 → Thương Thần Lục Ngoại Truyện: Luân Ngô Kỷ\r\n* 苍神录1 → Thương Thần Lục 1\r\n* 苍神录续・火凌之凰 → Thương Thần Lục Tục: Hỏa Lăng Chi Hoàng\r\n* 苍神录2 → Thương Thần Lục 2\r\n\r\n👉 仑吾纪 (Luân Ngô Kỷ) là phần ngoại truyện, đưa mốc thời gian của câu chuyện lùi về thời kỳ Chiến Đình Nghệ còn trẻ, trước những sự kiện chính của series.\r\ngame vẫn còn có thiếu sót ,mọi người gặp lỗi thì cmt mình sẽ cố gắng fix \r\n\r\nthay dấu phẩy thành dấu chấm\r\nchương 1 https:\/\/drive,google,com\/file\/d\/1Iy4G66LkBamq5o7uGq3VQgC86md32a49\/view?usp=sharing, \r\nchương 2 https:\/\/drive,google,com\/file\/d\/1dxFHKcIYnGNOFtV0nDulJB0DhgxRTaJq\/view?usp=sharing, \r\nchương 3 https:\/\/drive,google,com\/file\/d\/1qgwL_FtNJeD32MKFeWpPTKS2As66160F\/view?usp=sharing\r\n\r\nChia sẻ bởi : Phùng Văn Hải",
         "thumb": "https:\/\/i.imgur.com\/tQisgwi.jpeg",
         "shots": [
@@ -464,6 +472,8 @@
         "jar": {
             "240x320": "ENC:xlN72kdpasZ1ZFgmcx5vyccoo0zz1nH2MAT6mW9ujbe23RuRU2YpRtDzdgjZ3nWGiWB5u8fM9FGdEzsI\/sVs54VzskcTtI1ChYYXBRZWxBx+rGJMeZItQZ299eIQQX8UDS9dp0Xy\/sYHXIAcKPU="
         },
-        "created_at": "2026-09-10T14:04:19+02:00"
+        "downloads": 0,
+        "created_at": "2026-09-10T14:04:19+02:00",
+        "updated_at": "2026-09-23T04:24:14+02:00"
     }
 ]
