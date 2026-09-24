@@ -188,6 +188,7 @@ span.skel{display:block}
       </div>
 <!--/SLOT:DL-->
     </div>
+    <div id="readNote" style="display:none;margin:8px 12px 0;font-size:11px;color:#4a7a9a;text-align:center;background:#e8f4fd;border:1px dashed #81c7f0;border-radius:10px;padding:6px"></div>
   </div>
 
   <!-- Giới thiệu vải - Sổ Tay -->
@@ -736,6 +737,20 @@ async function renderDetail(){
   head.innerHTML=`<img src="${escHtml(g.thumb)}" alt="${escHtml(g.name)} thumb" width="84" height="84" decoding="async" fetchpriority="high"><div><h2>${escHtml(g.name)} ${g.hot?'<span style="background:#0066cc;color:#fff;font-size:8px;padding:2px 5px;border-radius:8px">HOT</span>':''} ${g.vi?'<span style="background:#0a9c4a;color:#fff;font-size:8px;padding:2px 5px;border-radius:8px">VIỆT HÓA</span>':''}</h2><table class="info-table"><tr><th>${cmtT('g_thr_genre','Thể loại')}</th><td><a href="${apiRoot()}/category.html?cat=${encodeURIComponent(g.cat||'')}" style="color:#0066cc">${escHtml(g.cat)}</a></td></tr><tr><th>${cmtT('g_thr_size','Dung lượng')}</th><td>${escHtml(g.size)}</td></tr><tr><th>${cmtT('g_thr_res','Màn hình')}</th><td>${(g.res||[]).map(r=>`<span class="res-tag">${escHtml(r)}</span>`).join(' ')}</td></tr>${dateStr?`<tr><th>${cmtT('g_thr_date','Ngày đăng')}</th><td>${dateStr}</td></tr>`:''}${dlCount!=null?`<tr><th>${cmtT('g_thr_dl','Lượt tải')}</th><td>${Number(dlCount).toLocaleString('vi-VN')}</td></tr>`:''}</table></div>`;
   // dl
   document.querySelector('.dl-grid').innerHTML=(g.res||[]).map(r=>`<div class="dl-option"><b>${escHtml(r)}</b><br><small style="color:#4a7a9a;font-size:10px">${escHtml(g.size)} • ${String(r).includes('240')?'QVGA':'QCIF'}</small><br><a href="${escHtml(apiRoot()+'/api/dl?id='+encodeURIComponent(g.id)+'&res='+encodeURIComponent(r))}" class="dl-btn" data-dl-btn="1" data-name="${escHtml(g.name)}" data-res="${escHtml(r)}">${cmtT('dl','⬇ Tải JAR')}</a></div>`).join('');
+  // Ghi chú đọc bài dưới lưới tải
+  try{
+    var rn=document.getElementById('readNote');
+    if(rn){
+      var needRead=(g.gate&&g.gate.type==='stats'&&g.gate.require&&g.gate.require.read)?+g.gate.require.read:0;
+      if(needRead>0){
+        rn.style.display='block';
+        var updRN=function(){ try{var have=stRead(id); rn.textContent= have>=needRead ? '✓ Đã đọc đủ '+needRead+'s — bấm Tải để lấy vé' : 'Mở trang '+needRead+'s để mở khóa ('+have+'/'+needRead+'s) — cứ mở trang là tính giờ';}catch(e){}};
+        updRN();
+        if(window._readNoteTimer) clearInterval(window._readNoteTimer);
+        window._readNoteTimer=setInterval(updRN,1000);
+      } else { rn.style.display='none'; }
+    }
+  }catch(e){}
   // Chia sẻ + QR + yêu thích
   try{
     const pageUrl=isPreview?location.href:('https://J2ME.VERCEL.APP/game/'+id+'.html');
