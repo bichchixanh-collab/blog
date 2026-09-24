@@ -332,6 +332,22 @@ module.exports = async (req, res) => {
       if (!token) return send(res, 503, { error: 'comments not configured' });
 
       let lastErr = null;
+      // Chặn trùng khít 24h: cùng game + cùng người (uid hoặc tên) + cùng nội dung trong 24h → 409
+      try{
+        const tmp = await readLive(token).catch(()=>null);
+        const chkList = tmp ? tmp.list : [];
+        const nowMs = Date.now();
+        const normN = String(name).trim().toLowerCase();
+        const dup = (Array.isArray(chkList)?chkList:[]).some(c=>{
+          if(!c || c.game!==game) return false;
+          if(String(c.text||'').trim()!==text) return false;
+          const t=Date.parse(c.created_at||'')||0;
+          if(!t || nowMs-t>24*3600*1000) return false;
+          if(cmtUid) return c.uid===cmtUid;
+          return !c.uid && String(c.name||'').trim().toLowerCase()===normN;
+        });
+        if(dup) return send(res,409,{error:'duplicate comment'});
+      }catch(e){}
       // Tối đa 2 vòng: mỗi vòng 2 call GitHub × timeout 7s; 3 vòng có thể vượt 10s giới hạn của Vercel Hobby.
       for (let attempt = 0; attempt < 2; attempt++) {
         memCache.at = 0;
