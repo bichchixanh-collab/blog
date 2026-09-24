@@ -34,7 +34,9 @@ html,body{overflow-x:hidden;max-width:100%}
 body{font-family:"Be Vietnam Pro",system-ui;background:#e8f4fd;color:#1a3a5c;padding:12px}
 img{max-width:100%;height:auto}
 a{color:#0066cc;text-decoration:none}
-.wrap{max-width:420px;margin:0 auto;display:grid;gap:14px;min-width:0}
+.app{max-width:420px;margin:0 auto;background:#fff;border:2px solid #4da6ff;border-radius:16px;overflow:hidden;box-shadow:0 6px 20px rgba(0,102,204,.18)}
+.wrap{max-width:420px;margin:0 auto;display:grid;gap:14px;min-width:0;padding:10px}
+.app .wrap{max-width:none;margin:0}
 .wrap>*{min-width:0}
 .header{background:linear-gradient(135deg,#4da6ff,#0066cc);color:#fff;padding:14px;border-radius:14px;text-align:center;border:2px solid #fff;box-shadow:0 4px 12px rgba(0,102,204,.3)}
 .header h1{font-family:"Mali",cursive;font-size:18px}
@@ -140,6 +142,7 @@ span.skel{display:block}
 <link rel="stylesheet" href="/assets/css/manga.css?v=7" data-root-href="assets/css/manga.css?v=7">
 </head>
 <body>
+<div class="app">
 <div class="wrap">
   <div style="background:#1a1a2e;color:#7fb1ff;font-family:monospace;font-size:11px;display:flex;justify-content:space-between;padding:6px 10px;border-radius:8px 8px 0 0;border:1px solid #4da6ff;border-bottom:none">
     <span>◉ JAVA J2ME</span><span id="clock">09:42</span><span>▂▃▅▇ 100%</span>
@@ -240,6 +243,7 @@ span.skel{display:block}
     <p style="margin:6px 0 0;font-size:10px;opacity:.7"><a href="index.html" data-root-link="index.html" style="color:#fff" data-i18n="foot_home">Trang chủ</a> · <a href="category.html" data-root-link="category.html" style="color:#fff" data-i18n="foot_cat">Thể loại</a> · <a href="profile.html" data-root-link="profile.html" style="color:#fff" data-i18n="foot_profile">♡ Hồ sơ</a> · <a href="lien-he.html" data-root-link="lien-he.html" style="color:#fff" data-i18n="foot_contact">Liên hệ / DMCA</a></p>
     <p style="margin:6px 0 0"><button class="dl-btn pwa-install" style="display:none;font-size:10px" data-i18n="install" onclick="installApp()">Cài app về máy</button></p>
   </footer>
+</div>
 </div>
 
 <!-- Popup anime - giữ nguyên hiệu ứng -->
