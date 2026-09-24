@@ -618,7 +618,7 @@ function __statsRows(g,apprN){
   if(rq.read!=null){
     var have=v.read||0;
     var pct=Math.min(100, Math.floor(have*100/Math.max(1,rq.read)));
-    rows.push({k:'r',need:+rq.read,has:have,ok:have>=+rq.read,label:cmtT('go_req_read','Đọc bài {n}s').replace('{n}',rq.read),hint:'<small>'+cmtT('go_readHint','cuộn xem mô tả, còn {s}s').replace('{s}',Math.max(0,rq.read-have))+' <span style="display:inline-block;width:40px;height:4px;background:#e8f4fd;border-radius:4px;vertical-align:middle"><span style="display:block;width:'+pct+'%;height:100%;background:#0066cc;border-radius:4px"></span></span></small>'});
+    rows.push({k:'r',need:+rq.read,has:have,ok:have>=+rq.read,label:cmtT('g_readReq','Đọc bài {n} giây').replace('{n}',rq.read),hint:'<small>'+cmtT('g_readWait','Đã đọc {s}/{n}s…').replace('{s}',have).replace('{n}',rq.read)+' <span style="display:inline-block;width:40px;height:4px;background:#e8f4fd;border-radius:4px;vertical-align:middle"><span style="display:block;width:'+pct+'%;height:100%;background:#0066cc;border-radius:4px"></span></span> <span style="font-size:10px">'+cmtT('g_readHint','cứ mở trang là tính giờ')+'</span></small>'});
   }
   if(rq.minutes!=null)rows.push({k:'m',need:+rq.minutes,has:v.min,ok:v.min>=+rq.minutes,label:cmtT('go_req_min','Online đủ {n} phút').replace('{n}',rq.minutes),hint:'<small>'+cmtT('go_auto','mở web là tự tính')+'</small>'});
   if(rq.likes!=null)rows.push({k:'l',need:+rq.likes,has:v.likes,ok:v.likes>=+rq.likes,label:cmtT('go_req_like','Thích {n} game').replace('{n}',rq.likes),hint:'<a href="'+apiRoot()+'/index.html" style="color:#0066cc">'+cmtT('go_likeNow','→ thích ngay')+'</a>'});
@@ -749,7 +749,7 @@ async function renderDetail(){
       else needRead=10;
       // mặc định mọi game đều 10s (theo yêu cầu)
       rn.style.display='block';
-      var updRN=function(){ try{var have=stRead(id); rn.textContent= have>=needRead ? '✓ Đã đọc đủ '+needRead+'s — bấm Tải để lấy vé' : 'Mở trang '+needRead+'s để mở khóa ('+have+'/'+needRead+'s) — cứ mở trang là tính giờ';}catch(e){}};
+      var updRN=function(){ try{var have=stRead(id); rn.textContent= have>=needRead ? '✓ '+cmtT('g_readDone','Đã đọc đủ — bấm Tải để tiếp tục') : cmtT('g_readNote','Mở trang {n}s để mở khóa tải').replace('{n}',needRead)+' ('+have+'/'+needRead+'s) — '+cmtT('g_readHint','cứ mở trang là tính giờ');}catch(e){}};
       updRN();
       if(window._readNoteTimer) clearInterval(window._readNoteTimer);
       window._readNoteTimer=setInterval(updRN,1000);
