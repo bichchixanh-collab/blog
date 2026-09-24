@@ -49,7 +49,15 @@ module.exports = async (req, res) => {
     if (!g) { send(res, 404, { error: 'not found' }); return; }
     const resList = Array.isArray(g.res) ? g.res : [];
     if (!resName || resList.indexOf(resName) < 0) { send(res, 400, { error: 'res invalid' }); return; }
-    const gate = (g.gate && g.gate.type && g.gate.type !== 'none') ? g.gate : null;
+    let gate = (g.gate && g.gate.type && g.gate.type !== 'none') ? g.gate : null;
+    // Mặc định mọi game đều yêu cầu đọc 10s (read_secs) - kể cả gate none
+    if (!gate) {
+      gate = { type: 'stats', require: { read: Math.max(1, Math.min(3600, parseInt(g.read_secs,10)||10)) } };
+    } else if (gate.type === 'stats' && gate.require && gate.require.read == null && g.read_secs) {
+      gate.require.read = Math.max(1, Math.min(3600, parseInt(g.read_secs,10)||10));
+    } else if (gate.type === 'stats' && (!gate.require || Object.keys(gate.require).length===0)) {
+      gate.require = { read: Math.max(1, Math.min(3600, parseInt(g.read_secs,10)||10)) };
+    }
     let hard = 0;
     if (gate) {
       const me = await verifySbTokenAsync(bearerToken(req));

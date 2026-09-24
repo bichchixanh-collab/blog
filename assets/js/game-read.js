@@ -13,13 +13,19 @@ function getId(){
 }
 function key(id){return 'j2me_read_'+String(id||getId()).slice(0,120);}
 window.stReadKey=key;
-window.stRead=function(id){try{var k=key(id||getId());return Math.max(0, parseInt(localStorage.getItem(k)||'0',10)||0);}catch(e){return 0;}};
+// Phiên mới phải đọc lại 10s: dùng sessionStorage chính, localStorage chỉ để fallback khi reload giữa chừng
+window.stRead=function(id){try{var k=key(id||getId());var s=sessionStorage.getItem(k); if(s!=null) return Math.max(0, parseInt(s,10)||0); return Math.max(0, parseInt(localStorage.getItem(k)||'0',10)||0);}catch(e){return 0;}};
 function tick(){
   try{
     if(document.hidden||!document.hasFocus()) return;
     var gid=getId(); if(!gid) return;
-    var k=key(gid), v=Math.max(0, parseInt(localStorage.getItem(k)||'0',10)||0);
-    if(v<2 || window.scrollY>30 || document.documentElement.scrollTop>30) localStorage.setItem(k,String(v+1));
+    var k=key(gid);
+    var cur=Math.max(0, parseInt(sessionStorage.getItem(k)||localStorage.getItem(k)||'0',10)||0);
+    if(cur<2 || window.scrollY>30 || document.documentElement.scrollTop>30){
+      var nv=cur+1;
+      try{sessionStorage.setItem(k,String(nv));}catch(e){}
+      try{localStorage.setItem(k,String(nv));}catch(e){}
+    }
   }catch(e){}
 }
 try{setInterval(tick,1000);}catch(e){}

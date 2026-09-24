@@ -741,14 +741,16 @@ async function renderDetail(){
   try{
     var rn=document.getElementById('readNote');
     if(rn){
-      var needRead=(g.gate&&g.gate.type==='stats'&&g.gate.require&&g.gate.require.read)?+g.gate.require.read:0;
-      if(needRead>0){
-        rn.style.display='block';
-        var updRN=function(){ try{var have=stRead(id); rn.textContent= have>=needRead ? '✓ Đã đọc đủ '+needRead+'s — bấm Tải để lấy vé' : 'Mở trang '+needRead+'s để mở khóa ('+have+'/'+needRead+'s) — cứ mở trang là tính giờ';}catch(e){}};
-        updRN();
-        if(window._readNoteTimer) clearInterval(window._readNoteTimer);
-        window._readNoteTimer=setInterval(updRN,1000);
-      } else { rn.style.display='none'; }
+      var needRead=0;
+      if(g.gate&&g.gate.type==='stats'&&g.gate.require&&g.gate.require.read) needRead=+g.gate.require.read;
+      else if(g.read_secs) needRead=+g.read_secs;
+      else needRead=10;
+      // mặc định mọi game đều 10s (theo yêu cầu)
+      rn.style.display='block';
+      var updRN=function(){ try{var have=stRead(id); rn.textContent= have>=needRead ? '✓ Đã đọc đủ '+needRead+'s — bấm Tải để lấy vé' : 'Mở trang '+needRead+'s để mở khóa ('+have+'/'+needRead+'s) — cứ mở trang là tính giờ';}catch(e){}};
+      updRN();
+      if(window._readNoteTimer) clearInterval(window._readNoteTimer);
+      window._readNoteTimer=setInterval(updRN,1000);
     }
   }catch(e){}
   // Chia sẻ + QR + yêu thích

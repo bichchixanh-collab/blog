@@ -97,8 +97,10 @@ module.exports = async (req, res) => {
     const games = loadGames();
     const g = games.find((x) => x && x.id === t.id);
     if (!g) { res.statusCode = 404; res.end('not found'); return; }
-    const gate = (g.gate && g.gate.type && g.gate.type !== 'none') ? g.gate : null;
-    if (gateHash(gate || { type: 'none' }) !== t.gh) {
+    let gate = (g.gate && g.gate.type && g.gate.type !== 'none') ? g.gate : null;
+    if (!gate) gate = { type: 'stats', require: { read: Math.max(1, Math.min(3600, parseInt(g.read_secs,10)||10)) } };
+    else if (gate.type === 'stats' && gate.require && gate.require.read == null && g.read_secs) gate.require.read = Math.max(1, Math.min(3600, parseInt(g.read_secs,10)||10));
+    if (gateHash(gate) !== t.gh) {
       res.statusCode = 302;
       res.setHeader('Location', `${siteOf(req)}/game/${encodeURIComponent(t.id)}.html?locked=1`);
       res.end();
@@ -148,10 +150,10 @@ async function finishDl(req, res, g, resName) {
     // Host lạ: không redirect thẳng, đưa qua trang cảnh báo go.html bằng vé mới
     // (vé giữ nguyên hiệu lực, không lộ URL).
     try {
-      const gate = (g.gate && g.gate.type && g.gate.type !== 'none') ? g.gate : null;
-      // mint with same binding as current request to avoid open redirect bypass
+      let gate2 = (g.gate && g.gate.type && g.gate.type !== 'none') ? g.gate : null;
+      if (!gate2) gate2 = { type: 'stats', require: { read: Math.max(1, Math.min(3600, parseInt(g.read_secs,10)||10)) } };
       const cid = String(req.headers['x-guest-cid'] || (req.query && req.query.cid) || '').slice(0,64);
-      const t = mintTicket(g.id, resName, gate || { type: 'none' }, 0, { ip: ipOf(req), cid });
+      const t = mintTicket(g.id, resName, gate2, 0, { ip: ipOf(req), cid });
       res.statusCode = 302;
       res.setHeader('Location', `${siteOf(req)}/go.html?ticket=${encodeURIComponent(t.ticket)}`);
       res.end();
