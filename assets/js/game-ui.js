@@ -1,8 +1,8 @@
 // game-ui
 (function(){
-  // Random toàn b�" ảnh trong assets/banners (.png/.jpg/...): quét qua API, không fix cứng tên/s� lượng.
-  // Thêm/xóa ảnh ch�0 cần copy file vào assets/banners.
-  // API ch�0 trả T�`N FILE; JS tự dựng URL theo �úng subfolder (http://localhost/blog hay domain root �ều �úng).
+  // Random toÃ n bá»™ áº£nh trong assets/banners (.png/.jpg/...): quÃ©t qua API, khÃ´ng fix cá»©ng tÃªn/sá»‘ lÆ°á»£ng.
+  // ThÃªm/xÃ³a áº£nh chá»‰ cáº§n copy file vÃ o assets/banners.
+  // API chá»‰ tráº£ TÃŠN FILE; JS tá»± dá»±ng URL theo Ä‘Ãºng subfolder (http://localhost/blog hay domain root Ä‘á»u Ä‘Ãºng).
   var FALLBACK_NAMES=['banner1.png','banner2.png','banner3.png','banner4.png','banner5.png','banner6.png','banner7.png','banner8.png'];
   function appRoot(){
     try{
@@ -40,8 +40,8 @@
   window.__BANNER_CACHE=null;
   window.getBannerList=async function(){
     if(window.__BANNER_CACHE&&window.__BANNER_CACHE.length) return window.__BANNER_CACHE;
-    // Ch�0 dùng endpoint tuy�!t ��i theo ROOT. KH�NG dùng relative 'api/...'/'data/...'
-    // vì từ trang /game/*.html chúng resolve thành /game/api/... gây 404/403 rác console.
+    // Chá»‰ dÃ¹ng endpoint tuyá»‡t Ä‘á»‘i theo ROOT. KHÃ”NG dÃ¹ng relative 'api/...'/'data/...'
+    // vÃ¬ tá»« trang /game/*.html chÃºng resolve thÃ nh /game/api/... gÃ¢y 404/403 rÃ¡c console.
     var urls=[ROOT+'/api/banners',ROOT+'/data/banners.json',ROOT+'/api/banners.php'];
     for(var i=0;i<urls.length;i++){
       var u=urls[i];
@@ -60,12 +60,12 @@
     window.__BANNER_CACHE=FALLBACK_URLS;
     return FALLBACK_URLS;
   };
-  // Random nhưng KH�NG trùng ảnh vừa hi�!n lần trư�:c (lưu tên file vào localStorage).
+  // Random nhÆ°ng KHÃ”NG trÃ¹ng áº£nh vá»«a hiá»‡n láº§n trÆ°á»›c (lÆ°u tÃªn file vÃ o localStorage).
   function bannerName(u){try{return decodeURIComponent(String(u||'').split('?')[0].split('#')[0].split('/').pop());}catch(e){return '';}}
   function lastBanner(){try{return localStorage.getItem('j2me_last_banner')||'';}catch(e){return '';}}
   function saveBanner(n){try{if(n)localStorage.setItem('j2me_last_banner',n);}catch(e){}}
   window.pickRandomBanner=function(list,nosave){var a=(list&&list.length)?list:(window.__BANNER_CACHE&&window.__BANNER_CACHE.length?window.__BANNER_CACHE:window.__BANNER_FALLBACK);if(!a||!a.length)return '';if(a.length<2){if(!nosave)saveBanner(bannerName(a[0]));return a[0];}var last=lastBanner(),pick=a[Math.floor(Math.random()*a.length)],tries=0;while(bannerName(pick)===last&&tries<10){pick=a[Math.floor(Math.random()*a.length)];tries++;}if(!nosave)saveBanner(bannerName(pick));return pick;};
-  // Link chân trang theo �úng subfolder (trang game có thỒ �x /game/ sâu 1 cấp)
+  // Link chÃ¢n trang theo Ä‘Ãºng subfolder (trang game cÃ³ thá»ƒ á»Ÿ /game/ sÃ¢u 1 cáº¥p)
   try{document.querySelectorAll('a[data-root-link]').forEach(function(a){a.href=ROOT+'/'+a.getAttribute('data-root-link');});document.querySelectorAll('img[data-root-src]').forEach(function(im){im.src=ROOT+'/'+im.getAttribute('data-root-src');});document.querySelectorAll('link[data-root-href]').forEach(function(l){l.href=ROOT+'/'+l.getAttribute('data-root-href');});}catch(e){}
   var img=document.getElementById('wapBannerImg');
   if(img){
@@ -136,7 +136,7 @@ lbTrack.addEventListener('touchend',()=>{
   else if(touchDeltaX<-threshold) lbGoto(LB_INDEX+1);
   else updateLightboxPos(true);
 });
-// Cảnh báo trư�:c khi m�x link ngoài trong mô tả
+// Cáº£nh bÃ¡o trÆ°á»›c khi má»Ÿ link ngoÃ i trong mÃ´ táº£
 document.addEventListener('click',function(e){
   const a=e.target&&e.target.closest?e.target.closest('.body-text a[target="_blank"]'):null;
   if(!a) return;
