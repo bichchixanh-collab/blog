@@ -1,9 +1,10 @@
 // api/user-data.js — đồng bộ TOÀN BỘ dữ liệu cá nhân lên Supabase (thay localStorage).
 // Khi đã đăng nhập, Supabase là nguồn chính; localStorage chỉ là cache offline.
-// GET  -> {senpai:{xp,data}, stats:{minutes,likes,completed}} (cần Bearer)
+// GET  -> {senpai:{xp,data}, stats:{minutes,likes,completed,bingo,pet_xp}} (cần Bearer)
 // POST -> body {senpai:{xp,data}} hợp nhất lên server (union/max, không mất data)
 const { bearerToken, verifySbTokenAsync, getUserStats } = require('./_sb');
 const { check, ipOf } = require('./_rate');
+const { originStatus } = require('./_lib');
 
 function send(res, code, obj) {
   res.statusCode = code;
@@ -41,6 +42,7 @@ function readJsonBody(req) {
 
 module.exports = async (req, res) => {
   try {
+    if (req.method === 'POST' && originStatus(req) !== 'same') { send(res, 403, { error: 'cross-origin denied' }); return; }
     const me = await verifySbTokenAsync(bearerToken(req));
     if (!me) { send(res, 401, { error: 'login required' }); return; }
     if (req.method === 'GET') {
@@ -74,7 +76,7 @@ module.exports = async (req, res) => {
         if (rt > Date.now() - 30000 && cur.data) {
           // merge nông: giữ các key mới từ local nếu server thiếu
           finalData = Object.assign({}, cur.data, data);
-          // data blob giữ max/union đã xử lý ở client, ở đây chỉ merge
+          // pet, gacha giữ max/union đã xử lý ở client, ở đây chỉ merge
         }
       }
       const r = await serviceFetch('/rest/v1/senpai?on_conflict=user_id', {

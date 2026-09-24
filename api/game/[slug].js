@@ -27,8 +27,17 @@ module.exports = async (req, res) => {
     if (!/^[a-z0-9][a-z0-9\-]{0,119}$/i.test(slug)) { res.statusCode = 400; res.end('slug invalid'); return; }
     const games = loadGames();
     const game = games.find((g) => g && g.id === slug);
-    const proto = req.headers['x-forwarded-proto'] || 'https';
-    const host = req.headers['x-forwarded-host'] || req.headers.host;
+    // Whitelist host to avoid X-Forwarded-Host poisoning
+    const rawHost = String(req.headers.host || '').split(':')[0].toLowerCase();
+    const fwdHost = String(req.headers['x-forwarded-host'] || '').split(',')[0].trim().split(':')[0].toLowerCase();
+    let host = rawHost;
+    if (fwdHost) {
+      let allowed = '';
+      try { if (process.env.SITE_URL) allowed = new URL(process.env.SITE_URL).host.toLowerCase(); } catch {}
+      if (fwdHost === rawHost || fwdHost === allowed || fwdHost.endsWith('.vercel.app')) host = fwdHost;
+    }
+    const protoRaw = String(req.headers['x-forwarded-proto'] || 'https').split(',')[0].trim().toLowerCase();
+    const proto = protoRaw === 'http' ? 'http' : 'https';
     const siteUrl = (process.env.SITE_URL || `${proto}://${host}`).replace(/\/$/, '');
     if (!game) {
       res.statusCode = 404;
@@ -70,11 +79,6 @@ module.exports = async (req, res) => {
     set('REL', R.relatedHtml(games, game, siteUrl));
     html = html.replace(/(<b id="bcName">)[\s\S]*?(<\/b>)/, `$1${R.esc(game.name)}$2`);
     html = html.replace('<div id="relatedBox" class="kawaii-i" style="display:none">', '<div id="relatedBox" class="kawaii-i">');
-    // Trang serve tại /game/:slug — đường dẫn assets tương đối sẽ vỡ (/game/assets/...)
-    // nên viết lại thành tuyệt đối từ root (deploy Vercel luôn ở root).
-    // Lookbehind (?<![\w-]) để KHÔNG chạm vào data-root-src="assets/..." (giữ cho XAMPP).
-    html = html.replace(/(?<![\w-])(src|href)="assets\//g, '$1="/assets/');
-    html = html.split('href="manifest.webmanifest"').join('href="/manifest.webmanifest"');
 
     res.statusCode = 200;
     res.setHeader('Content-Type', 'text/html; charset=utf-8');

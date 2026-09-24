@@ -4,6 +4,7 @@
 // - Service-role REST (SUPABASE_SERVICE_KEY, không bao giờ lộ client) đọc/ghi
 //   bảng public.user_stats (xem supabase-gating.sql).
 const crypto = require('crypto');
+const { isoWeek } = require('./_bingo');
 
 const SB_URL = (process.env.SUPABASE_URL || 'https://pmotbltodyyilarnvtpn.supabase.co').replace(/\/$/, '');
 function jwtSecret() {
@@ -26,6 +27,32 @@ function bearerToken(req) {
     return m ? m[1].trim().slice(0, 2000) : '';
   } catch { return ''; }
 }
+function isValidClaims(body) {
+  try {
+    const now = Date.now() / 1000;
+    if (!body || typeof body.sub !== 'string' || !body.sub) return false;
+    // exp required, allow 30s leeway
+    if (typeof body.exp !== 'number' || now > body.exp + 30) return false;
+    if (typeof body.nbf === 'number' && now < body.nbf - 30) return false;
+    if (typeof body.iat === 'number' && body.iat > now + 60) return false;
+    // iss/aud: if present, must be valid (otherwise reject)
+    if (body.iss != null) {
+      const iss = String(body.iss);
+      try {
+        const u = new URL(iss);
+        const sbHost = new URL(SB_URL).host;
+        if (u.host !== sbHost) return false;
+        if (!iss.includes('/auth/v1')) return false;
+      } catch { return false; }
+    }
+    if (body.aud != null) {
+      const aud = body.aud;
+      const ok = aud === 'authenticated' || (Array.isArray(aud) && aud.includes('authenticated'));
+      if (!ok) return false;
+    }
+    return true;
+  } catch { return false; }
+}
 function verifySbToken(token) {
   try {
     const s = jwtSecret();
@@ -39,8 +66,7 @@ function verifySbToken(token) {
     const a = Buffer.from(sig, 'utf8'), c = Buffer.from(want, 'utf8');
     if (a.length !== c.length || !crypto.timingSafeEqual(a, c)) return null;
     const body = b64uJson(b);
-    if (!body || !body.sub) return null;
-    if (typeof body.exp === 'number' && Date.now() / 1000 > body.exp + 30) return null;
+    if (!isValidClaims(body)) return null;
     return { uid: String(body.sub), email: body.email || '' };
   } catch { return null; }
 }
@@ -107,8 +133,15 @@ async function verifySbTokenAsync(token) {
     const ok = await verifyEs256(p[0], p[1], p[2], head);
     if (!ok) return null; // verifyEs256 đã ghi dbg chi tiết (jwks-fail / unknown-kid / bad-sig)
     const body = b64uJson(p[1]);
-    if (!body || !body.sub) { dbgSet({ step: 'no-sub' }); return null; }
-    if (typeof body.exp === 'number' && Date.now() / 1000 > body.exp + 30) { dbgSet({ step: 'expired' }); return null; }
+    if (!isValidClaims(body)) {
+      const now = Date.now() / 1000;
+      if (!body || !body.sub) dbgSet({ step: 'no-sub' });
+      else if (typeof body.exp === 'number' && now > body.exp + 30) dbgSet({ step: 'expired' });
+      else if (typeof body.nbf === 'number' && now < body.nbf - 30) dbgSet({ step: 'nbf' });
+      else if (typeof body.iat === 'number' && body.iat > now + 60) dbgSet({ step: 'iat-future' });
+      else dbgSet({ step: 'bad-claims' });
+      return null;
+    }
     dbgSet({ step: 'es256-ok', kid: head.kid || '' });
     return { uid: String(body.sub), email: body.email || '' };
   } catch { dbgSet({ step: 'exception' }); return null; }
@@ -173,13 +206,14 @@ async function diagService() {
 // Đọc stats của uid. Thiếu hàng -> zeros. Lỗi hạ tầng -> null (caller rớt mềm).
 async function getUserStats(uid) {
   try {
-    const r = await sbFetch(`/rest/v1/user_stats?uid=eq.${encodeURIComponent(uid)}&select=minutes,likes,completed,updated_at`);
+    const r = await sbFetch(`/rest/v1/user_stats?uid=eq.${encodeURIComponent(uid)}&select=minutes,likes,completed,bingo,pet_xp,updated_at`);
     if (r.status === 200 && Array.isArray(r.json) && r.json.length) return cleanStats(r.json[0]);
     if (r.status === 200 || r.status === 404 || r.status === 406) return cleanStats(null);
     return null;
   } catch { return null; }
 }
-// Ghi event like/unlike/complete/uncomplete. Trả về stats mới, hoặc null khi lỗi.
+// Ghi event. Heartbeat chỉ +1 phút nếu lần ghi trước cách ≥50s (chống farm).
+// Trả về stats mới, hoặc null khi lỗi.
 async function eventUserStats(uid, ev) {
   try {
     const cur = await getUserStats(uid);
@@ -187,7 +221,11 @@ async function eventUserStats(uid, ev) {
     const now = new Date().toISOString();
     let { minutes, likes, completed, bingo, pet_xp } = cur;
     const t = ev && ev.t;
-    if (t === 'like' || t === 'unlike' || t === 'complete' || t === 'uncomplete') {
+    if (t === 'heartbeat') {
+      const last = Date.parse(cur.updated_at || '') || 0;
+      if (Date.now() - last < 50000) return cur; // quá nhanh, giữ nguyên
+      minutes += 1;
+    } else if (t === 'like' || t === 'unlike' || t === 'complete' || t === 'uncomplete') {
       const id = String((ev && ev.id) || '').slice(0, 120);
       if (!/^[a-z0-9][a-z0-9\-]{0,119}$/i.test(id)) return cur;
       const arr = (t === 'like' || t === 'unlike') ? likes : completed;
@@ -195,6 +233,23 @@ async function eventUserStats(uid, ev) {
       if ((t === 'like' || t === 'complete') && at < 0) arr.push(id);
       if ((t === 'unlike' || t === 'uncomplete') && at >= 0) arr.splice(at, 1);
       if (t === 'like' || t === 'unlike') likes = arr.slice(-500); else completed = arr.slice(-500);
+    } else if (t === 'bingo') {
+      // Hợp nhất ô bingo đã đánh (idempotent): {week:{actionId:1}}.
+      // Thiếu week hợp lệ thì dùng tuần hiện tại (server UTC, xem _bingo).
+      let w = String((ev && ev.week) || '').slice(0, 8);
+      if (!/^\d{4}-W\d{2}$/.test(w)) w = isoWeek(new Date());
+      const ids = Array.isArray(ev && ev.ids) ? ev.ids : ((ev && ev.id) ? [ev.id] : []);
+      if (!/^\d{4}-W\d{2}$/.test(w)) return cur;
+      const set = Object.assign({}, bingo[w] || {});
+      for (const raw of ids.slice(0, 24)) {
+        const k = String(raw || '');
+        if (/^[a-z0-9_]{1,24}$/i.test(k)) set[k] = 1;
+      }
+      bingo = Object.assign({}, bingo, { [w]: set });
+    } else if (t === 'petxp') {
+      // EXP pet chỉ tăng (max-merge, chống ghi đè ngược)
+      const v = Math.max(0, Math.min(10000000, parseInt(ev && ev.exp, 10) || 0));
+      if (v > pet_xp) pet_xp = v;
     } else {
       return cur;
     }

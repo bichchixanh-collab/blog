@@ -13,6 +13,7 @@ const https = require('https');
 const crypto = require('crypto');
 const { bearerToken, verifySbTokenAsync } = require('./_sb');
 const { check: rateCheck, ipOf } = require('./_rate');
+const { originStatus } = require('./_lib');
 
 const REPO = process.env.GITHUB_REPO || 'bichchixanh-collab/blog';
 const BRANCH = process.env.GITHUB_BRANCH || 'main';
@@ -142,21 +143,13 @@ function bigrams(s) {
   }
   return set;
 }
-// Chuẩn "bình luận chất lượng" DÙNG CHUNG cho cả thưởng EXP lẫn đếm mở gate:
-// đủ dài, đủ chữ cái, không lặp ký tự. Rác vẫn hiện bình thường, chỉ vô dụng.
-function qualityText(text) {
+function bonusEligible({ text, uid, list, excludeId }) {
+  if (!uid) return { ok: false, reason: 'no_uid' };
   const t = String(text || '').trim();
   if (t.length < BONUS_MIN_LEN) return { ok: false, reason: 'too_short' };
   const letters = (t.match(/[A-Za-zÀ-ỹđ]/g) || []).length;
   if (letters / Math.max(1, t.length) < 0.4) return { ok: false, reason: 'gibberish' };
   if (/(.)\1{5,}/.test(t)) return { ok: false, reason: 'repeat' };
-  return { ok: true };
-}
-function bonusEligible({ text, uid, list, excludeId }) {
-  if (!uid) return { ok: false, reason: 'no_uid' };
-  const q = qualityText(text);
-  if (!q.ok) return q;
-  const t = String(text || '').trim();
   const mine = (Array.isArray(list) ? list : [])
     .filter((c) => c && c.status === 'approved' && c.uid === uid && (!excludeId || c.id !== excludeId))
     .slice(-60);
@@ -302,6 +295,7 @@ module.exports = async (req, res) => {
       return;
     }
     const isPost = req.method === 'POST';
+    if (isPost && originStatus(req) !== 'same') return send(res, 403, { error: 'cross-origin denied' });
     if (!(await rateCheck({ ip: ipOf(req), route: isPost ? 'eco-post' : 'eco-get', limit: isPost ? 20 : 100, windowS: isPost ? 600 : 60 }))) {
       return send(res, 429, { error: 'slow down' });
     }
@@ -376,7 +370,6 @@ module.exports = async (req, res) => {
 module.exports.chargeForDownload = chargeForDownload;
 module.exports.creditCommentBonus = creditCommentBonus;
 module.exports.bonusEligible = bonusEligible;
-module.exports.qualityText = qualityText;
 module.exports.dayStr = dayStr;
 module.exports.costOf = (g) => {
   const v = parseInt(g && g.dl_cost, 10);

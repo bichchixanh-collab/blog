@@ -8,7 +8,7 @@ const { mintTicket, checkProofExtended } = require('./_lock');
 const { countApproved } = require('./comments');
 const { bearerToken, verifySbTokenAsync, getUserStats, getSenpai } = require('./_sb');
 const { chargeForDownload, costOf } = require('./economy');
-const { readSecsOf } = require('./_lock');
+const { countLinesMax, petLevel } = require('./_bingo');
 // Gom số server-side theo tài khoản cho khóa CỨNG. null = hạ tầng lỗi (fail-closed).
 async function resolveServerStats(uid) {
   try {
@@ -16,9 +16,13 @@ async function resolveServerStats(uid) {
     if (!st || !sen) return null;
     const appr = await countApproved([], uid);
     return {
+      min: st.minutes,
       likes: st.likes.length,
       done: st.completed.length,
       approved: appr,
+      bingoLines: countLinesMax(st.bingo, st.likes.length > 0),
+      petLv: petLevel(st.pet_xp),
+      badges: sen.badges.length > 0,
       xp: sen.xp,
     };
   } catch { return null; }
@@ -66,14 +70,9 @@ module.exports = async (req, res) => {
         }
       }
       const proof = req.query && req.query.proof;
-      const chk = await checkProofExtended(proof, id, gate, countApproved, serverStats, !!me, ipOf(req), readSecsOf(g));
+      const chk = await checkProofExtended(proof, id, gate, countApproved, serverStats, !!me, ipOf(req));
       if (!chk.ok) { send(res, 403, { error: 'locked', reason: chk.reason, hard: serverStats ? 1 : 0 }); return; }
       hard = chk.hard ? 1 : 0;
-    } else {
-      // Bài mở tự do vẫn phải đọc đủ số giây (vé đọc do server ký lúc mở trang).
-      const proof = req.query && req.query.proof;
-      const chkR = await checkProofExtended(proof, id, null, countApproved, null, false, ipOf(req), readSecsOf(g));
-      if (!chkR.ok) { send(res, 403, { error: 'locked', reason: chkR.reason, hard: 0 }); return; }
     }
     // Ví EXP: trừ giá tải của bài (tải lại game đã sở hữu thì miễn phí).
     {
@@ -94,7 +93,22 @@ module.exports = async (req, res) => {
         if (!pay.ok) { send(res, 503, { error: 'economy unavailable' }); return; }
       }
     }
-    const t = mintTicket(id, resName, gate || { type: 'none' }, hard);
+    // Bind ticket to caller identity (uid or guest cid) + IP subnet
+    let bindUid = null, bindCid = '';
+    try {
+      const meBind = await verifySbTokenAsync(bearerToken(req));
+      if (meBind) bindUid = meBind.uid;
+      else {
+        const raw = Buffer.from(String((req.query && req.query.proof) || '').replace(/-/g, '+').replace(/_/g, '/'), 'base64').toString('utf8');
+        const pj = JSON.parse(raw);
+        if (pj && typeof pj.cid === 'string') bindCid = pj.cid.slice(0, 64);
+      }
+      if (!bindCid) {
+        const c = String((req.query && req.query.cid) || req.headers['x-guest-cid'] || '').slice(0, 64);
+        if (/^[0-9a-f]{24}$/i.test(c)) bindCid = c;
+      }
+    } catch {}
+    const t = mintTicket(id, resName, gate || { type: 'none' }, hard, { uid: bindUid, cid: bindCid, ip: ipOf(req) });
     send(res, 200, { ticket: t.ticket, exp: t.exp, hard });
   } catch (e) { try { console.error('ticket error:', e && e.message); } catch {} send(res, 500, { error: 'error' }); }
 };

@@ -136,11 +136,15 @@ body{background:#e8f4fd;padding:12px}
     <p style="font-size:11px;line-height:1.6" data-i18n-html="guide_text">Chọn đúng độ phân giải → Bấm <b>⬇ Tải JAR</b> → Copy vào thẻ nhớ → Cài đặt. Không cần giải nén.</p>
   </section>
 
+
+
   <section class="kawaii-i">
     <div class="clouds">☁️ ☁️ ☁️</div>
     <div class="kawaii-title" data-i18n="cat_sec">≡ Thể loại</div>
     <div class="cat-grid" id="catGridIndex" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px"></div>
   </section>
+
+
 
   <section class="fabric-box" id="favSection" style="display:none">
     <div class="fabric-title" data-i18n="fav_sec">♥ Game Yêu Thích</div>
@@ -251,10 +255,12 @@ document.addEventListener('error',function(e){var t=e.target;if(!t||t.tagName!==
 })();
 let CACHE=null,GAME_AT=0;async function loadGames(){if(CACHE&&Date.now()-GAME_AT<3e5)return CACHE;try{const s=localStorage.getItem('j2me_games');if(s){const o=JSON.parse(s);if(o&&Date.now()-o.at<3e5&&Array.isArray(o.data)&&o.data.length){CACHE=o.data;GAME_AT=o.at;return CACHE;}}}catch(e){}const r=await fetch('data/games.json',{headers:{Accept:'application/json'}});CACHE=await r.json();GAME_AT=Date.now();try{localStorage.setItem('j2me_games',JSON.stringify({at:GAME_AT,data:CACHE}));}catch(e){}return CACHE;}
 function escHtml(s){return String(s==null?'':s).replace(/[&<>"']/g,function(m){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m];});}
+// Helper bingo: đánh dấu tiến trình tuần (khớp senpai.js/game.html). Không đổi giao diện.
+function __bm(a){try{var d=new Date();var t=new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()));var day=(t.getUTCDay()+6)%7;t.setUTCDate(t.getUTCDate()-day+3);var f=new Date(Date.UTC(t.getUTCFullYear(),0,4));var fd=(f.getUTCDay()+6)%7;f.setUTCDate(f.getUTCDate()-fd+3);var w=1+Math.round((t-f)/6048e5);var W=t.getUTCFullYear()+'-W'+('0'+w).slice(-2);var k='j2me_bingo_prog',o=JSON.parse(localStorage.getItem(k)||'{}');if(!o[W])o[W]={};if(!o[W][a]){o[W][a]=1;localStorage.setItem(k,JSON.stringify(o));}}catch(e){}}
 // Yêu thích (localStorage) + cài app PWA
 function favGet(){try{const a=JSON.parse(localStorage.getItem('j2me_favs')||'[]');return Array.isArray(a)?a:[];}catch(e){return [];}}
 function favHas(id){try{return favGet().indexOf(id)>=0;}catch(e){return false;}}
-function favToggle(id){try{let a=favGet();const was=a.indexOf(id)>=0;a=was?a.filter(function(x){return x!==id;}):a.concat([id]);localStorage.setItem('j2me_favs',JSON.stringify(a.slice(0,200)));refreshFavHearts();renderFavGrid();var on=!was;try{stEvent(on?'like':'unlike',id);}catch(e){}return on;}catch(e){return false;}}
+function favToggle(id){try{let a=favGet();const was=a.indexOf(id)>=0;a=was?a.filter(function(x){return x!==id;}):a.concat([id]);localStorage.setItem('j2me_favs',JSON.stringify(a.slice(0,200)));refreshFavHearts();renderFavGrid();try{__bm('fav');}catch(e){}var on=!was;try{stEvent(on?'like':'unlike',id);}catch(e){}return on;}catch(e){return false;}}
 function refreshFavHearts(){try{document.querySelectorAll('[data-fav]').forEach(function(b){b.textContent=favHas(b.getAttribute('data-fav'))?'♥':'♡';});}catch(e){}}
 let deferredPrompt=null;
 window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();deferredPrompt=e;try{document.querySelectorAll('.pwa-install').forEach(function(b){b.style.display='';});}catch(err){}});
@@ -342,6 +348,9 @@ function suggestGames(q){
     document.getElementById('hotList').innerHTML='<p style="padding:16px;text-align:center;color:#4a7a9a">'+T('idx_empty','Chưa có game nào — vào admin.php để đăng bài đầu tiên ♡')+'</p>';
     document.getElementById('newList').innerHTML='';
     document.getElementById('viethoaGrid').innerHTML='';
+    const ex0=document.getElementById('extraList'); if(ex0) ex0.innerHTML='';
+    const ex20=document.getElementById('extraGrid2'); if(ex20) ex20.innerHTML='';
+    const rnd0=document.getElementById('randomList'); if(rnd0) rnd0.innerHTML='';
     return;
   }
   await paintIndex(games0);
@@ -411,6 +420,9 @@ async function paintIndex(games){
   }catch(e){}
   renderNewPage();
   document.getElementById('viethoaGrid').innerHTML=games.filter(g=>g.vi).slice(0,6).map(g=>`<a href="game/${escHtml(g.id)}.html" class="grid-item"><img src="${escHtml(g.thumb)}" width="48" height="48" loading="lazy" decoding="async" alt="${escHtml(g.name)}"><span>${escHtml(String(g.name||'').split('[')[0].slice(0,14))} ${lockBadge(g)}</span><small>${escHtml((g.res||[])[0]||'')}</small></a>`).join('') || games.slice(0,6).map(g=>`<a href="game/${escHtml(g.id)}.html" class="grid-item"><img src="${escHtml(g.thumb)}" width="48" height="48" loading="lazy" decoding="async" alt="${escHtml(g.name)}"><span>${escHtml(String(g.name||'').split('[')[0].slice(0,14))} ${lockBadge(g)}</span></a>`).join('');
+  const extra=document.getElementById('extraList'); if(extra) extra.innerHTML=games.slice(3,6).map(g=>card(g)).join('');
+  const extra2=document.getElementById('extraGrid2'); if(extra2) extra2.innerHTML=games.slice(6,9).map(g=>`<a href="game/${escHtml(g.id)}.html" class="grid-item"><img src="${escHtml(g.thumb)}" width="48" height="48" loading="lazy" alt="${escHtml(g.name)}"><span>${escHtml(String(g.name||'').split('[')[0].slice(0,12))} ${lockBadge(g)}</span><small>${escHtml(g.size||'')}</small></a>`).join('');
+  const rnd=document.getElementById('randomList'); if(rnd) rnd.innerHTML=[...games].sort(()=>0.5-Math.random()).slice(0,3).map(g=>card(g)).join('');
   refreshFavHearts(); renderFavGrid();
   const catIdx=document.getElementById('catGridIndex');
   if(catIdx){
@@ -473,6 +485,7 @@ function bindIndexOnce(){
 // Stats local cho khóa tải: phút online + lượt thích + phá đảo + tên bình luận
 function stGet(k,d){try{var v=localStorage.getItem(k);return v==null?d:JSON.parse(v);}catch(e){return d;}}
 function stSet(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+function stMinutes(){return Math.floor((+stGet('j2me_online_ms',0))/60000);}
 function stLikes(){var a=stGet('j2me_favs',[]);return Array.isArray(a)?a.length:0;}
 function stDone(){var a=stGet('j2me_done',[]);return Array.isArray(a)?a.length:0;}
 function stNames(){var a=stGet('j2me_names',[]);return Array.isArray(a)?a.filter(Boolean).slice(0,5):[];}
@@ -486,6 +499,7 @@ function stEvent(t,id){try{var tk=stToken();if(!tk)return;fetch(stApiRoot()+'/ap
 var _stApprCache={at:0,n:-1};
 function stCid(){try{var c=localStorage.getItem('j2me_cid');if(typeof c==='string'&&/^[0-9a-f]{24}$/.test(c))return c;c='';var ch='0123456789abcdef';for(var i=0;i<24;i++)c+=ch[Math.floor(Math.random()*16)];try{localStorage.setItem('j2me_cid',c);}catch(e){}return c;}catch(e){return '';}}
 function stApprovedCount(cb){var now=Date.now();if(_stApprCache.n>=0&&now-_stApprCache.at<60000){cb(_stApprCache.n);return;}var tk='';try{tk=stToken();}catch(e){}var names=stNames();if(!tk&&!names.length){cb(0);return;}var url=stApiRoot()+'/api/comments?mine=1'+(names.length?'&names='+encodeURIComponent(names.join(',')):'');var hh=tk?{'Authorization':'Bearer '+tk}:{};fetch(url,{headers:hh,cache:'no-store'}).then(function(r){return r.json();}).then(function(j){var n=+(j&&j.mine)||0;_stApprCache={at:now,n:n};cb(n);}).catch(function(){cb(_stApprCache.n>=0?_stApprCache.n:0);});}
+(function(){try{setInterval(function(){try{if(document.hidden)return;var ms=+localStorage.getItem('j2me_online_ms')||0;localStorage.setItem('j2me_online_ms',String(ms+60000));}catch(e){}try{var tk=stToken();if(tk)fetch(stApiRoot()+'/api/ustats',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+tk},body:JSON.stringify({t:'heartbeat'}),keepalive:true}).catch(function(){});}catch(e){}try{var pr=null;try{pr=JSON.parse(localStorage.getItem('j2me_presence')||'null');}catch(e){}fetch(stApiRoot()+'/api/presence',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({tok:(pr&&pr.tok)||'',cid:stCid()}),keepalive:true}).then(function(r){return r.json();}).then(function(j){if(j&&j.tok)try{localStorage.setItem('j2me_presence',JSON.stringify({tok:j.tok,n:j.n||0}));}catch(e){}}).catch(function(){});}catch(e){}},60000);}catch(e){}})();
 </script>
 </body>
 </html>

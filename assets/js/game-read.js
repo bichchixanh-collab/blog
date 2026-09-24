@@ -1,0 +1,26 @@
+// assets/js/game-read.js - per-article reading time (thay cho phút online toàn site)
+// Đếm giây khi trang visible + focused + đã scroll >30px hoặc >2s
+(function(){
+'use strict';
+function getId(){
+  try{
+    var p=new URLSearchParams(location.search);
+    var id=p.get('id'); if(id) return id.replace(/\.html$/,'');
+    var m=location.pathname.match(/\/game\/([^\/]+)\.html$/); if(m) return decodeURIComponent(m[1]);
+    var m2=location.pathname.match(/\/game\/([^\/]+)$/); if(m2) return decodeURIComponent(m2[1]);
+  }catch(e){}
+  return '';
+}
+function key(id){return 'j2me_read_'+String(id||getId()).slice(0,120);}
+window.stReadKey=key;
+window.stRead=function(id){try{var k=key(id||getId());return Math.max(0, parseInt(localStorage.getItem(k)||'0',10)||0);}catch(e){return 0;}};
+function tick(){
+  try{
+    if(document.hidden||!document.hasFocus()) return;
+    var gid=getId(); if(!gid) return;
+    var k=key(gid), v=Math.max(0, parseInt(localStorage.getItem(k)||'0',10)||0);
+    if(v<2 || window.scrollY>30 || document.documentElement.scrollTop>30) localStorage.setItem(k,String(v+1));
+  }catch(e){}
+}
+try{setInterval(tick,1000);}catch(e){}
+})();

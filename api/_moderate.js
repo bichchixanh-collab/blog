@@ -116,6 +116,17 @@ function isSpam(text){
   if(t.length>20 && special/t.length > 0.4) return 'spam: nhiều ký tự đặc biệt';
   return null;
 }
+// Chất lượng thấp: ngắn/gibberish - gương economy.js bonusEligible
+function isLowQuality(text){
+  const t = String(text||'').trim();
+  if(t.length < 12) return 'quá ngắn / kém chất lượng (cần ≥12 ký tự)';
+  const letters = (t.match(/[A-Za-zÀ-ỹđ]/g) || []).length;
+  if(letters / Math.max(1, t.length) < 0.4) return 'nội dung không rõ nghĩa';
+  // câu chỉ 1-2 từ ngắn như Nice, Ok, Keren
+  const words = t.split(/\s+/).filter(Boolean);
+  if(words.length <= 2 && t.length <= 20) return 'quá ngắn / chung chung';
+  return null;
+}
 
 // Gọi OpenAI Moderation (omni-moderation-latest, free, hỗ trợ tiếng Việt) —
 // chỉ khi admin bật ai_enabled trong data/moderate_config.json VÀ có
@@ -173,6 +184,8 @@ async function checkComment({text, name}){
   if(bad) return {ok:false, reason:`từ cấm: ${bad}`};
   const spam = isSpam(t);
   if(spam) return {ok:false, reason:spam};
+  const low = isLowQuality(t);
+  if(low) return {ok:false, reason:low};
   // AI OpenAI (nếu admin bật + có key) — chỉ gọi khi đã qua hết local
   const ai = await checkOpenAI(t);
   if (ai && ai.blocked) return {ok:false, reason: ai.reason};
@@ -192,6 +205,8 @@ function checkCommentSync({text, name}){
   if(bad) return {ok:false, reason:`từ cấm: ${bad}`};
   const spam = isSpam(t);
   if(spam) return {ok:false, reason:spam};
+  const low = isLowQuality(t);
+  if(low) return {ok:false, reason:low};
   return {ok:true, reason:''};
 }
 

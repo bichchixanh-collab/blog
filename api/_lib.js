@@ -23,11 +23,13 @@ function hitRate(ip, route, limit, windowMs) {
 function originStatus(req) {
   if (req.method === 'GET') return 'same';
   const origin = req.headers.origin || req.headers.referer || '';
-  const host = req.headers.host || '';
+  const host = String(req.headers.host || '').split(':')[0].toLowerCase();
   if (!origin) return 'unverified';
   try {
-    const h = new URL(origin).host;
-    return (h === String(host).split(':')[0] || h.endsWith('.vercel.app')) ? 'same' : 'cross';
+    const h = new URL(origin).host.toLowerCase();
+    if (h === host || h.endsWith('.vercel.app')) return 'same';
+    try { if (process.env.SITE_URL && h === new URL(process.env.SITE_URL).host.toLowerCase()) return 'same'; } catch {}
+    return 'cross';
   } catch { return 'cross'; }
 }
 // Giữ tên cũ để tương thích ngược, nhưng giờ CHẶN cả 'cross' lẫn không xác định

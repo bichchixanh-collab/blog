@@ -162,13 +162,7 @@ module.exports = async (req, res) => {
       return send(res, 429, { error: 'Thao tác quá nhanh, thử lại sau ít phút.' });
     }
     const _origin = isPost ? originStatus(req) : 'same';
-    if (isPost && _origin === 'cross') return send(res, 403, { error: 'cross-origin denied' });
-    // 'unverified' (không gửi Origin/Referer): không chặn cứng để tránh chặn nhầm
-    // app/WAP cũ thật sự không gửi header này, nhưng siết trần rate-limit mạnh hơn
-    // hẳn — bot giả curl cũng chỉ đạt tối đa mức này thay vì full limit.
-    if (isPost && _origin === 'unverified' && !(await rateCheck({ ip: ipOf(req), route: 'unverified-origin', limit: 10, windowS: 60 }))) {
-      return send(res, 429, { error: 'Thao tác quá nhanh, thử lại sau ít phút.' });
-    }
+    if (isPost && _origin !== 'same') return send(res, 403, { error: 'cross-origin denied' });
 
     const token = process.env.GITHUB_TOKEN || '';
 

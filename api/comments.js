@@ -9,9 +9,10 @@
 const fs = require('fs');
 const path = require('path');
 const https = require('https');
+const crypto = require('crypto');
 const { bearerToken, verifySbTokenAsync, getLastAuthDbg } = require('./_sb');
 const { checkComment, isAutoApprove } = require('./_moderate');
-const { creditCommentBonus, qualityText } = require('./economy');
+const { creditCommentBonus } = require('./economy');
 
 const REPO = process.env.GITHUB_REPO || 'bichchixanh-collab/blog';
 const BRANCH = process.env.GITHUB_BRANCH || 'main';
@@ -93,13 +94,10 @@ async function countApproved(names, uid) {
     // Đếm theo uid HOẶC tên đã dùng (chống trùng id): bao cả bình luận cũ
     // đăng trước khi gắn uid, và tên user tự khai. Ké tên người khác để mở
     // khóa vẫn possible ở mức mềm — chấp nhận như thiết kế (xem HUONG-DAN).
-    // Chỉ đếm bình luận ĐẠT CHUẨN (đủ dài, không spam ký tự): rác vẫn hiện
-    // bình thường nhưng không mở được gate.
     let n = 0;
     const seen = {};
     for (const c of list) {
       if (!c || c.status !== 'approved' || !c.id || seen[c.id]) continue;
-      if (!qualityText(c.text).ok) continue;
       const byUid = !!uid && c.uid === uid;
       const byName = want.length > 0 && want.indexOf(normName(c.name)) >= 0;
       if (byUid || byName) { seen[c.id] = 1; n++; }
@@ -332,22 +330,6 @@ module.exports = async (req, res) => {
       if (!token) return send(res, 503, { error: 'comments not configured' });
 
       let lastErr = null;
-      // Chặn trùng khít 24h: cùng game + cùng người (uid hoặc tên) + cùng nội dung trong 24h → 409
-      try{
-        const tmp = await readLive(token).catch(()=>null);
-        const chkList = tmp ? tmp.list : [];
-        const nowMs = Date.now();
-        const normN = String(name).trim().toLowerCase();
-        const dup = (Array.isArray(chkList)?chkList:[]).some(c=>{
-          if(!c || c.game!==game) return false;
-          if(String(c.text||'').trim()!==text) return false;
-          const t=Date.parse(c.created_at||'')||0;
-          if(!t || nowMs-t>24*3600*1000) return false;
-          if(cmtUid) return c.uid===cmtUid;
-          return !c.uid && String(c.name||'').trim().toLowerCase()===normN;
-        });
-        if(dup) return send(res,409,{error:'duplicate comment'});
-      }catch(e){}
       // Tối đa 2 vòng: mỗi vòng 2 call GitHub × timeout 7s; 3 vòng có thể vượt 10s giới hạn của Vercel Hobby.
       for (let attempt = 0; attempt < 2; attempt++) {
         memCache.at = 0;
@@ -360,28 +342,13 @@ module.exports = async (req, res) => {
           }
           parentId = parent.id;
         }
-        // Chặn gửi trùng khít 24h (bấm 2 lần / copy-paste): cùng game + cùng người
-        // (uid hoặc tên) + cùng nội dung trong 24h qua -> 409, khỏi tốn lượt duyệt.
-        try {
-          const nowMs = Date.now();
-          const normN = String(name).trim().toLowerCase();
-          const dup = (Array.isArray(list) ? list : []).some((c) => {
-            if (!c || c.game !== game) return false;
-            if (String(c.text || '').trim() !== text) return false;
-            const t = Date.parse(c.created_at || '') || 0;
-            if (!t || nowMs - t > 24 * 3600 * 1000) return false;
-            if (cmtUid) return c.uid === cmtUid;
-            return !c.uid && String(c.name || '').trim().toLowerCase() === normN;
-          });
-          if (dup) return send(res, 409, { error: 'duplicate comment' });
-        } catch (e) {}
         // Auto-duyệt combo: công tắc admin (data/moderate_config.json) + env dự phòng.
         // Local sync trước, Perspective AI sau nếu admin bật ai_enabled và có key ở Vercel.
         const autoOn = isAutoApprove();
         const chk = autoOn ? await checkComment({ text, name }) : {ok:false, reason:'auto tắt'};
         const nextStatus = autoOn && chk.ok ? 'approved' : 'pending';
         list.push({
-          id: `c${Date.now().toString(36)}${Math.floor(Math.random() * 1e6).toString(36)}`,
+          id: `c${Date.now().toString(36)}${crypto.randomBytes(4).toString('hex')}`,
           game,
           name,
           stars: parentId ? 0 : stars,
