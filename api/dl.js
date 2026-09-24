@@ -18,8 +18,8 @@ function siteOf(req) {
   return `${req.headers['x-forwarded-proto'] || 'https'}://${req.headers['x-forwarded-host'] || req.headers.host}`;
 }
 // Game có gate yêu cầu proof: server kiểm đúng game + ngày tươi +
-// số bình luận duyệt (đếm chéo DB) + phút online qua presence chain đã ký.
-// Like/phá đảo vẫn là số local (khóa mềm); chỉ phút online là siết cứng cho cả khách.
+// số bình luận duyệt (đếm chéo DB).
+// Like/phá đảo vẫn là số local (khóa mềm).
 async function checkProofLegacy(p, id, gate, req) {
   try {
     if (!p) return false;
@@ -32,7 +32,8 @@ async function checkProofLegacy(p, id, gate, req) {
     if (isNaN(dayMs)) return false;
     if (Math.abs(Date.now() - dayMs) > 2 * 864e5) return false;
     if (gate.type === 'stats') {
-      const chk = await checkProofExtended(p, id, gate, countApproved, null, false, req ? ipOf(req) : '');
+      // Luồng cũ không có vé đọc (rz) nên bỏ qua điều kiện đọc — vé đọc chỉ bắt ở luồng ticket chính.
+      const chk = await checkProofExtended(p, id, gate, countApproved, null, false, req ? ipOf(req) : '', 0);
       if (!chk.ok) return false;
     }
     return true;

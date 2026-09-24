@@ -136,27 +136,10 @@ body{background:#e8f4fd;padding:12px}
     <p style="font-size:11px;line-height:1.6" data-i18n-html="guide_text">Chọn đúng độ phân giải → Bấm <b>⬇ Tải JAR</b> → Copy vào thẻ nhớ → Cài đặt. Không cần giải nén.</p>
   </section>
 
-  <section class="kawaii-g">
-    <div class="kawaii-title" data-i18n="cookie_hot">🍪 Bánh Quy Hot</div>
-    <div id="extraList"></div>
-  </section>
-
-  <section class="kawaii-h">
-    <div class="straw"></div>
-    <div class="kawaii-title" data-i18n="milk_rec">🥛 Hộp Sữa Đề Xuất</div>
-    <div class="game-grid" id="extraGrid2"></div>
-  </section>
-
   <section class="kawaii-i">
     <div class="clouds">☁️ ☁️ ☁️</div>
     <div class="kawaii-title" data-i18n="cat_sec">≡ Thể loại</div>
     <div class="cat-grid" id="catGridIndex" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px"></div>
-  </section>
-
-  <section class="kawaii-j">
-    <div class="lollipop">🍭</div>
-    <div class="kawaii-title" data-i18n="candy_rand">🍭 Kẹo Mút Ngẫu Nhiên</div>
-    <div id="randomList"></div>
   </section>
 
   <section class="fabric-box" id="favSection" style="display:none">
@@ -359,9 +342,6 @@ function suggestGames(q){
     document.getElementById('hotList').innerHTML='<p style="padding:16px;text-align:center;color:#4a7a9a">'+T('idx_empty','Chưa có game nào — vào admin.php để đăng bài đầu tiên ♡')+'</p>';
     document.getElementById('newList').innerHTML='';
     document.getElementById('viethoaGrid').innerHTML='';
-    const ex0=document.getElementById('extraList'); if(ex0) ex0.innerHTML='';
-    const ex20=document.getElementById('extraGrid2'); if(ex20) ex20.innerHTML='';
-    const rnd0=document.getElementById('randomList'); if(rnd0) rnd0.innerHTML='';
     return;
   }
   await paintIndex(games0);
@@ -431,9 +411,6 @@ async function paintIndex(games){
   }catch(e){}
   renderNewPage();
   document.getElementById('viethoaGrid').innerHTML=games.filter(g=>g.vi).slice(0,6).map(g=>`<a href="game/${escHtml(g.id)}.html" class="grid-item"><img src="${escHtml(g.thumb)}" width="48" height="48" loading="lazy" decoding="async" alt="${escHtml(g.name)}"><span>${escHtml(String(g.name||'').split('[')[0].slice(0,14))} ${lockBadge(g)}</span><small>${escHtml((g.res||[])[0]||'')}</small></a>`).join('') || games.slice(0,6).map(g=>`<a href="game/${escHtml(g.id)}.html" class="grid-item"><img src="${escHtml(g.thumb)}" width="48" height="48" loading="lazy" decoding="async" alt="${escHtml(g.name)}"><span>${escHtml(String(g.name||'').split('[')[0].slice(0,14))} ${lockBadge(g)}</span></a>`).join('');
-  const extra=document.getElementById('extraList'); if(extra) extra.innerHTML=games.slice(3,6).map(g=>card(g)).join('');
-  const extra2=document.getElementById('extraGrid2'); if(extra2) extra2.innerHTML=games.slice(6,9).map(g=>`<a href="game/${escHtml(g.id)}.html" class="grid-item"><img src="${escHtml(g.thumb)}" width="48" height="48" loading="lazy" alt="${escHtml(g.name)}"><span>${escHtml(String(g.name||'').split('[')[0].slice(0,12))} ${lockBadge(g)}</span><small>${escHtml(g.size||'')}</small></a>`).join('');
-  const rnd=document.getElementById('randomList'); if(rnd) rnd.innerHTML=[...games].sort(()=>0.5-Math.random()).slice(0,3).map(g=>card(g)).join('');
   refreshFavHearts(); renderFavGrid();
   const catIdx=document.getElementById('catGridIndex');
   if(catIdx){
@@ -496,7 +473,6 @@ function bindIndexOnce(){
 // Stats local cho khóa tải: phút online + lượt thích + phá đảo + tên bình luận
 function stGet(k,d){try{var v=localStorage.getItem(k);return v==null?d:JSON.parse(v);}catch(e){return d;}}
 function stSet(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
-function stMinutes(){return Math.floor((+stGet('j2me_online_ms',0))/60000);}
 function stLikes(){var a=stGet('j2me_favs',[]);return Array.isArray(a)?a.length:0;}
 function stDone(){var a=stGet('j2me_done',[]);return Array.isArray(a)?a.length:0;}
 function stNames(){var a=stGet('j2me_names',[]);return Array.isArray(a)?a.filter(Boolean).slice(0,5):[];}
@@ -510,7 +486,6 @@ function stEvent(t,id){try{var tk=stToken();if(!tk)return;fetch(stApiRoot()+'/ap
 var _stApprCache={at:0,n:-1};
 function stCid(){try{var c=localStorage.getItem('j2me_cid');if(typeof c==='string'&&/^[0-9a-f]{24}$/.test(c))return c;c='';var ch='0123456789abcdef';for(var i=0;i<24;i++)c+=ch[Math.floor(Math.random()*16)];try{localStorage.setItem('j2me_cid',c);}catch(e){}return c;}catch(e){return '';}}
 function stApprovedCount(cb){var now=Date.now();if(_stApprCache.n>=0&&now-_stApprCache.at<60000){cb(_stApprCache.n);return;}var tk='';try{tk=stToken();}catch(e){}var names=stNames();if(!tk&&!names.length){cb(0);return;}var url=stApiRoot()+'/api/comments?mine=1'+(names.length?'&names='+encodeURIComponent(names.join(',')):'');var hh=tk?{'Authorization':'Bearer '+tk}:{};fetch(url,{headers:hh,cache:'no-store'}).then(function(r){return r.json();}).then(function(j){var n=+(j&&j.mine)||0;_stApprCache={at:now,n:n};cb(n);}).catch(function(){cb(_stApprCache.n>=0?_stApprCache.n:0);});}
-(function(){try{setInterval(function(){try{if(document.hidden)return;var ms=+localStorage.getItem('j2me_online_ms')||0;localStorage.setItem('j2me_online_ms',String(ms+60000));}catch(e){}try{var tk=stToken();if(tk)fetch(stApiRoot()+'/api/ustats',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+tk},body:JSON.stringify({t:'heartbeat'}),keepalive:true}).catch(function(){});}catch(e){}try{var pr=null;try{pr=JSON.parse(localStorage.getItem('j2me_presence')||'null');}catch(e){}fetch(stApiRoot()+'/api/presence',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({tok:(pr&&pr.tok)||'',cid:stCid()}),keepalive:true}).then(function(r){return r.json();}).then(function(j){if(j&&j.tok)try{localStorage.setItem('j2me_presence',JSON.stringify({tok:j.tok,n:j.n||0}));}catch(e){}}).catch(function(){});}catch(e){}},60000);}catch(e){}})();
 </script>
 </body>
 </html>

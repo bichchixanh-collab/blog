@@ -44,10 +44,10 @@
         "hot": false,
         "vi": false,
         "new": false,
+        "read_secs": 10,
         "gate": {
             "type": "stats",
             "require": {
-                "minutes": 10,
                 "comments": 1
             }
         },
@@ -110,10 +110,10 @@
         "hot": false,
         "vi": true,
         "new": false,
+        "read_secs": 10,
         "gate": {
             "type": "stats",
             "require": {
-                "minutes": 10,
                 "comments": 2
             }
         },
@@ -144,10 +144,10 @@
         "hot": false,
         "vi": false,
         "new": false,
+        "read_secs": 2,
         "gate": {
             "type": "stats",
             "require": {
-                "minutes": 2,
                 "comments": 1
             }
         },
@@ -213,10 +213,10 @@
         "hot": false,
         "vi": false,
         "new": false,
+        "read_secs": 20,
         "gate": {
             "type": "stats",
             "require": {
-                "minutes": 20,
                 "comments": 2
             }
         },

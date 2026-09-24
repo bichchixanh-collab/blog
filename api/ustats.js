@@ -1,8 +1,8 @@
 // api/ustats.js — đếm server-side cho khóa tải CỨNG (chỉ người đã đăng nhập).
 // Client gửi EVENT kèm Bearer access_token (không gửi số tự khai):
-//   heartbeat (+1 phút nếu cách lần trước ≥50s) | like/unlike/complete/uncomplete {id}
-// GET  /api/ustats            -> {uid, minutes, likes, completed}
-// POST /api/ustats {t, ...}   -> {ok, minutes, likes, completed}
+//   like/unlike/complete/uncomplete {id}
+// GET  /api/ustats            -> {uid, likes, completed}
+// POST /api/ustats {t, ...}   -> {ok, likes, completed}
 const { check, ipOf } = require('./_rate');
 const { bearerToken, verifySbTokenAsync, getUserStats, eventUserStats } = require('./_sb');
 
@@ -14,7 +14,6 @@ function send(res, code, obj) {
 }
 function counts(st) {
   return {
-    minutes: st.minutes,
     likes: st.likes.length,
     completed: st.completed.length,
   };
@@ -48,7 +47,7 @@ module.exports = async (req, res) => {
       if (!await check({ ip: ipOf(req), route: 'ustats-post', limit: 120, windowS: 60 })) { send(res, 429, { error: 'slow down' }); return; }
       const p = (await readJsonBody(req)) || {};
       const t = String(p.t || '');
-      if (['heartbeat', 'like', 'unlike', 'complete', 'uncomplete'].indexOf(t) < 0) { send(res, 400, { error: 'bad event' }); return; }
+      if (['like', 'unlike', 'complete', 'uncomplete'].indexOf(t) < 0) { send(res, 400, { error: 'bad event' }); return; }
       const st = await eventUserStats(me.uid, { t, id: p.id });
       if (!st) { send(res, 503, { error: 'stats unavailable' }); return; }
       send(res, 200, Object.assign({ ok: true }, counts(st)));
