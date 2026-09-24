@@ -1,5 +1,37 @@
 [
     {
+        "id": "tam-quoc-truyen-ky-lu-bo-truyen",
+        "name": "Tam Quốc Truyền Kỳ - Lữ Bố Truyện",
+        "cat": "Nhập vai",
+        "size": "",
+        "res": [
+            "240x320"
+        ],
+        "hot": false,
+        "vi": true,
+        "new": false,
+        "gate": {
+            "type": "none",
+            "xp": 100
+        },
+        "dl_cost": 8,
+        "read_secs": 10,
+        "desc": "Trò chơi lấy bối cảnh thời Tam Quốc, cốt truyện tập trung vào các trận chiến của các anh hùng và tương tác giữa các nhân vật, bao gồm các yếu tố chinh phục và tương tác, với phong cách đối thoại tương đối nhẹ nhàng. Nội dung trò chơi đưa người chơi và nhân vật trong game cùng nhau trải nghiệm câu chuyện thời Tam Quốc.\r\n\r\nTrong trò chơi này, người chơi có thể sống lại thời Tam Quốc kinh điển với những anh hùng, mỹ nhân xinh đẹp.\r\n\r\n\"Tam Quốc Truyền Thuyết: Ma Thần Lữ Bố\" là một game nhập vai hành động với lối chơi cốt lõi kết hợp các yếu tố của chiến lược theo lượt. Người chơi có thể tham gia chiến đấu chiến lược theo nhiều phong cách cảnh chiến đấu khác nhau. Hệ thống chiến đấu bao gồm các hiệu ứng đặc biệt và tương tác trong bối cảnh, đồng thời cũng có các kỹ năng chiến đấu \"ngựa\". Trò chơi bao gồm nhiều hệ thống độc đáo như phép thuật, chế tạo thuốc, khai thác và thu thập kỹ năng sống.\r\n\r\n© NGUỒN: J2ME.VERCEL.APP\r\n[credit]Game java hay - vào ngay https:\/\/J2ME.VERCEL.APP\r\nVui lòng ghi thêm 2 dòng này khi chia sẻ lại bài viết.[\/credit]",
+        "thumb": "https:\/\/i.ibb.co\/675KPQ10\/wm-1790130204343.jpg",
+        "shots": [
+            "https:\/\/i.ibb.co\/675KPQ10\/wm-1790130204343.jpg",
+            "https:\/\/i.ibb.co\/cXVDSGdk\/wm-1790130205878.jpg",
+            "https:\/\/i.ibb.co\/bMv4NxDJ\/wm-1790130206469.jpg",
+            "https:\/\/i.ibb.co\/ZRhfCb6g\/wm-1790130207099.jpg"
+        ],
+        "jar": {
+            "240x320": "https:\/\/sfile.co\/AZ5XpUUDxFE"
+        },
+        "downloads": 0,
+        "created_at": "2026-09-23T04:32:50+02:00",
+        "updated_at": "2026-09-24T07:32:23+02:00"
+    },
+    {
         "id": "kisah-tiga-negara-gui-shen-lu-bu",
         "name": "Kisah Tiga Negara - Gui Shen Lu Bu",
         "cat": "Nhập vai",
@@ -13,26 +45,25 @@
         "gate": {
             "type": "stats",
             "require": {
-                "likes": 1,
-                "read": 15
+                "minutes": 10,
+                "comments": 1
             }
         },
         "desc": "Permainan ini berlatar belakang periode Tiga Kerajaan , dan alur ceritanya berpusat pada pertempuran para pahlawan dan interaksi karakter, termasuk unsur penaklukan dan interaksi, dengan gaya dialog yang relatif ringan. Konten permainan melibatkan pemain dan karakter permainan yang mengalami kisah periode Tiga Kerajaan bersama-sama. \r\n\r\nDalam permainan ini, pemain dapat menghidupkan kembali era Tiga Kerajaan klasik dengan para pahlawan dan wanita cantik.\r\n\r\n\"Legenda Tiga Kerajaan: Dewa Hantu Lu Bu\" adalah permainan peran aksi dengan gameplay inti yang menggabungkan elemen strategi berbasis giliran . Pemain dapat terlibat dalam pertempuran strategis dalam berbagai gaya adegan pertempuran . Sistem pertarungan mencakup efek khusus dan interaksi adegan, dan juga menampilkan keterampilan bertarung \"kuda\" . Permainan ini mencakup berbagai sistem unik, seperti sihir, pembuatan obat, penambangan, dan pengumpulan keterampilan hidup",
-        "thumb": "https://i.ibb.co/B5ND2Knm/wm-1789994852783.jpg",
+        "thumb": "https:\/\/i.ibb.co\/B5ND2Knm\/wm-1789994852783.jpg",
         "shots": [
-            "https://i.ibb.co/B5ND2Knm/wm-1789994852783.jpg",
-            "https://i.ibb.co/jZgB7sbQ/wm-1789994854852.jpg",
-            "https://i.ibb.co/r2SvgqYw/wm-1789994855480.jpg",
-            "https://i.ibb.co/sdbGW9tS/wm-1789994856089.jpg",
-            "https://i.ibb.co/9kdhH28M/wm-1789994856711.jpg"
+            "https:\/\/i.ibb.co\/B5ND2Knm\/wm-1789994852783.jpg",
+            "https:\/\/i.ibb.co\/jZgB7sbQ\/wm-1789994854852.jpg",
+            "https:\/\/i.ibb.co\/r2SvgqYw\/wm-1789994855480.jpg",
+            "https:\/\/i.ibb.co\/sdbGW9tS\/wm-1789994856089.jpg",
+            "https:\/\/i.ibb.co\/9kdhH28M\/wm-1789994856711.jpg"
         ],
         "jar": {
-            "240x320": "https://sfile.co/GPoSqFjl2cT"
+            "240x320": "https:\/\/sfile.co\/GPoSqFjl2cT"
         },
         "downloads": 0,
         "created_at": "2026-09-21T14:58:00+02:00",
-        "updated_at": "2026-09-21T14:58:00+02:00",
-        "read_secs": 15
+        "updated_at": "2026-09-21T14:58:00+02:00"
     },
     {
         "id": "legend-vs-zombies",
@@ -48,25 +79,23 @@
         "gate": {
             "type": "stats",
             "require": {
-                "read": 10,
-                "likes": 1
+                "comments": 1
             }
         },
         "desc": "Trò này thì chắc không lạ gì với ae nữa rồi :3\r\nHack:\r\n- Vô hạn gem\r\n- Vô hạn coin",
-        "thumb": "https://i.ibb.co/0yQ7kFT2/wm-1789994006683.jpg",
+        "thumb": "https:\/\/i.ibb.co\/0yQ7kFT2\/wm-1789994006683.jpg",
         "shots": [
-            "https://i.ibb.co/B5wCry2Z/wm-1789993887197.jpg",
-            "https://i.ibb.co/CKWcXG14/wm-1789993888692.jpg",
-            "https://i.ibb.co/bZcXKmT/wm-1789993889384.jpg",
-            "https://i.ibb.co/0yQ7kFT2/wm-1789994006683.jpg"
+            "https:\/\/i.ibb.co\/B5wCry2Z\/wm-1789993887197.jpg",
+            "https:\/\/i.ibb.co\/CKWcXG14\/wm-1789993888692.jpg",
+            "https:\/\/i.ibb.co\/bZcXKmT\/wm-1789993889384.jpg",
+            "https:\/\/i.ibb.co\/0yQ7kFT2\/wm-1789994006683.jpg"
         ],
         "jar": {
-            "240x320": "https://sfile.co/WTlmWIsdqz0"
+            "240x320": "https:\/\/sfile.co\/WTlmWIsdqz0"
         },
         "downloads": 0,
         "created_at": "2026-09-21T14:40:59+02:00",
-        "updated_at": "2026-09-21T17:19:29+02:00",
-        "read_secs": 10
+        "updated_at": "2026-09-21T17:19:29+02:00"
     },
     {
         "id": "boom-air",
@@ -82,26 +111,25 @@
         "gate": {
             "type": "stats",
             "require": {
-                "likes": 1,
-                "read": 15
+                "minutes": 10,
+                "comments": 2
             }
         },
         "desc": "Selamat datang kembali di J2ME! Kali ini saya membawa game klasik yang seru dengan grafis chibi yang lucu, cocok dimainkan saat waktu luang.\r\n\r\n🎮 **Game: Bom Air**\r\n\r\nKendalikan karakter dan ikuti misi di setiap level untuk menyelesaikan semua tantangan!",
-        "thumb": "https://i.ibb.co/FLC2Vfqg/wm-1789915723809.jpg",
+        "thumb": "https:\/\/i.ibb.co\/FLC2Vfqg\/wm-1789915723809.jpg",
         "shots": [
-            "https://i.ibb.co/FLC2Vfqg/wm-1789915723809.jpg",
-            "https://i.ibb.co/Fb37Qgm6/wm-1789915729242.jpg",
-            "https://i.ibb.co/MmLDj5Z/wm-1789915730893.jpg",
-            "https://i.ibb.co/CsBwr2r3/wm-1789915731473.jpg",
-            "https://i.ibb.co/bg1ZQHZs/wm-1789915732113.jpg"
+            "https:\/\/i.ibb.co\/FLC2Vfqg\/wm-1789915723809.jpg",
+            "https:\/\/i.ibb.co\/Fb37Qgm6\/wm-1789915729242.jpg",
+            "https:\/\/i.ibb.co\/MmLDj5Z\/wm-1789915730893.jpg",
+            "https:\/\/i.ibb.co\/CsBwr2r3\/wm-1789915731473.jpg",
+            "https:\/\/i.ibb.co\/bg1ZQHZs\/wm-1789915732113.jpg"
         ],
         "jar": {
-            "240x320": "https://drive.google.com/file/d/130sn3E5AVYSqVn7sgfy4OEbcQ44AlhV-/view"
+            "240x320": "https:\/\/drive.google.com\/file\/d\/130sn3E5AVYSqVn7sgfy4OEbcQ44AlhV-\/view"
         },
         "downloads": 0,
         "created_at": "2026-09-20T17:11:34+02:00",
-        "updated_at": "2026-09-20T17:11:34+02:00",
-        "read_secs": 15
+        "updated_at": "2026-09-20T17:11:34+02:00"
     },
     {
         "id": "honor-of-king",
@@ -117,26 +145,25 @@
         "gate": {
             "type": "stats",
             "require": {
-                "likes": 1,
-                "read": 10
+                "minutes": 2,
+                "comments": 1
             }
         },
-        "desc": "Halo semuanya! 👋 Setelah sekian lama menghilang, akhirnya saya kembali lagi! 😎🔥 Kali ini saya membawa sebuah game yang benar-benar menarik dan wajib kalian coba! 🎮👀\r\n\r\n\r\n\r\n🔥 SIAPA SANGKA… “HONOR OF KINGS” TERNYATA PUNYA VERSI JAVA OFFLINE?! 😱\r\n\r\n\r\n\r\nTidak perlu server. Tidak perlu internet. Tidak perlu HP dengan spesifikasi tinggi… cukup punya satu HP Java jadul! 📱🔥\r\n\r\n\r\n\r\nSebuah game fanmade yang terinspirasi dari Honor of Kings telah dibuat kembali dengan gaya khas game Java zaman dulu. Map, karakter, pertarungan, dan berbagai elemen MOBA semuanya dibuat dalam versi yang lebih sederhana, menghadirkan sensasi bermain offline yang penuh nostalgia! 👀\r\n\r\n\r\n\r\n⚔️ GAME JAVA KLASIK + MOBA ALA HONOR OF KINGS = APA YANG AKAN TERJADI?!\r\n\r\n\r\n\r\nYang paling menarik… game ini BUKAN game resmi Honor of Kings. Ini adalah game fanmade yang dibuat dengan nuansa khas game Java era dulu.\r\n\r\n\r\n\r\n👉 Buat kamu yang pernah menikmati game Java jadul, GAME INI WAJIB DICOBA! 🔥📱\r\n\r\n\r\n\r\n💨 CHEAT SPEED:\r\nMasuk ke Shop, lalu tekan tombol 2 sebanyak 2 kali atau tekan tombol Atas (↑).\r\n\r\n\r\n\r\n[credit]Game Java keren — kunjungi: https://J2ME.VERCEL.APP\r\nMohon sertakan 2 baris ini saat membagikan ulang postingan ini.[/credit]",
-        "thumb": "https://i.ibb.co/5WBvXmp8/wm-1789867217581.jpg",
+        "desc": "Halo semuanya! 👋 Setelah sekian lama menghilang, akhirnya saya kembali lagi! 😎🔥 Kali ini saya membawa sebuah game yang benar-benar menarik dan wajib kalian coba! 🎮👀\r\n\r\n\r\n\r\n🔥 SIAPA SANGKA… “HONOR OF KINGS” TERNYATA PUNYA VERSI JAVA OFFLINE?! 😱\r\n\r\n\r\n\r\nTidak perlu server. Tidak perlu internet. Tidak perlu HP dengan spesifikasi tinggi… cukup punya satu HP Java jadul! 📱🔥\r\n\r\n\r\n\r\nSebuah game fanmade yang terinspirasi dari Honor of Kings telah dibuat kembali dengan gaya khas game Java zaman dulu. Map, karakter, pertarungan, dan berbagai elemen MOBA semuanya dibuat dalam versi yang lebih sederhana, menghadirkan sensasi bermain offline yang penuh nostalgia! 👀\r\n\r\n\r\n\r\n⚔️ GAME JAVA KLASIK + MOBA ALA HONOR OF KINGS = APA YANG AKAN TERJADI?!\r\n\r\n\r\n\r\nYang paling menarik… game ini BUKAN game resmi Honor of Kings. Ini adalah game fanmade yang dibuat dengan nuansa khas game Java era dulu.\r\n\r\n\r\n\r\n👉 Buat kamu yang pernah menikmati game Java jadul, GAME INI WAJIB DICOBA! 🔥📱\r\n\r\n\r\n\r\n💨 CHEAT SPEED:\r\nMasuk ke Shop, lalu tekan tombol 2 sebanyak 2 kali atau tekan tombol Atas (↑).\r\n\r\n\r\n\r\n[credit]Game Java keren — kunjungi: https:\/\/J2ME.VERCEL.APP\r\nMohon sertakan 2 baris ini saat membagikan ulang postingan ini.[\/credit]",
+        "thumb": "https:\/\/i.ibb.co\/5WBvXmp8\/wm-1789867217581.jpg",
         "shots": [
-            "https://i.ibb.co/5WBvXmp8/wm-1789867217581.jpg",
-            "https://i.ibb.co/3mQTp5vB/wm-1789867218888.jpg",
-            "https://i.ibb.co/Zzd14YNR/wm-1789867219503.jpg",
-            "https://i.ibb.co/ymf8rQfP/wm-1789867220357.jpg",
-            "https://i.ibb.co/7xpVkKdN/wm-1789867220972.jpg"
+            "https:\/\/i.ibb.co\/5WBvXmp8\/wm-1789867217581.jpg",
+            "https:\/\/i.ibb.co\/3mQTp5vB\/wm-1789867218888.jpg",
+            "https:\/\/i.ibb.co\/Zzd14YNR\/wm-1789867219503.jpg",
+            "https:\/\/i.ibb.co\/ymf8rQfP\/wm-1789867220357.jpg",
+            "https:\/\/i.ibb.co\/7xpVkKdN\/wm-1789867220972.jpg"
         ],
         "jar": {
-            "240x320": "https://www.mediafire.com/file/tlybvwgcboe3u4p/VGVD-Bakawap-ID.jar/file"
+            "240x320": "https:\/\/www.mediafire.com\/file\/tlybvwgcboe3u4p\/VGVD-Bakawap-ID.jar\/file"
         },
         "downloads": 0,
         "created_at": "2026-09-20T03:27:01+02:00",
-        "updated_at": "2026-09-22T13:04:38+02:00",
-        "read_secs": 10
+        "updated_at": "2026-09-22T13:04:38+02:00"
     },
     {
         "id": "moba-vuong-gia-vinh-dieu",
@@ -152,28 +179,26 @@
         "gate": {
             "type": "stats",
             "require": {
-                "read": 10,
-                "likes": 1
+                "comments": 1
             }
         },
-        "desc": "🔥 AI NGỜ… “VƯƠNG GIẢ VINH DIỆU” LẠI CÓ BẢN JAVA OFFLINE?! 😱\r\nKhông cần server. Không cần mạng. Không cần máy cấu hình cao… chỉ cần một chiếc điện thoại Java! 📱\r\nMột tựa game fanmade lấy cảm hứng từ Vương Giả Vinh Diệu đã được tạo lại theo phong cách game Java ngày xưa — bản đồ, nhân vật, chiến đấu… tất cả được “thu nhỏ” vào một game offline cực kỳ hoài niệm. 👀\r\n⚔️ Java đời cũ + MOBA kiểu Vương Giả Vinh Diệu = chuyện gì sẽ xảy ra?\r\nĐiều thú vị nhất là… đây không phải game chính thức của Vương Giả Vinh Diệu. Đây là một sản phẩm fanmade mang đậm dấu ấn của thời kỳ game Java.\r\n👉 Ai từng mê game Java chắc chắn sẽ muốn thử!\r\nThêm cheat speed cho game: vào shop nhấn 2 lần phím 2 hoặc phím lên.\r\n\r\n[credit]Game java hay - vào ngay https://J2ME.VERCEL.APP\r\nVui lòng ghi thêm 2 dòng này khi chia sẻ lại bài viết.[/credit]",
-        "thumb": "https://i.ibb.co/Q73bMQPb/wm-1789826990806.jpg",
+        "desc": "🔥 AI NGỜ… “VƯƠNG GIẢ VINH DIỆU” LẠI CÓ BẢN JAVA OFFLINE?! 😱\r\nKhông cần server. Không cần mạng. Không cần máy cấu hình cao… chỉ cần một chiếc điện thoại Java! 📱\r\nMột tựa game fanmade lấy cảm hứng từ Vương Giả Vinh Diệu đã được tạo lại theo phong cách game Java ngày xưa — bản đồ, nhân vật, chiến đấu… tất cả được “thu nhỏ” vào một game offline cực kỳ hoài niệm. 👀\r\n⚔️ Java đời cũ + MOBA kiểu Vương Giả Vinh Diệu = chuyện gì sẽ xảy ra?\r\nĐiều thú vị nhất là… đây không phải game chính thức của Vương Giả Vinh Diệu. Đây là một sản phẩm fanmade mang đậm dấu ấn của thời kỳ game Java.\r\n👉 Ai từng mê game Java chắc chắn sẽ muốn thử!\r\nThêm cheat speed cho game: vào shop nhấn 2 lần phím 2 hoặc phím lên.\r\n\r\n[credit]Game java hay - vào ngay https:\/\/J2ME.VERCEL.APP\r\nVui lòng ghi thêm 2 dòng này khi chia sẻ lại bài viết.[\/credit]",
+        "thumb": "https:\/\/i.ibb.co\/Q73bMQPb\/wm-1789826990806.jpg",
         "shots": [
-            "https://i.ibb.co/Q73bMQPb/wm-1789826990806.jpg",
-            "https://i.ibb.co/HfpsKCfL/wm-1789826991203.jpg",
-            "https://i.ibb.co/23BmSgHg/wm-1789826991659.jpg",
-            "https://i.ibb.co/20ms3DL7/wm-1789826992143.jpg",
-            "https://i.ibb.co/Pvnx5NT5/wm-1789826992582.jpg",
-            "https://i.ibb.co/YBy8pjRV/wm-1789826993220.jpg",
-            "https://i.ibb.co/SwcRVWKv/wm-1789826993824.jpg"
+            "https:\/\/i.ibb.co\/Q73bMQPb\/wm-1789826990806.jpg",
+            "https:\/\/i.ibb.co\/HfpsKCfL\/wm-1789826991203.jpg",
+            "https:\/\/i.ibb.co\/23BmSgHg\/wm-1789826991659.jpg",
+            "https:\/\/i.ibb.co\/20ms3DL7\/wm-1789826992143.jpg",
+            "https:\/\/i.ibb.co\/Pvnx5NT5\/wm-1789826992582.jpg",
+            "https:\/\/i.ibb.co\/YBy8pjRV\/wm-1789826993220.jpg",
+            "https:\/\/i.ibb.co\/SwcRVWKv\/wm-1789826993824.jpg"
         ],
         "jar": {
-            "240x320": "https://www.mediafire.com/file/124sj0qw0fkdcfm/VGVD-VN-Bakawap.jar/file"
+            "240x320": "https:\/\/www.mediafire.com\/file\/124sj0qw0fkdcfm\/VGVD-VN-Bakawap.jar\/file"
         },
         "downloads": 0,
         "created_at": "2026-09-19T16:18:26+02:00",
-        "updated_at": "2026-09-20T03:19:08+02:00",
-        "read_secs": 10
+        "updated_at": "2026-09-20T03:19:08+02:00"
     },
     {
         "id": "phong-van-huyen-hoa",
@@ -189,26 +214,25 @@
         "gate": {
             "type": "stats",
             "require": {
-                "likes": 1,
-                "read": 20
+                "minutes": 20,
+                "comments": 2
             }
         },
-        "desc": "Trải nghiệm hành động cực nhanh, những trận chiến bùng nổ, kỹ năng mãn nhãn, cốt truyện hấp dẫn và điều khiển mượt mà, trực quan. Đây chắc chắn là một game hành động đỉnh cao sẽ mang đến cho bạn cảm giác hồi hộp tột đỉnh! Bạn còn chờ gì nữa? Bước vào thế giới **Phong Vân Huyễn Hóa** và trải nghiệm những trận chiến chưa từng có!\r\n\r\n[credit]Game java hay - vào ngay https://J2ME.VERCEL.APP\r\nVui lòng ghi thêm 2 dòng này khi chia sê lại bài viết.[/credit]",
-        "thumb": "https://i.ibb.co/9HVF8QbH/wm-1789821407809.jpg",
+        "desc": "Trải nghiệm hành động cực nhanh, những trận chiến bùng nổ, kỹ năng mãn nhãn, cốt truyện hấp dẫn và điều khiển mượt mà, trực quan. Đây chắc chắn là một game hành động đỉnh cao sẽ mang đến cho bạn cảm giác hồi hộp tột đỉnh! Bạn còn chờ gì nữa? Bước vào thế giới **Phong Vân Huyễn Hóa** và trải nghiệm những trận chiến chưa từng có!\r\n\r\n[credit]Game java hay - vào ngay https:\/\/J2ME.VERCEL.APP\r\nVui lòng ghi thêm 2 dòng này khi chia sê lại bài viết.[\/credit]",
+        "thumb": "https:\/\/i.ibb.co\/9HVF8QbH\/wm-1789821407809.jpg",
         "shots": [
-            "https://i.ibb.co/9HVF8QbH/wm-1789821407809.jpg",
-            "https://i.ibb.co/wFGbyZbR/wm-1789821409159.jpg",
-            "https://i.ibb.co/zT7RqBks/wm-1789821409568.jpg",
-            "https://i.ibb.co/Mxb5dYgw/wm-1789821410220.jpg",
-            "https://i.ibb.co/Y7wM7RmB/wm-1789821410897.jpg"
+            "https:\/\/i.ibb.co\/9HVF8QbH\/wm-1789821407809.jpg",
+            "https:\/\/i.ibb.co\/wFGbyZbR\/wm-1789821409159.jpg",
+            "https:\/\/i.ibb.co\/zT7RqBks\/wm-1789821409568.jpg",
+            "https:\/\/i.ibb.co\/Mxb5dYgw\/wm-1789821410220.jpg",
+            "https:\/\/i.ibb.co\/Y7wM7RmB\/wm-1789821410897.jpg"
         ],
         "jar": {
-            "240x320": "https://www.mediafire.com/file/7ge7b34nmyn0dn7/pvhh-vn-vh_bakawap.jar/file"
+            "240x320": "https:\/\/www.mediafire.com\/file\/7ge7b34nmyn0dn7\/pvhh-vn-vh_bakawap.jar\/file"
         },
         "downloads": 0,
         "created_at": "2026-09-19T14:48:21+02:00",
-        "updated_at": "2026-09-19T15:28:58+02:00",
-        "read_secs": 20
+        "updated_at": "2026-09-19T15:28:58+02:00"
     },
     {
         "id": "phuc-ma-doat-hon-nhan",
@@ -228,22 +252,22 @@
             "badge": "rare",
             "xp": 100
         },
-        "desc": "Trò chơi xoay quanh Kaine, hậu duệ của gia tộc Lunas, người bị kẻ phản diện Akasa đánh cắp linh hồn, dẫn đến một cuộc tàn sát. Tám năm sau, Thành phố Quỷ tiếp tục nuốt chửng linh hồn của tất cả sinh vật sống, và một cô gái trẻ dấn thân vào hang ổ của quỷ để bắt đầu câu chuyện.\r\n\r\n[credit]Game java hay - vào ngay https://J2ME.VERCEL.APP\r\nVui lòng ghi thêm 2 dòng này khi chia sê lại bài viết.[/credit]",
-        "thumb": "https://i.ibb.co/b57ND6sk/wm-1789574517024.jpg",
+        "dl_cost": 5,
+        "desc": "Trò chơi xoay quanh Kaine, hậu duệ của gia tộc Lunas, người bị kẻ phản diện Akasa đánh cắp linh hồn, dẫn đến một cuộc tàn sát. Tám năm sau, Thành phố Quỷ tiếp tục nuốt chửng linh hồn của tất cả sinh vật sống, và một cô gái trẻ dấn thân vào hang ổ của quỷ để bắt đầu câu chuyện.\r\n\r\n[credit]Game java hay - vào ngay https:\/\/J2ME.VERCEL.APP\r\nVui lòng ghi thêm 2 dòng này khi chia sê lại bài viết.[\/credit]",
+        "thumb": "https:\/\/i.ibb.co\/b57ND6sk\/wm-1789574517024.jpg",
         "shots": [
-            "https://i.ibb.co/b57ND6sk/wm-1789574517024.jpg",
-            "https://i.ibb.co/cKBZCC0h/wm-1789574518458.jpg",
-            "https://i.ibb.co/bj1JCKd7/wm-1789574519143.jpg",
-            "https://i.ibb.co/gb14fsYg/wm-1789574519807.jpg",
-            "https://i.ibb.co/VpMR4q95/wm-1789574520416.jpg"
+            "https:\/\/i.ibb.co\/b57ND6sk\/wm-1789574517024.jpg",
+            "https:\/\/i.ibb.co\/cKBZCC0h\/wm-1789574518458.jpg",
+            "https:\/\/i.ibb.co\/bj1JCKd7\/wm-1789574519143.jpg",
+            "https:\/\/i.ibb.co\/gb14fsYg\/wm-1789574519807.jpg",
+            "https:\/\/i.ibb.co\/VpMR4q95\/wm-1789574520416.jpg"
         ],
         "jar": {
-            "240x320": "ENC:ShA4JyvGdulEzHlvrjs15IuAo65Dq7VuN2avDR3/uQ0GnAXznZLFBnDMfK4zgHroZ+udYYjQ/EX0JXJxcb4uGwtbD5V772F2hqNeV36QCNZPTlWuFFUGJhYpfhL+W6O18YXpnFrKENG7"
+            "240x320": "ENC:ShA4JyvGdulEzHlvrjs15IuAo65Dq7VuN2avDR3\/uQ0GnAXznZLFBnDMfK4zgHroZ+udYYjQ\/EX0JXJxcb4uGwtbD5V772F2hqNeV36QCNZPTlWuFFUGJhYpfhL+W6O18YXpnFrKENG7"
         },
         "downloads": 0,
         "created_at": "2026-09-16T16:25:28+02:00",
-        "updated_at": "2026-09-19T17:26:18+02:00",
-        "read_secs": 10
+        "updated_at": "2026-09-23T04:25:52+02:00"
     },
     {
         "id": "cuong-hon-di-gioi-than-binh",
@@ -259,30 +283,28 @@
         "gate": {
             "type": "stats",
             "require": {
-                "read": 10,
-                "likes": 1
+                "comments": 2
             }
         },
         "dl_cost": 100,
-        "desc": "### Bối cảnh\r\n\r\nCâu chuyện bắt đầu từ lúc **“Cánh cổng đến thế giới khác được mở ra”**, từ đó hình thành một thế giới giả tưởng nơi **con người, ma quỷ và thần linh** cùng tồn tại và đan xen với nhau.\r\n\r\nNgười chơi vào vai **Kẻ Sát Hồn**, phải ký khế ước với một **nữ ma quyến rũ**, sau đó tu luyện **chân nguyên linh hồn** để từng bước phá bỏ vòng luân hồi và số phận đã kéo dài hàng nghìn năm.\r\n\r\nMạch truyện chính xoay quanh những trận chiến quy mô lớn như **phá trận giữa hàng nghìn quân**, **chiến đấu trên chiến trường**... Người chơi sẽ khám phá cách **luyện hóa thần khí** trong một không gian nơi **giấc mơ và hiện thực đan xen**.\r\n\r\n### Lối chơi\r\n\r\n**Hệ thống chiến đấu:**\r\nSử dụng hình thức chiến đấu thời gian thực. Nhân vật có thể **hợp thể với nữ ma** để tung ra các kỹ năng đặc biệt. Trò chơi có nhiều kiểu chiến đấu khác nhau, chẳng hạn như **đột kích chiến trường, giải cơ quan, vượt chướng ngại** và nhiều tình huống khác.\r\n\r\n**Hệ thống phát triển nhân vật:**\r\nNgười chơi tiêu diệt quái vật để thu thập **chân nguyên**, từ đó tăng cấp và cường hóa linh hồn. Khi phát triển nhân vật, người chơi có thể mở khóa **cây kỹ năng song tu** và tính năng **rèn trang bị**.\r\n\r\n**Chế độ vượt ải:**\r\nCác màn chơi được sắp xếp theo mức độ khó tăng dần. Mỗi màn đều có **cốt truyện ẩn** để khám phá và những trận đấu với **trùm**.\r\n\r\n### Phong cách hình ảnh\r\n\r\nTrò chơi sử dụng phong cách hình ảnh **thế giới khác u tối**, với nhiều khu vực có thiết kế khác nhau như **địa ngục dung nham**, **thành phố máy móc**...\r\n\r\nThiết kế nhân vật lấy cảm hứng từ **thần thoại phương Đông**, đặc biệt là các nhân vật nữ ma được xây dựng với sự kết hợp giữa vẻ **ma mị, kỳ dị** và nét **thiêng liêng**.\r\n\r\nHiệu ứng chiến đấu sử dụng **hiệu ứng ánh sáng dạng hạt** và **làm mờ chuyển động** để tạo cảm giác đòn đánh mạnh và chân thực hơn.\r\n\r\n### Điều khiển và hệ thống\r\n\r\nTrò chơi có **hướng dẫn dành cho người mới** bao phủ toàn bộ quá trình chơi. Giao diện điều khiển kết hợp **joystick ảo** với **bảng kỹ năng dạng vòng tròn**.\r\n\r\nNgoài ra còn có hệ thống **theo dõi thành tựu**, tính năng **tự động tìm đường** và hỗ trợ **tự động treo máy khi offline để tích lũy kinh nghiệm**.\r\n\r\nPhiên bản phát hành vào thời điểm đó cũng đã hỗ trợ **nhiều độ phân giải màn hình**, đồng thời tối ưu để trò chơi chạy tốt hơn trên **các thiết bị cấu hình thấp**.\r\n\r\n### Thông tin phiên bản\r\n\r\nPhiên bản này có các chương cốt truyện cơ bản và cho người chơi lựa chọn nhiều **nhánh nghề nghiệp** khác nhau.\r\n\r\nSau đó, nhà phát triển tiếp tục cho ra mắt các sản phẩm liên quan như **“Sổ Sát Hồn”** và **“Sát Hồn Online”**, từ đó phát triển trò chơi thành một **chuỗi sản phẩm cùng thương hiệu**.\r\n\r\nTrò chơi sử dụng hình thức **bán vật phẩm trong game**. Cửa hàng cung cấp các nội dung trả phí như **trang phục, ngoại hình nhân vật** và **phù văn tăng cường sức mạnh**.\r\n\r\n### Yếu tố văn hóa\r\n\r\nTrò chơi kết hợp giữa **tu chân phương Đông** và **thế giới fantasy phương Tây**. Hệ thống tu luyện **chân nguyên linh hồn** được sử dụng để xây dựng lại cách phát triển chỉ số nhân vật thường thấy trong các game RPG truyền thống.\r\n\r\nPhần hội thoại trong cốt truyện có lồng ghép các yếu tố từ **thơ ca cổ điển Trung Quốc**. Thiết kế kiến trúc trong game lấy cảm hứng từ **hoa văn đồ đồng thời Thương – Chu**, đồng thời kết hợp với những đặc điểm của **kiến trúc Gothic**.\r\n\r\n\r\n[credit]Game java hay - vào ngay https://J2ME.VERCEL.APP\r\nVui lòng ghi thêm 2 dòng này khi chia sê lại bài viết.[/credit]",
-        "thumb": "https://i.imgur.com/xDGFCGE.png",
+        "desc": "### Bối cảnh\r\n\r\nCâu chuyện bắt đầu từ lúc **“Cánh cổng đến thế giới khác được mở ra”**, từ đó hình thành một thế giới giả tưởng nơi **con người, ma quỷ và thần linh** cùng tồn tại và đan xen với nhau.\r\n\r\nNgười chơi vào vai **Kẻ Sát Hồn**, phải ký khế ước với một **nữ ma quyến rũ**, sau đó tu luyện **chân nguyên linh hồn** để từng bước phá bỏ vòng luân hồi và số phận đã kéo dài hàng nghìn năm.\r\n\r\nMạch truyện chính xoay quanh những trận chiến quy mô lớn như **phá trận giữa hàng nghìn quân**, **chiến đấu trên chiến trường**... Người chơi sẽ khám phá cách **luyện hóa thần khí** trong một không gian nơi **giấc mơ và hiện thực đan xen**.\r\n\r\n### Lối chơi\r\n\r\n**Hệ thống chiến đấu:**\r\nSử dụng hình thức chiến đấu thời gian thực. Nhân vật có thể **hợp thể với nữ ma** để tung ra các kỹ năng đặc biệt. Trò chơi có nhiều kiểu chiến đấu khác nhau, chẳng hạn như **đột kích chiến trường, giải cơ quan, vượt chướng ngại** và nhiều tình huống khác.\r\n\r\n**Hệ thống phát triển nhân vật:**\r\nNgười chơi tiêu diệt quái vật để thu thập **chân nguyên**, từ đó tăng cấp và cường hóa linh hồn. Khi phát triển nhân vật, người chơi có thể mở khóa **cây kỹ năng song tu** và tính năng **rèn trang bị**.\r\n\r\n**Chế độ vượt ải:**\r\nCác màn chơi được sắp xếp theo mức độ khó tăng dần. Mỗi màn đều có **cốt truyện ẩn** để khám phá và những trận đấu với **trùm**.\r\n\r\n### Phong cách hình ảnh\r\n\r\nTrò chơi sử dụng phong cách hình ảnh **thế giới khác u tối**, với nhiều khu vực có thiết kế khác nhau như **địa ngục dung nham**, **thành phố máy móc**...\r\n\r\nThiết kế nhân vật lấy cảm hứng từ **thần thoại phương Đông**, đặc biệt là các nhân vật nữ ma được xây dựng với sự kết hợp giữa vẻ **ma mị, kỳ dị** và nét **thiêng liêng**.\r\n\r\nHiệu ứng chiến đấu sử dụng **hiệu ứng ánh sáng dạng hạt** và **làm mờ chuyển động** để tạo cảm giác đòn đánh mạnh và chân thực hơn.\r\n\r\n### Điều khiển và hệ thống\r\n\r\nTrò chơi có **hướng dẫn dành cho người mới** bao phủ toàn bộ quá trình chơi. Giao diện điều khiển kết hợp **joystick ảo** với **bảng kỹ năng dạng vòng tròn**.\r\n\r\nNgoài ra còn có hệ thống **theo dõi thành tựu**, tính năng **tự động tìm đường** và hỗ trợ **tự động treo máy khi offline để tích lũy kinh nghiệm**.\r\n\r\nPhiên bản phát hành vào thời điểm đó cũng đã hỗ trợ **nhiều độ phân giải màn hình**, đồng thời tối ưu để trò chơi chạy tốt hơn trên **các thiết bị cấu hình thấp**.\r\n\r\n### Thông tin phiên bản\r\n\r\nPhiên bản này có các chương cốt truyện cơ bản và cho người chơi lựa chọn nhiều **nhánh nghề nghiệp** khác nhau.\r\n\r\nSau đó, nhà phát triển tiếp tục cho ra mắt các sản phẩm liên quan như **“Sổ Sát Hồn”** và **“Sát Hồn Online”**, từ đó phát triển trò chơi thành một **chuỗi sản phẩm cùng thương hiệu**.\r\n\r\nTrò chơi sử dụng hình thức **bán vật phẩm trong game**. Cửa hàng cung cấp các nội dung trả phí như **trang phục, ngoại hình nhân vật** và **phù văn tăng cường sức mạnh**.\r\n\r\n### Yếu tố văn hóa\r\n\r\nTrò chơi kết hợp giữa **tu chân phương Đông** và **thế giới fantasy phương Tây**. Hệ thống tu luyện **chân nguyên linh hồn** được sử dụng để xây dựng lại cách phát triển chỉ số nhân vật thường thấy trong các game RPG truyền thống.\r\n\r\nPhần hội thoại trong cốt truyện có lồng ghép các yếu tố từ **thơ ca cổ điển Trung Quốc**. Thiết kế kiến trúc trong game lấy cảm hứng từ **hoa văn đồ đồng thời Thương – Chu**, đồng thời kết hợp với những đặc điểm của **kiến trúc Gothic**.\r\n\r\n\r\n[credit]Game java hay - vào ngay https:\/\/J2ME.VERCEL.APP\r\nVui lòng ghi thêm 2 dòng này khi chia sê lại bài viết.[\/credit]",
+        "thumb": "https:\/\/i.imgur.com\/xDGFCGE.png",
         "shots": [
-            "https://i.ibb.co/XrY5vZFR/wm-1789315360643.jpg",
-            "https://i.ibb.co/vCwJm0jD/wm-1789315399597.jpg",
-            "https://i.ibb.co/kgR6cR8V/wm-1789315400238.jpg",
-            "https://i.ibb.co/pjzHRDKz/wm-1789315427315.jpg",
-            "https://i.ibb.co/8gvWNWG5/wm-1789315427879.jpg",
-            "https://i.ibb.co/Z6N3R9kF/wm-1789315428391.jpg",
-            "https://i.ibb.co/pBnqkZjW/wm-1789315400846.jpg",
-            "https://i.ibb.co/Sw8mZJn7/wm-1789315401490.jpg"
+            "https:\/\/i.ibb.co\/XrY5vZFR\/wm-1789315360643.jpg",
+            "https:\/\/i.ibb.co\/vCwJm0jD\/wm-1789315399597.jpg",
+            "https:\/\/i.ibb.co\/kgR6cR8V\/wm-1789315400238.jpg",
+            "https:\/\/i.ibb.co\/pjzHRDKz\/wm-1789315427315.jpg",
+            "https:\/\/i.ibb.co\/8gvWNWG5\/wm-1789315427879.jpg",
+            "https:\/\/i.ibb.co\/Z6N3R9kF\/wm-1789315428391.jpg",
+            "https:\/\/i.ibb.co\/pBnqkZjW\/wm-1789315400846.jpg",
+            "https:\/\/i.ibb.co\/Sw8mZJn7\/wm-1789315401490.jpg"
         ],
         "jar": {
-            "240x320": "https://drive.google.com/file/d/1zcb1Ip99D96Li-XFeQEyxcliZ4GwQh37/view?usp=sharing"
+            "240x320": "https:\/\/drive.google.com\/file\/d\/1zcb1Ip99D96Li-XFeQEyxcliZ4GwQh37\/view?usp=sharing"
         },
         "downloads": 0,
         "created_at": "2026-09-13T15:33:42+02:00",
-        "updated_at": "2026-09-22T18:14:09+02:00",
-        "read_secs": 10
+        "updated_at": "2026-09-22T18:14:09+02:00"
     },
     {
         "id": "haku-farm",
@@ -303,21 +325,20 @@
             "xp": 100
         },
         "desc": "game chơi offline theo thời gian thực, bạn nuôi gà con thời gian 4h là lớn  thì bạn thoát ra nó vẫn tự chạy, ví dụ 4 tiếng sau vào thì nó sẽ lớn thành gà truởng thành. Game có chế độ hàng xóm, có thể sang ăn trộm được( nhanh kiếm tiền hơn là tự chăn nuôi)",
-        "thumb": "https://i.imgur.com/ynudWDJ.jpeg",
+        "thumb": "https:\/\/i.imgur.com\/ynudWDJ.jpeg",
         "shots": [
-            "https://i.imgur.com/ynudWDJ.jpeg",
-            "https://i.imgur.com/v7tIDoP.jpeg",
-            "https://i.imgur.com/gVhFi2O.jpeg",
-            "https://i.imgur.com/Q9M1ObM.jpeg",
-            "https://i.imgur.com/jJWoBXk.jpeg"
+            "https:\/\/i.imgur.com\/ynudWDJ.jpeg",
+            "https:\/\/i.imgur.com\/v7tIDoP.jpeg",
+            "https:\/\/i.imgur.com\/gVhFi2O.jpeg",
+            "https:\/\/i.imgur.com\/Q9M1ObM.jpeg",
+            "https:\/\/i.imgur.com\/jJWoBXk.jpeg"
         ],
         "jar": {
-            "240x320": "ENC:+9ACdXNae7xBS5btU3N5SMXXrcnGFDu9zq+TvDz4NRz0WTPxzijyBE4wopwCXXgUmey4LIpPp9/V7knv4zgGhPRZnkSQFmXmyFxn3X5uctf0XSEbMRXy097DF5TszmVR"
+            "240x320": "ENC:+9ACdXNae7xBS5btU3N5SMXXrcnGFDu9zq+TvDz4NRz0WTPxzijyBE4wopwCXXgUmey4LIpPp9\/V7knv4zgGhPRZnkSQFmXmyFxn3X5uctf0XSEbMRXy097DF5TszmVR"
         },
         "downloads": 0,
         "created_at": "2026-09-13T05:15:56+02:00",
-        "updated_at": "2026-09-13T05:15:56+02:00",
-        "read_secs": 10
+        "updated_at": "2026-09-13T05:15:56+02:00"
     },
     {
         "id": "chinh-phuc-coi-than",
@@ -330,21 +351,28 @@
         "hot": false,
         "vi": true,
         "new": false,
-        "desc": "Siêu Phẩm 🔥CHINH PHỤC CÕI THẦN VIỆT HOÁ 🔥\r\n\r\n- Thể Loại: Nhập Vai, ARPG\r\n\r\n- Màn Hình: 240x320\r\n\r\n- Việt Hoá 99,99% by me và A.I (còn 0,01% nữa là do tìm ko ra file mã hóa để việt hóa chữ \"Lên cấp\") 😂\r\n\r\n- Giới thiệu:\r\n\r\nNhững cuộc chiến giữa ánh sáng và bóng tối, giữa tình yêu và lòng thù hận, cùng hành trình kỳ vĩ đưa bạn qua nhiều vùng đất khác nhau. Hãy nỗ lực hết mình để vượt qua tất cả các thử thách đó.\r\n\r\nNhững màn giao tranh kịch tính, vô số đòn combo cùng kho vũ khí đa dạng – tất cả đều hội tụ trong tựa game này!\r\n\r\nP/s: Gửi lời cảm ơn chân thành và sâu sắc nhất đến b Mộc Lam Ca Ca đã nhiệt tình hướng dẫn và chỉ bảo mình trong việc vh game 🥰\r\n\r\nNguồn từ FB: Thành Nam",
-        "thumb": "https://i.imgur.com/3OFRX6c.jpeg",
+        "gate": {
+            "type": "none",
+            "lines": 1,
+            "level": 3,
+            "badge": "rare",
+            "xp": 100
+        },
+        "dl_cost": 1,
+        "desc": "Siêu Phẩm 🔥CHINH PHỤC CÕI THẦN VIỆT HOÁ 🔥\r\n\r\n- Thể Loại: Nhập Vai, ARPG\r\n\r\n- Màn Hình: 240x320\r\n\r\n- Việt Hoá 99,99% by me và A.I (còn 0,01% nữa là do tìm ko ra file mã hóa để việt hóa chữ \"Lên cấp\") 😂\r\n\r\n- Giới thiệu:\r\n\r\nNhững cuộc chiến giữa ánh sáng và bóng tối, giữa tình yêu và lòng thù hận, cùng hành trình kỳ vĩ đưa bạn qua nhiều vùng đất khác nhau. Hãy nỗ lực hết mình để vượt qua tất cả các thử thách đó.\r\n\r\nNhững màn giao tranh kịch tính, vô số đòn combo cùng kho vũ khí đa dạng – tất cả đều hội tụ trong tựa game này!\r\n\r\nP\/s: Gửi lời cảm ơn chân thành và sâu sắc nhất đến b Mộc Lam Ca Ca đã nhiệt tình hướng dẫn và chỉ bảo mình trong việc vh game 🥰\r\n\r\nNguồn từ FB: Thành Nam",
+        "thumb": "https:\/\/i.imgur.com\/3OFRX6c.jpeg",
         "shots": [
-            "https://i.imgur.com/3OFRX6c.jpeg",
-            "https://i.imgur.com/ViDz6ZK.jpeg",
-            "https://i.imgur.com/jDsD3IX.jpeg",
-            "https://i.imgur.com/ehNJi1z.jpeg"
+            "https:\/\/i.imgur.com\/3OFRX6c.jpeg",
+            "https:\/\/i.imgur.com\/ViDz6ZK.jpeg",
+            "https:\/\/i.imgur.com\/jDsD3IX.jpeg",
+            "https:\/\/i.imgur.com\/ehNJi1z.jpeg"
         ],
         "jar": {
-            "240x320": "ENC:NXKhYPYqG7spWy5tJCHLrIx2eREh4Ah+2qykiekKttp82M5lx3E4S4GpxG24dngrSCS+t3ra4XC1ASk+G6S0ZBPkTqq/IRefxLWc7+rlOd2safpz7/MiwP9fdNEi4m5oBKWZvklNCg=="
+            "240x320": "ENC:NXKhYPYqG7spWy5tJCHLrIx2eREh4Ah+2qykiekKttp82M5lx3E4S4GpxG24dngrSCS+t3ra4XC1ASk+G6S0ZBPkTqq\/IRefxLWc7+rlOd2safpz7\/MiwP9fdNEi4m5oBKWZvklNCg=="
         },
         "downloads": 0,
         "created_at": "2026-09-11T12:53:53+02:00",
-        "updated_at": "2026-09-11T12:53:53+02:00",
-        "read_secs": 10
+        "updated_at": "2026-09-23T04:25:35+02:00"
     },
     {
         "id": "do-re-mon-tay-du-ky",
@@ -357,23 +385,30 @@
         "hot": false,
         "vi": false,
         "new": true,
+        "gate": {
+            "type": "none",
+            "lines": 1,
+            "level": 3,
+            "badge": "rare",
+            "xp": 100
+        },
+        "dl_cost": 1,
         "desc": "Đôrêmon Tây Du Ký việt hoá bởi LKT Pro\r\nTình hình là thấy game java cũ này cũng vui nhưng chưa có ai việt hoá nên mình mà g về việt hoá để mọi người hiểu cốt truyện.\r\n\r\nCốt truyện đơn giản là Nôbita muốn vào thế giới Tây Du chơi nên nhờ Đôrêmon mang bảo bối thế giới mộng ảo để được trải nghiệm du lịch. Cố gắng thu thập bảo bối để giải cứu thầy trò Đường Tăng, tiêu diệt quái và thoát ra ngoài thôi :)\r\n\r\nĐã việt hoá full thoại và menu, còn lại mấy cái lặt vặt không dịch do lười, chủ yếu là chơi trải nghiệm cốt truyện thôi.",
-        "thumb": "https://i.imgur.com/cIFxSr1.jpeg",
+        "thumb": "https:\/\/i.imgur.com\/cIFxSr1.jpeg",
         "shots": [
-            "https://i.imgur.com/XBJJ5dC.jpeg",
-            "https://i.imgur.com/FP3XXgb.jpeg",
-            "https://i.imgur.com/kwFiOaC.jpeg",
-            "https://i.imgur.com/dNweRBf.jpeg",
-            "https://i.imgur.com/Tuw9aSh.jpeg",
-            "https://i.imgur.com/cIFxSr1.jpeg"
+            "https:\/\/i.imgur.com\/XBJJ5dC.jpeg",
+            "https:\/\/i.imgur.com\/FP3XXgb.jpeg",
+            "https:\/\/i.imgur.com\/kwFiOaC.jpeg",
+            "https:\/\/i.imgur.com\/dNweRBf.jpeg",
+            "https:\/\/i.imgur.com\/Tuw9aSh.jpeg",
+            "https:\/\/i.imgur.com\/cIFxSr1.jpeg"
         ],
         "jar": {
-            "240x320": "ENC:/K0x4ssZUyRywk8W1Wbnx4LuJNvtl/nFBoeihOgdRfQY/fVrkSYOatkeOaDHRsdrR1v9mpNbVgeov2mJjpCPG60MptJRZ3X6+KyCpsaglxGtu1m+W9P8ae4iVHDwAZBtnx6HzZ9kwvOSsYSsPZwTAhLq8itmWtIEDbho9xlRmjSPdIz7KtodaN/nNOVIuGxB4Gw0NE5Nt5RCyq3JRJV9JIJYqliJB7hWu7YHcuFwwkwE6YxaTGCk+koLBHsGz9rE75fUmSbDabEwkYbu9XSCR1L0Ku4/ka10QwxaHA/lHXgX5PFH1pan1RZrT4LeBStAm8eQOORGDzxu4bmC9BkJ9MltrlW0EA1bZukpktpJyg=="
+            "240x320": "ENC:\/K0x4ssZUyRywk8W1Wbnx4LuJNvtl\/nFBoeihOgdRfQY\/fVrkSYOatkeOaDHRsdrR1v9mpNbVgeov2mJjpCPG60MptJRZ3X6+KyCpsaglxGtu1m+W9P8ae4iVHDwAZBtnx6HzZ9kwvOSsYSsPZwTAhLq8itmWtIEDbho9xlRmjSPdIz7KtodaN\/nNOVIuGxB4Gw0NE5Nt5RCyq3JRJV9JIJYqliJB7hWu7YHcuFwwkwE6YxaTGCk+koLBHsGz9rE75fUmSbDabEwkYbu9XSCR1L0Ku4\/ka10QwxaHA\/lHXgX5PFH1pan1RZrT4LeBStAm8eQOORGDzxu4bmC9BkJ9MltrlW0EA1bZukpktpJyg=="
         },
         "downloads": 0,
         "created_at": "2026-09-11T12:25:03+02:00",
-        "updated_at": "2026-09-11T12:27:30+02:00",
-        "read_secs": 10
+        "updated_at": "2026-09-23T04:25:19+02:00"
     },
     {
         "id": "castle-of-magic",
@@ -386,19 +421,28 @@
         "hot": false,
         "vi": true,
         "new": false,
+        "gate": {
+            "type": "none",
+            "lines": 1,
+            "level": 3,
+            "badge": "rare",
+            "xp": 100
+        },
+        "dl_cost": 1,
         "desc": "Siêu Phẩm Castle Of Magic \r\n*  Game nặng, đồ họa đẹp dành cho anh em test sức mạnh của máy. mình đã test trên nokia E72 và nó giật tung mắt. anh em muốn thử trên các máy khác có thể tải về test game có bản full 240x320, 360x640 ko bị cắt giảm đồ họa, âm thanh hiệu ứng hay. anh em có thể thử sức.\r\n* Tải về giải nén có 4 file java trong đó gồm bản 240x320 full nặng ~1MB, 360x640 full ~1.3-1.4MB và 2 phiên bản 320x240 bao gồm cả việt hóa cắt giảm dung lượng ~6-700kb.\r\n\r\nlink gồm 5 file trong đó 3 file tiếng anh và 2 file việt hóa 240 và cả 320.",
-        "thumb": "https://i.imgur.com/3Fp9aZ2.jpeg",
+        "thumb": "https:\/\/i.imgur.com\/3Fp9aZ2.jpeg",
         "shots": [
-            "https://i.imgur.com/IF8RmeO.jpeg",
-            "https://i.imgur.com/AlM2RbY.jpeg",
-            "https://i.imgur.com/rPOC2Oj.jpeg",
-            "https://i.imgur.com/3Fp9aZ2.jpeg"
+            "https:\/\/i.imgur.com\/IF8RmeO.jpeg",
+            "https:\/\/i.imgur.com\/AlM2RbY.jpeg",
+            "https:\/\/i.imgur.com\/rPOC2Oj.jpeg",
+            "https:\/\/i.imgur.com\/3Fp9aZ2.jpeg"
         ],
         "jar": {
-            "240x320": "ENC:r06a3KBSfKBGMQqLX095lRGXQzOtx4seaCLbmH4O8Yj3qf3IVmPM66Oj2Y9QX3qyO1S0bK65d/t1iySodlvPVK8gq1h1QHazWVTHYIe5qYhG4ni1gDJkn1Xu3Cqmu30fCyCUZwH6Kb+w8AyI2HRtNBTwUZ7SFdkU"
+            "240x320": "ENC:r06a3KBSfKBGMQqLX095lRGXQzOtx4seaCLbmH4O8Yj3qf3IVmPM66Oj2Y9QX3qyO1S0bK65d\/t1iySodlvPVK8gq1h1QHazWVTHYIe5qYhG4ni1gDJkn1Xu3Cqmu30fCyCUZwH6Kb+w8AyI2HRtNBTwUZ7SFdkU"
         },
+        "downloads": 0,
         "created_at": "2026-09-10T14:10:12+02:00",
-        "read_secs": 10
+        "updated_at": "2026-09-23T04:24:59+02:00"
     },
     {
         "id": "kiem-linh-chu-tien-chi-chien-1788855732",
@@ -418,20 +462,20 @@
             "badge": "rare",
             "xp": 100
         },
+        "dl_cost": 1,
         "desc": "Tên: Kiếm Linh - Chư Tiên Chi Chiến\r\nThể loại: ARPG\r\nMàn hình: 240x320\r\nVH full bởi bigame, cờ nhách sms bởi skypeaful\r\nSiêu phẩm tặt tém kiếm hiệp\r\nCó đầy đủ các hệ thống (gần giống) 1 game mmorpg: trang bị, vật phẩm, nâng cấp bằng đá, nhiệm vụ, bản đồ, kỹ năng...",
-        "thumb": "https://i.imgur.com/KFC6CtS.jpeg",
+        "thumb": "https:\/\/i.imgur.com\/KFC6CtS.jpeg",
         "shots": [
-            "https://i.imgur.com/KFC6CtS.jpeg",
-            "https://i.imgur.com/glcv8ua.jpeg",
-            "https://i.imgur.com/2JhYdsh.jpeg"
+            "https:\/\/i.imgur.com\/KFC6CtS.jpeg",
+            "https:\/\/i.imgur.com\/glcv8ua.jpeg",
+            "https:\/\/i.imgur.com\/2JhYdsh.jpeg"
         ],
         "jar": {
-            "240x320": "ENC:J3vMPX3fWGmildyNyqFWEWaiM9LXpfEUbSgQEI0P5cSnzevDfcV93nzIWOpQftlU1qMmciZ1BhEjbhxh7V3MJXjlxE3/sviwoQVbkvjS2TvGh9Y/1Z5DO/TgULUPps+V44kyZL8pmhfMr2ysCLK9lUQNdo0LjIp/"
+            "240x320": "ENC:J3vMPX3fWGmildyNyqFWEWaiM9LXpfEUbSgQEI0P5cSnzevDfcV93nzIWOpQftlU1qMmciZ1BhEjbhxh7V3MJXjlxE3\/sviwoQVbkvjS2TvGh9Y\/1Z5DO\/TgULUPps+V44kyZL8pmhfMr2ysCLK9lUQNdo0LjIp\/"
         },
         "downloads": 0,
         "created_at": "2026-09-10T14:10:07+02:00",
-        "updated_at": "2026-09-13T08:23:20+02:00",
-        "read_secs": 10
+        "updated_at": "2026-09-23T04:24:46+02:00"
     },
     {
         "id": "phieu-mieu-tien-do-tinh-than-kiem",
@@ -444,20 +488,29 @@
         "hot": false,
         "vi": true,
         "new": false,
-        "desc": "Một lão nhân thần bí tặng kiếm — là số mệnh!\r\nTình cờ gặp gỡ Tiên Linh tộc — là duyên phận!\r\nĐứng trước tình bằng hữu bền chặt và tình yêu trong tầm tay, ngươi sẽ lựa chọn ra sao? Tất cả đều là sự sắp đặt của số mệnh, hay chỉ là một âm mưu che trời lấp đất?\r\nHệ thống bồi dưỡng Tiên Linh độc đáo cùng năng lực Kiếm Hồn Thức Tỉnh sẽ đồng hành với ngươi, đưa ngươi bước vào một câu chuyện huyền huyễn đầy ly kỳ...\r\n\r\n\r\nhttps://drive.google.com/file/d/12DMw5ZBgJRfWQ22KyhsiJ542prvdSnpV/view?usp=sharing \r\n\r\n_________\r\n\r\nNguồn từ : Mộc Lam Ca Ca",
-        "thumb": "https://i.imgur.com/DZhtWhE.jpeg",
+        "gate": {
+            "type": "none",
+            "lines": 1,
+            "level": 3,
+            "badge": "rare",
+            "xp": 100
+        },
+        "dl_cost": 1,
+        "desc": "Một lão nhân thần bí tặng kiếm — là số mệnh!\r\nTình cờ gặp gỡ Tiên Linh tộc — là duyên phận!\r\nĐứng trước tình bằng hữu bền chặt và tình yêu trong tầm tay, ngươi sẽ lựa chọn ra sao? Tất cả đều là sự sắp đặt của số mệnh, hay chỉ là một âm mưu che trời lấp đất?\r\nHệ thống bồi dưỡng Tiên Linh độc đáo cùng năng lực Kiếm Hồn Thức Tỉnh sẽ đồng hành với ngươi, đưa ngươi bước vào một câu chuyện huyền huyễn đầy ly kỳ...\r\n\r\n\r\nhttps:\/\/drive.google.com\/file\/d\/12DMw5ZBgJRfWQ22KyhsiJ542prvdSnpV\/view?usp=sharing \r\n\r\n_________\r\n\r\nNguồn từ : Mộc Lam Ca Ca",
+        "thumb": "https:\/\/i.imgur.com\/DZhtWhE.jpeg",
         "shots": [
-            "https://i.imgur.com/oDKswho.jpeg",
-            "https://i.imgur.com/1oJqHxK.jpeg",
-            "https://i.imgur.com/GB5aViU.jpeg",
-            "https://i.imgur.com/P6BDSFZ.jpeg",
-            "https://i.imgur.com/DZhtWhE.jpeg"
+            "https:\/\/i.imgur.com\/oDKswho.jpeg",
+            "https:\/\/i.imgur.com\/1oJqHxK.jpeg",
+            "https:\/\/i.imgur.com\/GB5aViU.jpeg",
+            "https:\/\/i.imgur.com\/P6BDSFZ.jpeg",
+            "https:\/\/i.imgur.com\/DZhtWhE.jpeg"
         ],
         "jar": {
-            "240x320": "ENC:Zrw2G/OnApcJFu+fTqUQ8/zefcLhAIUvNxU5poRjdanABWClYxxl7W7iYz2dACBRKU+A1kHCZvIIbcchE9/lrCGfxVLMXpGIiqeH7KYHI7OPHX77NSqlGB3RkGLsVw25OtOA4TaUpHlH7ilyW0o="
+            "240x320": "ENC:Zrw2G\/OnApcJFu+fTqUQ8\/zefcLhAIUvNxU5poRjdanABWClYxxl7W7iYz2dACBRKU+A1kHCZvIIbcchE9\/lrCGfxVLMXpGIiqeH7KYHI7OPHX77NSqlGB3RkGLsVw25OtOA4TaUpHlH7ilyW0o="
         },
+        "downloads": 0,
         "created_at": "2026-09-10T14:09:59+02:00",
-        "read_secs": 10
+        "updated_at": "2026-09-23T04:24:30+02:00"
     },
     {
         "id": "thuong-than-luc-ngoai-truyen-luan-ngo-ky",
@@ -470,18 +523,27 @@
         "hot": false,
         "vi": true,
         "new": false,
-        "desc": "🎮 [VIỆT HÓA] 苍神录外传 - 仑吾纪 | THƯƠNG THẦN LỤC NGOẠI TRUYỆN – LUÂN NGÔ KỶ\r\n Màn hình: 240x320 \r\n\r\nMột tựa game chiến thuật nhập vai mang đậm phong cách final fantasy tatics huyền thoại nay đã được Việt hóa!\r\n\r\nKHÁC BIỆT SO VỚI BẢN CHÍNH\r\n\r\nDù là ngoại truyện của 苍神录 (Thương Thần Lục), trò chơi không đi theo lối nhập vai truyền thống mà kết hợp RPG + chiến thuật, với góc nhìn Isometric 45° độc đáo.\r\n\r\nNhân vật có thể:\r\n* Nhận kinh nghiệm và lên cấp sau mỗi trận chiến.\r\n* Sử dụng nhiều loại vũ khí khác nhau.\r\n* Tung ra các tuyệt kỹ và pháp thuật với đặc tính riêng.\r\n* Tự do vận dụng chiến thuật tùy tình huống.\r\n\r\nĐặc biệt, chiến đấu không đơn thuần là \"đánh càng mạnh càng tốt\". Vị trí và địa hình đóng vai trò rất quan trọng!\r\n\r\nHướng tấn công của kẻ địch\r\nChênh lệch độ cao\r\nTương khắc thuộc tính\r\nẢnh hưởng của địa hình\r\nKỹ năng và pháp thuật\r\n\r\nTất cả kết hợp lại tạo nên những trận chiến khá căng thẳng và có nhiều cách xử lý khác nhau.\r\n\r\n📖 CỐT TRUYỆN\r\n> \r\n\r\n*“Nhật trục tinh nguyệt ánh yêu đồ,*\r\n*Phúc hữu thương lâm hiện Nữ Oa phục.*\r\n*Ngạo khí lăng vân trừ ma chướng,*\r\n*Nhân giả chấp kiếm phổ Thương Ngô.”*\r\n\r\n⏳ Thời gian là cuối thời Thương – Trụ.\r\n\r\nThiên hạ rối ren, chính sự hỗn loạn, chiến tranh liên miên khắp nơi.\r\n\r\nTại một ngôi làng bí ẩn mang tên Bách Hoàng, chàng thiếu niên Chiến Đình Nghệ – người kế thừa sức mạnh Phục Hy của tộc Bách Hoàng – từng vô tình đối đầu với thế lực Ma tộc.\r\n\r\nSau trận chiến ấy, Đình Nghệ nhận ra sức mạnh của bản thân vẫn còn quá yếu.\r\n\r\nLo sợ ngôi làng một ngày nào đó sẽ bị thế lực tà ác đe dọa, cậu quyết định rời khỏi quê hương, bắt đầu một cuộc khổ luyện để tìm kiếm sức mạnh đủ khả năng chống lại những kẻ địch mạnh mẽ.\r\n\r\nHai năm sau...\r\n\r\nĐình Nghệ đặt chân đến Từ Châu.\r\n\r\nVà cũng từ đây, một hành trình kỳ lạ bắt đầu.\r\n\r\nTHỨ TỰ CHƠI ĐỀ XUẤT CHO SERIES 苍神录 (THƯƠNG THẦN LỤC)\r\n\r\nNếu muốn trải nghiệm cốt truyện theo đúng thứ tự của series, bạn có thể chơi lần lượt:\r\n* 苍神录序・极神传 → Thương Thần Lục Tự: Cực Thần Truyện\r\n* 苍神录外传・仑吾纪 → Thương Thần Lục Ngoại Truyện: Luân Ngô Kỷ\r\n* 苍神录1 → Thương Thần Lục 1\r\n* 苍神录续・火凌之凰 → Thương Thần Lục Tục: Hỏa Lăng Chi Hoàng\r\n* 苍神录2 → Thương Thần Lục 2\r\n\r\n👉 仑吾纪 (Luân Ngô Kỷ) là phần ngoại truyện, đưa mốc thời gian của câu chuyện lùi về thời kỳ Chiến Đình Nghệ còn trẻ, trước những sự kiện chính của series.\r\ngame vẫn còn có thiếu sót ,mọi người gặp lỗi thì cmt mình sẽ cố gắng fix \r\n\r\nthay dấu phẩy thành dấu chấm\r\nchương 1 https://drive,google,com/file/d/1Iy4G66LkBamq5o7uGq3VQgC86md32a49/view?usp=sharing, \r\nchương 2 https://drive,google,com/file/d/1dxFHKcIYnGNOFtV0nDulJB0DhgxRTaJq/view?usp=sharing, \r\nchương 3 https://drive,google,com/file/d/1qgwL_FtNJeD32MKFeWpPTKS2As66160F/view?usp=sharing\r\n\r\nChia sẻ bởi : Phùng Văn Hải",
-        "thumb": "https://i.imgur.com/tQisgwi.jpeg",
+        "gate": {
+            "type": "none",
+            "lines": 1,
+            "level": 3,
+            "badge": "rare",
+            "xp": 100
+        },
+        "dl_cost": 1,
+        "desc": "🎮 [VIỆT HÓA] 苍神录外传 - 仑吾纪 | THƯƠNG THẦN LỤC NGOẠI TRUYỆN – LUÂN NGÔ KỶ\r\n Màn hình: 240x320 \r\n\r\nMột tựa game chiến thuật nhập vai mang đậm phong cách final fantasy tatics huyền thoại nay đã được Việt hóa!\r\n\r\nKHÁC BIỆT SO VỚI BẢN CHÍNH\r\n\r\nDù là ngoại truyện của 苍神录 (Thương Thần Lục), trò chơi không đi theo lối nhập vai truyền thống mà kết hợp RPG + chiến thuật, với góc nhìn Isometric 45° độc đáo.\r\n\r\nNhân vật có thể:\r\n* Nhận kinh nghiệm và lên cấp sau mỗi trận chiến.\r\n* Sử dụng nhiều loại vũ khí khác nhau.\r\n* Tung ra các tuyệt kỹ và pháp thuật với đặc tính riêng.\r\n* Tự do vận dụng chiến thuật tùy tình huống.\r\n\r\nĐặc biệt, chiến đấu không đơn thuần là \"đánh càng mạnh càng tốt\". Vị trí và địa hình đóng vai trò rất quan trọng!\r\n\r\nHướng tấn công của kẻ địch\r\nChênh lệch độ cao\r\nTương khắc thuộc tính\r\nẢnh hưởng của địa hình\r\nKỹ năng và pháp thuật\r\n\r\nTất cả kết hợp lại tạo nên những trận chiến khá căng thẳng và có nhiều cách xử lý khác nhau.\r\n\r\n📖 CỐT TRUYỆN\r\n> \r\n\r\n*“Nhật trục tinh nguyệt ánh yêu đồ,*\r\n*Phúc hữu thương lâm hiện Nữ Oa phục.*\r\n*Ngạo khí lăng vân trừ ma chướng,*\r\n*Nhân giả chấp kiếm phổ Thương Ngô.”*\r\n\r\n⏳ Thời gian là cuối thời Thương – Trụ.\r\n\r\nThiên hạ rối ren, chính sự hỗn loạn, chiến tranh liên miên khắp nơi.\r\n\r\nTại một ngôi làng bí ẩn mang tên Bách Hoàng, chàng thiếu niên Chiến Đình Nghệ – người kế thừa sức mạnh Phục Hy của tộc Bách Hoàng – từng vô tình đối đầu với thế lực Ma tộc.\r\n\r\nSau trận chiến ấy, Đình Nghệ nhận ra sức mạnh của bản thân vẫn còn quá yếu.\r\n\r\nLo sợ ngôi làng một ngày nào đó sẽ bị thế lực tà ác đe dọa, cậu quyết định rời khỏi quê hương, bắt đầu một cuộc khổ luyện để tìm kiếm sức mạnh đủ khả năng chống lại những kẻ địch mạnh mẽ.\r\n\r\nHai năm sau...\r\n\r\nĐình Nghệ đặt chân đến Từ Châu.\r\n\r\nVà cũng từ đây, một hành trình kỳ lạ bắt đầu.\r\n\r\nTHỨ TỰ CHƠI ĐỀ XUẤT CHO SERIES 苍神录 (THƯƠNG THẦN LỤC)\r\n\r\nNếu muốn trải nghiệm cốt truyện theo đúng thứ tự của series, bạn có thể chơi lần lượt:\r\n* 苍神录序・极神传 → Thương Thần Lục Tự: Cực Thần Truyện\r\n* 苍神录外传・仑吾纪 → Thương Thần Lục Ngoại Truyện: Luân Ngô Kỷ\r\n* 苍神录1 → Thương Thần Lục 1\r\n* 苍神录续・火凌之凰 → Thương Thần Lục Tục: Hỏa Lăng Chi Hoàng\r\n* 苍神录2 → Thương Thần Lục 2\r\n\r\n👉 仑吾纪 (Luân Ngô Kỷ) là phần ngoại truyện, đưa mốc thời gian của câu chuyện lùi về thời kỳ Chiến Đình Nghệ còn trẻ, trước những sự kiện chính của series.\r\ngame vẫn còn có thiếu sót ,mọi người gặp lỗi thì cmt mình sẽ cố gắng fix \r\n\r\nthay dấu phẩy thành dấu chấm\r\nchương 1 https:\/\/drive,google,com\/file\/d\/1Iy4G66LkBamq5o7uGq3VQgC86md32a49\/view?usp=sharing, \r\nchương 2 https:\/\/drive,google,com\/file\/d\/1dxFHKcIYnGNOFtV0nDulJB0DhgxRTaJq\/view?usp=sharing, \r\nchương 3 https:\/\/drive,google,com\/file\/d\/1qgwL_FtNJeD32MKFeWpPTKS2As66160F\/view?usp=sharing\r\n\r\nChia sẻ bởi : Phùng Văn Hải",
+        "thumb": "https:\/\/i.imgur.com\/tQisgwi.jpeg",
         "shots": [
-            "https://i.imgur.com/wyrSFco.jpeg",
-            "https://i.imgur.com/hBokLCD.jpeg",
-            "https://i.imgur.com/ooh3dg0.jpeg",
-            "https://i.imgur.com/tQisgwi.jpeg"
+            "https:\/\/i.imgur.com\/wyrSFco.jpeg",
+            "https:\/\/i.imgur.com\/hBokLCD.jpeg",
+            "https:\/\/i.imgur.com\/ooh3dg0.jpeg",
+            "https:\/\/i.imgur.com\/tQisgwi.jpeg"
         ],
         "jar": {
-            "240x320": "ENC:xlN72kdpasZ1ZFgmcx5vyccoo0zz1nH2MAT6mW9ujbe23RuRU2YpRtDzdgjZ3nWGiWB5u8fM9FGdEzsI/sVs54VzskcTtI1ChYYXBRZWxBx+rGJMeZItQZ299eIQQX8UDS9dp0Xy/sYHXIAcKPU="
+            "240x320": "ENC:xlN72kdpasZ1ZFgmcx5vyccoo0zz1nH2MAT6mW9ujbe23RuRU2YpRtDzdgjZ3nWGiWB5u8fM9FGdEzsI\/sVs54VzskcTtI1ChYYXBRZWxBx+rGJMeZItQZ299eIQQX8UDS9dp0Xy\/sYHXIAcKPU="
         },
+        "downloads": 0,
         "created_at": "2026-09-10T14:04:19+02:00",
-        "read_secs": 10
+        "updated_at": "2026-09-23T04:24:14+02:00"
     }
 ]
