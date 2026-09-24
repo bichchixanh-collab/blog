@@ -1,5 +1,5 @@
 ﻿// sw.js v9 â€” versioned cache, khÃ´ng cache API POST, giá»›i háº¡n dung lÆ°á»£ng.
-const CACHE = 'j2me-v10';
+const CACHE = 'j2me-v11';
 const CORE = ['index.html', 'category.html', 'game.html', 'profile.html', 'lien-he.html', '404.html', 'offline.html', 'go.html', 'dang-nhap.html', 'assets/js/sb-auth.js', 'assets/js/sb-config.js', 'assets/js/sb-sync.js', 'assets/js/sb-board.js', 'assets/i18n.js', 'assets/js/game-common.js', 'assets/js/game-comments.js', 'assets/js/game-detail.js', 'assets/js/game-ui.js',            'trang-xep-hang.html', 'style.min.css', 'assets/css/manga.css', 'assets/anime-girl.png', 'assets/logo.png',                     'manifest.webmanifest'];
 self.addEventListener('install', (e) => {
   e.waitUntil(caches.open(CACHE).then((c) => c.addAll(CORE).catch(() => {})).then(() => self.skipWaiting()));
