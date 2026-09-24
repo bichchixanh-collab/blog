@@ -647,19 +647,17 @@ function __lockLive(gid,gm,msg,res,head,foot){
       __lockTick++;
       var doPaint=function(){
         var rows=__statsRows(gm,__lockAppr);
-        var needCmt=rows.some(function(r){return r.k==='c';});
         var paint=function(rr){
           __lockPaint(msg,rr,head,foot);
           if(__statsPass(rr)){ __lockStop(); msg.textContent=cmtT('g_getting','Đủ điều kiện! Đang lấy vé...'); __ticketAndGo(gid,res,msg,true); }
         };
-        if(needCmt&&(__lockTick%3===0)){ try{stApprovedCount(function(n){__lockAppr=n;paint(__statsRows(gm,n));});}catch(e){paint(rows);} }
-        else paint(rows);
+        paint(rows);
       };
-      // Mỗi ~30s đồng bộ lại số server (nếu đã đăng nhập) rồi mới vẽ
-      if(__lockTick%3===0){ try{__pullSrvVals(doPaint);}catch(e){doPaint();} }
+      // tick 1s realtime cho Đọc bài; server sync mỗi 30s
+      if(__lockTick%30===0){ try{__pullSrvVals(doPaint);}catch(e){doPaint();} }
       else doPaint();
     }catch(e){}
-  },10000);
+  },1000);
 }
 function __ticketAndGo(gid,res,msgEl,wasPassing){
   __lockStop();
