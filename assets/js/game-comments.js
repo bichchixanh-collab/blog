@@ -1,5 +1,5 @@
 // game-comments
-// Bình luận + �ánh giá sao (phân trang 5/trang + realtime polling, giữ nguyên trang �ang xem)
+// B�nh lu�n + ��nh gi� sao (ph�n trang 5/trang + realtime polling, gi� nguy�n trang �ang xem)
 let CMT_PAGE=1; const CMT_LIMIT=5; let CMT_GAME=''; let CMT_TOTAL=0, CMT_PAGES=1, CMT_TIMER=null, CMT_KNOWN=0;
 function cmtT(k,fb){ try{ if(window.I18N&&window.I18N.t){const v=window.I18N.t(k); if(v&&v!==k) return v;} }catch(e){} return fb; }
 // HiỒn th�9 rõ ngày/tháng/nĒm - giờ:phút (vd: 20/09/2026 - 14:05)
@@ -24,7 +24,7 @@ async function loadComments(gameId, page){
     window._cmtReplyTo=null;
     const replyLbl=cmtT('cmt_reply',"↳ Trả lời");
     const itemHtml=function(c,reply){
-      const st=reply?'':('<div class="stars">'+'â˜…'.repeat(c.stars)+'â˜†'.repeat(5-c.stars)+'</div>');
+      const st=reply?'':('<div class="stars">'+'��&'.repeat(c.stars)+'�� '.repeat(5-c.stars)+'</div>');
       return '<div class="cmt-item"'+(reply?' style="margin:6px 0 0 18px;border-style:dashed"':'')+'>'+st+'<b>'+escHtml(c.name)+'</b> <small>'+escHtml(fmtDT(c.created_at))+'</small><div>'+escHtml(c.text)+'</div>'
       +(reply?'':'<div><button data-reply="'+escHtml(c.id)+'" data-rname="'+escHtml(c.name)+'" style="background:none;border:none;color:#0066cc;font-size:11px;cursor:pointer;padding:0">'+escHtml(replyLbl)+'</button></div>')+'</div>';
     };
