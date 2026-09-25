@@ -1,5 +1,43 @@
 [
     {
+        "id": "tien-kiem-ky-hiep-truyen",
+        "name": "Tiên Kiếm Kỳ Hiệp Truyện",
+        "cat": "Nhập vai",
+        "size": "935 Kb",
+        "res": [
+            "240x320"
+        ],
+        "hot": false,
+        "vi": true,
+        "new": true,
+        "gate": {
+            "type": "stats",
+            "require": {
+                "read": 30
+            }
+        },
+        "dl_cost": 8,
+        "read_secs": 30,
+        "voluntary": {
+            "fog": 1
+        },
+        "desc": "**《Tiên Kiếm Kỳ Hiệp Truyện》** là một game hành động vượt ải màn hình ngang.\r\n\r\n\r\n\r\nSương tuyết phai nhòa, lệ rơi nơi linh châu; ta vẫn ôm một giấc mộng, dưới ánh trăng cong như lưỡi câu. Hãy cùng hồi tưởng mối tình sâu đậm của Tiêu Dao và ba hồng nhan tri kỷ trong cuộc đời chàng.\r\n\r\n\r\n\r\nPháp bảo xuất hiện liên tục, Tiên Kiếm nay đều thuộc về tay bạn. Những tuyệt kỹ kinh điển như Phi Long Thám Vân Thủ và Càn Khôn Nhất Trịch sẽ một lần nữa tái hiện. Linh Nhi, Nguyệt Như và A Nô sẽ đồng hành cùng bạn. Một truyền kỳ Tiên Kiếm mới sẽ do chính bạn viết nên...\r\n\r\n\r\n\r\nMột câu chuyện tiên hiệp mới sắp mở ra, một trang sử mới đang chờ bạn tự tay viết tiếp…\r\n\r\n\r\n\r\nTình yêu, thù hận, ân oán của những nhân vật chính đan xen phức tạp; những cuộc gặp gỡ, chia ly, sinh tử cứ liên tục quấn lấy nhau. **《Tiên Kiếm Kỳ Hiệp Truyện 》** tái hiện chân thực cốt truyện nguyên bản, với những tình tiết cảm động đưa bạn bước vào thế giới Tiên Kiếm rộng lớn, hòa mình vào câu chuyện lãng mạn và khám phá những bí mật sâu kín nhất của thế giới.\r\n\r\n\r\n© NGUỒN: J2ME.VERCEL.APP\r\n[credit]Game java hay - vào ngay https:\/\/j2me.vercel.app\r\nVui lòng ghi thêm 2 dòng này khi chia sẻ lại bài viết.[\/credit]",
+        "thumb": "https:\/\/i.ibb.co\/v6JLC5pn\/wm-1790347376423.jpg",
+        "shots": [
+            "https:\/\/i.ibb.co\/v6JLC5pn\/wm-1790347376423.jpg",
+            "https:\/\/i.ibb.co\/Z1SQhwZ8\/wm-1790347377831.jpg",
+            "https:\/\/i.ibb.co\/XZXkDbxb\/wm-1790347378374.jpg",
+            "https:\/\/i.ibb.co\/nswrrYmb\/wm-1790347380074.jpg",
+            "https:\/\/i.ibb.co\/sv5DCnm3\/wm-1790347380520.jpg"
+        ],
+        "jar": {
+            "240x320": "https:\/\/sfile.co\/jG17kDI8y4z"
+        },
+        "downloads": 0,
+        "created_at": "2026-09-25T16:52:33+02:00",
+        "updated_at": "2026-09-25T16:52:33+02:00"
+    },
+    {
         "id": "tam-quoc-truyen-ky-lu-bo-truyen",
         "name": "Tam Quốc Truyền Kỳ - Lữ Bố Truyện",
         "cat": "Nhập vai",
