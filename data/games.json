@@ -1,39 +1,5 @@
 [
     {
-        "id": "puzzle-warriors-eng",
-        "name": "Puzzle Warriors ENG",
-        "cat": "Trí tuệ",
-        "size": "400Kb",
-        "res": [
-            "240x320"
-        ],
-        "hot": false,
-        "vi": false,
-        "new": false,
-        "gate": {
-            "type": "none",
-            "xp": 100
-        },
-        "dl_cost": 2,
-        "read_secs": 10,
-        "voluntary": {
-            "fog": 1
-        },
-        "desc": "Mình sẽ chuyển đoạn này sang tiếng Việt theo kiểu **giới thiệu game Java cổ điển**, giữ chất phiêu lưu, fantasy và lời văn tự nhiên hơn bản dịch sát chữ:\r\n\r\nKhông một ai, kể cả những người già nhất, còn nhớ được ngày đất nước xinh đẹp **Kartucia** rơi vào tay hai tên pháp sư hỏa ngục bằng thứ ma thuật hắc ám.\r\n\r\nĐã từ rất lâu, Kartucia chìm trong bóng tối và người dân phải sống trong cảnh khốn cùng dưới sự cai trị tàn bạo của bè lũ tay sai. Thế nhưng, một truyền thuyết vẫn được lưu truyền qua bao thế hệ: **một vị anh hùng sẽ xuất hiện và mang hòa bình trở lại cho vùng đất này.**\r\n\r\nNhưng thời gian không còn nhiều!\r\n\r\nHai pháp sư hỏa ngục đang chuẩn bị mở ra **Vực Thẳm Kinh Hoàng**, triệu hồi hàng ngàn con quỷ gieo rắc tai họa khắp Kartucia. Một khi cánh cổng được mở, mọi hy vọng sẽ hoàn toàn biến mất.\r\n\r\nTất cả mọi người đều tin rằng **bạn chính là vị anh hùng trong truyền thuyết**.\r\n\r\n⚔️ **Đừng khiến họ thất vọng! Hãy đứng lên chiến đấu, đánh bại thế lực bóng tối và cứu lấy Kartucia!**",
-        "thumb": "https:\/\/i.ibb.co\/KpqzYbYD\/wm-1790349568327.jpg",
-        "shots": [
-            "https:\/\/i.ibb.co\/tM5MyMPg\/wm-1790349558023.jpg",
-            "https:\/\/i.ibb.co\/5xTbSdhp\/wm-1790349563304.jpg",
-            "https:\/\/i.ibb.co\/KpqzYbYD\/wm-1790349568327.jpg"
-        ],
-        "jar": {
-            "240x320": "https:\/\/sfile.co\/PeoYqGfN7Eh"
-        },
-        "downloads": 0,
-        "created_at": "2026-09-25T17:25:59+02:00",
-        "updated_at": "2026-09-25T17:27:11+02:00"
-    },
-    {
         "id": "tan-the-huyet-chien-sat-thu-bong-toi",
         "name": "Tận Thế Huyết Chiến - Sát Thủ Bóng Tối",
         "cat": "Nhập vai",
