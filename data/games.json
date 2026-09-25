@@ -1,5 +1,44 @@
 [
     {
+        "id": "tan-the-huyet-chien-sat-thu-bong-toi",
+        "name": "Tận Thế Huyết Chiến - Sát Thủ Bóng Tối",
+        "cat": "Nhập vai",
+        "size": "2.3 MB",
+        "res": [
+            "240x320",
+            "320x240"
+        ],
+        "hot": false,
+        "vi": false,
+        "new": false,
+        "gate": {
+            "type": "stats",
+            "require": {
+                "read": 10
+            }
+        },
+        "dl_cost": 5,
+        "read_secs": 10,
+        "voluntary": {
+            "fog": 1
+        },
+        "desc": "Một câu chuyện đan xen giữa **tình yêu, thù hận và những âm mưu đen tối**. Khi hai người yêu nhau bị kẻ thù chia cắt và biến thành đối thủ, liệu bạn sẽ chọn giữ vững đạo nghĩa, hay bất chấp tất cả để bảo vệ người mình yêu?\r\n\r\nQuỷ dữ gieo rắc sự thao túng, biến những con người từng lương thiện thành những kẻ mất hết nhân tính. Trong thế giới đầy hiểm nguy ấy, chỉ có bạn mới có thể phá tan âm mưu, cứu lấy người mình yêu và đưa mọi thứ trở về đúng quỹ đạo.\r\n\r\n🔥 **Hành động mãn nhãn – combo liên hoàn – kỹ năng tuyệt đẹp!**\r\nKết hợp kiếm và súng, tung ra những đòn đánh mạnh mẽ, làm chủ **song kiếm** và vượt qua hàng loạt kẻ thù trên hành trình giải cứu thế giới.\r\n\r\nMột cuộc phiêu lưu đầy kịch tính đang chờ bạn. **Tình yêu, chiến đấu, bí ẩn và những lựa chọn nghiệt ngã** — tất cả sẽ được hé lộ qua từng màn chơi.\r\n\r\n- **Việt Hoá 100% by ThanhNam (Chicken Play Games)** -",
+        "thumb": "https:\/\/i.ibb.co\/20t5673y\/wm-1790348733283.jpg",
+        "shots": [
+            "https:\/\/i.ibb.co\/20t5673y\/wm-1790348733283.jpg",
+            "https:\/\/i.ibb.co\/xqY4X3Bt\/wm-1790348734905.jpg",
+            "https:\/\/i.ibb.co\/84xX2fPy\/wm-1790348735328.jpg",
+            "https:\/\/i.ibb.co\/2Y8B4qVX\/wm-1790348735850.jpg"
+        ],
+        "jar": {
+            "240x320": "https:\/\/sfile.co\/D6HRPqYLsjm",
+            "320x240": "https:\/\/sfile.co\/O4XnrCWuV2E"
+        },
+        "downloads": 0,
+        "created_at": "2026-09-25T17:17:54+02:00",
+        "updated_at": "2026-09-25T17:17:54+02:00"
+    },
+    {
         "id": "tien-kiem-ky-hiep-truyen",
         "name": "Tiên Kiếm Kỳ Hiệp Truyện",
         "cat": "Nhập vai",
