@@ -1,119 +1,99 @@
-# J2ME WAP — Kho game Java (`blog-v2/`)
+# J2ME WAP — Kho Game Java V2 (`blog-v2`)
 
-Web tải game Java J2ME giao diện WAP anime: 11 trang HTML + API serverless (Vercel) + Supabase (auth/đếm) + GitHub (lưu data). Chi tiết hệ khóa tải xem `HUONG-DAN-KHOA-TAI.md`.
+WAP tải game Java J2ME (Nokia S40, Samsung, SE) giao diện Anime, chạy serverless trên **Vercel** + **Supabase** (auth + đếm cứng) + **GitHub** (lưu `data/*.json`). Đã harden toàn diện: ticket bind user/IP, JWT nbf/iat/iss/aud, CSRF/CORS, open-redirect, download host, one-time ticket, RLS.
 
----
+> `admin.php` + `config.php` là tool local **không commit** (xem `HUONGDAN.md`).
 
-## 1. Bản đồ repo
+## 1. Tính năng chính
 
-| Đường dẫn | Vai trò |
+### 1.1 Trang web (11 HTML)
+| Trang | Mô tả |
 |---|---|
-| `index.html`, `game.html`, `category.html`, `profile.html`, `goc-senpai.html`, `go.html`, `offline.html`, `404.html`, `dang-nhap.html`, `lien-he.html`, `trang-xep-hang.html` | 11 trang web (HTML + inline JS/CSS) |
-| `api/*.js` | Serverless functions Vercel (`dl`, `ticket`, `meta`, `ustats`, `comments`, `stats`, `banners`, `game/[slug]`, `_lock`, `_sb`, `_bingo`, `_lib`, `_rate`, `_store`, `_github`) |
-| `data/games.json` | Database game (admin ghi, web đọc) |
-| `data/comments.json`, `data/stats.json` | Bình luận + lượt tải (đồng bộ qua GitHub API) |
-| `assets/js/` (`app.js`, `senpai.js`, `sb-auth.js`, `sb-sync.js`, ...) | JS client |
-| `assets/css/manga.css`, `style.min.css` | Giao diện |
-| `admin.php` + `config.php` | **Tool local, KHÔNG commit** — đăng bài, duyệt comment, mã hóa link |
-| `supabase-gating.sql` | Migration bảng `user_stats` (chạy 1 lần) |
-| `HUONG-DAN-KHOA-TAI.md` | Hướng dẫn chi tiết hệ khóa tải |
-| `sw.js` | Service Worker (cache `j2me-v6`) |
+| `index.html` | Trang chủ: Hot (top downloads), Mới (phân trang 3/trang), Việt Hóa grid, Thể loại 9 mục, Yêu thích (local), Thống kê tổng tải/top/bình luận, banner random `assets/banners/` |
+| `game.html` + SSR `api/game/[slug].js` | Chi tiết game: SSR `shared/render.mjs` (khớp pixel client), SEO canonical/og/jsonLD, JAR giấu (chỉ qua vé), đọc bài 10s đếm realtime (1s tick, session per-tab), khóa tải modal live 1s |
+| `category.html` | Lọc theo cat + search không dấu |
+| `profile.html` | Hồ sơ: XP, streak, huy hiệu, seen/favs/done |
+| `goc-senpai.html` | Góc Senpai: bingo tuần, pet, nhiệm vụ |
+| `go.html` | Gateway ngoài: kiểm vé `api/meta`, hiện host tin cậy |
+| `dang-nhap.html` | Supabase Auth (email/pass/magic) qua `assets/js/sb-auth.js` REST thuần |
+| `lien-he.html`, `404.html`, `offline.html`, `trang-xep-hang.html` | Phụ |
+| `sw.js` | Service Worker cache `j2me-v7`, offline fallback |
+| `assets/js/game-read.js` | Đếm thời gian đọc bài per-article (sessionStorage, visible+focused, 1s) |
+| `assets/i18n.js` | Đa ngôn ngữ VI/ID (180+ key), `I18N.T()` |
 
-Quy ước: `game.html` render client + SSR qua `shared/render.mjs` (sửa giao diện phải sửa cả 2 cho khớp pixel).
+### 1.2 Hệ khóa tải
+- `gate` trong `data/games.json`: `none` (mở) | `stats` (tích AND: `read`, `likes`, `completed`) | `xp` | `login` (+ `read_secs` mặc định 10s cho **mọi game**)
+- Vé HMAC `v2` 15 phút: `{v,id,res,day,exp,gh,hard,jti,sub,iph}` + `HMAC-SHA256(LOCK_SECRET|ticket)`, bind `sub` (hash uid/cid) + `iph` (subnet /24, /64), `jti` one-time (Redis `SET NX EX 900` hoặc memory)
+- Luồng: `game.html` → `__proof` (st.read/likes/done + presence) → `GET /api/ticket?proof=` → `mintTicket` → `go.html?ticket=` → `GET /api/dl?ticket=` → `verifyTicket` + `verifyTicketBinding` + `gateHash` + one-time → `302` tới host allowlist
+- Link JAR `ENC:` AES-256-GCM (`iv12|cipher|tag`, AAD=gameId) giải chỉ ở server (`_lock:decryptUrl`), fallback plaintext chỉ `https://` exact
 
----
+### 1.3 Presence & khóa cứng
+- Khách: `POST /api/presence` mint chain `n` (+1 mỗi 50s, subnet+cid), verify qua `_lock:verifyPresence`
+- Đã đăng nhập: `POST /api/ustats` heartbeat/like/complete/bingo/petxp → `user_stats` (service_role), GET `api/ustats` trả `minutes/likes/completed/bingoLines/petLv`
+- `countApproved()` đếm bình luận duyệt theo `uid` hoặc `names`
 
-## 2. GitHub — repo `bichchixanh-collab/blog`, nhánh `main`
+### 1.4 Bình luận
+- `POST /api/comments` (CSRF same-origin, Turnstile nếu có, honeypot): `pending` → admin duyệt → `approved`
+- `GET /api/comments?game=&page=&limit=` (5/trang, replies kèm cha, sort `created_at desc`)
+- Auto-duyệt `isAutoApprove()` + `checkComment` (URL/phone/email/banned/spam/lowQuality `>=12 ký tự, >=40% chữ, không chung chung` + OpenAI moderation nếu `ai_enabled`)
+- ID `crypto.randomBytes(4).hex` (không `Math.random`)
 
-- Push thẳng `main` (không PR trong workflow này). Vercel tự deploy mỗi push (1–2 phút).
-- Có commit **tự động** chạy nền: `update games`, `update sitemap`, `comments: ...`, `stats: ...` (do admin/sync đẩy). Push bị `rejected` là bình thường → `git fetch origin` → `git rebase origin/main` (sạch vì khác file) → push lại. **Không force-push.**
-- File local KHÔNG commit: `admin.php`, `config.php`, `deploy_file.py`, `assets/css/main.min.css`.
-- `deploy_file.py` là script phá repo cũ (xóa + force-push) — repo đã ổn định, **đừng chạy**.
-- Sau deploy web mới: **Ctrl+F5** 1 lần (xả SW/cache cũ).
+### 1.5 Ví EXP & download giá
+- `GET/POST /api/economy` (`cid` 24hex hoặc Bearer): `checkin` 5-10 + streak bonus, `chargeForDownload` trừ `dl_cost` (sở hữu miễn phí), `creditCommentBonus` (+5 khi duyệt, chống farm: bigram duplicate, 2/ngày)
+- `data/economy.json` qua GitHub API (fine-grained Contents RW `data/stats.json` + `data/comments.json`)
 
----
+### 1.6 Đếm tải
+- `POST /api/stats` (CSRF block) → `_store:countDl` → Upstash Redis `INCR dl:id` hoặc batch memory 1 commit/phút `data/stats.json`
+- `GET /api/stats` public
 
-## 3. Vercel — project `blog` (team `bichchixanh-collab`), domain `j2me.vercel.app`
+### 1.7 Bảo mật đã harden (audit 12 mục)
+- JWT `verifySbToken` HS256 + ES256 JWKS: `nbf/iat/iss/aud/exp+30s` (`_sb:isValidClaims`)
+- CSRF `originStatus` same-origin cho mọi `POST` (comments/economy/ustats/presence/user-data/stats)
+- CORS `Access-Control-Allow-Origin:*` chỉ GET public, `X-Frame-Options:SAMEORIGIN`, `CSP: script-src 'self'` (+ `unsafe-inline` còn do inline, sẽ bỏ khi tách hết)
+- `siteOf`/`siteUrl` whitelist `host` + `SITE_URL` + `*.vercel.app`, bỏ tin mù `x-forwarded-host`
+- `ALLOW_HOSTS` strict `https:` + no userinfo + no fallback resName
+- `used_tickets` one-time + cleanup `delete where used_at < now()-1d`
+- Cookie `admin.php` `httponly samesite Lax`, guest `cid` 24hex (sẽ ký HttpOnly)
 
-Đường dẫn: Dashboard → project `blog` → **Settings → Environments** → bảng **Environment Variables**.
-
-- Type luôn chọn **Secret** cho các biến dưới (trừ khi ghi rõ).
-- Cột Environments tick **Production** (web live chạy Production).
-- Thêm/sửa biến xong **bắt buộc Redeploy** (tab Deployments → ⋯ → Redeploy), biến mới chỉ có tác dụng sau deploy.
-
-### 3.1. Bảng biến môi trường (đủ 12)
-
-| Biến | Mức | Lấy ở đâu | Thiếu thì sao |
-|---|---|---|---|
-| `GITHUB_TOKEN` | Cần | GitHub → Settings → Developer settings → Personal access tokens → token có quyền `repo` | Bình luận không gửi được (503), đếm tải chỉ memory, sitemap/admin không đồng bộ GitHub |
-| `LOCK_SECRET` | Cần (khóa) | Tự tạo: `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"` (≥16 ký tự) | Vé tải + mã hóa link rớt về chế độ mềm |
-| `SUPABASE_JWT_SECRET` | Cần (khóa cứng) | Supabase → Settings → **JWT Keys** → *Legacy JWT secret* → Reveal | Không xác thực được đăng nhập → chỉ khóa mềm |
-| `SUPABASE_SERVICE_KEY` | Cần (khóa cứng) | Supabase → Settings → **API Keys** → *Secret keys* (`sb_secret_...`, đừng lấy `sb_publishable_`) | Server không đọc/ghi `user_stats` → khóa cứng lỗi 503 |
-| `GITHUB_REPO` / `GITHUB_BRANCH` | Tùy chọn | Mặc định code đã có (`bichchixanh-collab/blog`, `main`) | Không cần set |
-| `SUPABASE_URL` | Tùy chọn | Mặc định code đã có URL public project | Không cần set |
-| `SITE_URL` | Tùy chọn | Domain chính, vd `https://j2me.vercel.app` | Tự lấy từ host request |
-| `FILES_HOST` | Tùy chọn | Host file riêng nếu có (thêm vào allowlist tải) | Chỉ tải được từ drive/mediafire/github/jsdelivr |
-| `TURNSTILE_SECRET` | ⚠️ Tùy chọn | Cloudflare Turnstile dashboard | **Chỉ set khi đã gắn widget captcha vào form** — web hiện chưa có widget, set vào là 100% bình luận lỗi captcha |
-| `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN` | Tùy chọn | Upstash Console | Không có thì đếm tải bằng memory + gom batch 1 commit/phút |
-
-### 3.2. Quota cần biết (Hobby)
-- Functions: **1M invocations + 4 CPU-giờ/tháng**. Mỗi lượt tải = 3 calls (ticket+meta+dl, mỗi cái vài chục ms); heartbeat = 60 calls/giờ/user đã login. Web nhỏ thì dư; chạm ~70% thì giãn heartbeat hoặc gộp `meta` vào `ticket`.
-- Supabase Free: **unlimited API requests**, DB 500MB, egress 5GB — heartbeat/like thoải mái. Lưu ý: project pause sau 1 tuần không hoạt động (request đầu chậm 10–30s).
-- GitHub API: vé tải **không tốn call nào** (HMAC + đọc file local).
-
----
-
-## 4. Supabase — project `j2me-wap`
-
-Vào https://supabase.com → project → làm lần lượt:
-
-1. **Chạy SQL 1 lần**: **SQL Editor** → New query → dán toàn bộ `supabase-gating.sql` → Run → Success. Tạo bảng `public.user_stats(uid, minutes, likes, completed, bingo, pet_xp, updated_at)`, RLS bật, không policy (chỉ `service_role` chạm được). Chạy lại an toàn (`IF NOT EXISTS`).
-2. **Lấy keys** (xem bảng mục 3.1): **Settings → API Keys** (secret `sb_secret_...`), **Settings → JWT Keys → Legacy JWT secret** (Reveal).
-3. Auth (email/pass/link ma thuật) dùng sẵn qua `dang-nhap.html` — không cần cấu hình thêm.
-
----
-
-## 5. Admin local (`admin.php` + `config.php`)
-
-`admin.php` chạy local (XAMPP/hop `j2me.alwaysdata.net` của bạn), **không commit**. Cần `config.php` cùng thư mục (mẫu đúng cú pháp — trong `return [...]` dùng `=>`):
-
-```php
-<?php
-// File local - KHÔNG commit lên GitHub
-return [
-    'GITHUB_TOKEN' => 'ghp_...',          // token repo (thu hồi ngay nếu từng lộ)
-    'GITHUB_REPO'  => 'bichchixanh-collab/blog',
-    'GITHUB_BRANCH'=> 'main',
-    'GITHUB_PATH'  => 'data/games.json',
-    'LOCK_SECRET'  => '...GIỐNG HỆT Vercel...',  // khác nhau là Vercel không giải mã được
-    'ADMIN_USER' => 'admin',
-    'ADMIN_PASS' => '...hash...',          // tạo bằng: php -r "echo password_hash('MAT_KHAU_MOI', PASSWORD_DEFAULT), PHP_EOL;"
-];
+## 2. Cấu trúc repo
+```
+blog-v2/
+  index.html, game.html, go.html, category.html, profile.html, ...
+  api/_lib.js, _sb.js, _lock.js, _bingo.js, _rate.js, _store.js, _github.js
+  api/ticket.js, dl.js, comments.js, stats.js, economy.js, ustats.js, presence.js, user-data.js, meta.js, banners.js, game/[slug].js
+  data/games.json, comments.json, stats.json, economy.json, banners.json, notice.json
+  assets/js/sb-auth.js, sb-config.js, sb-board.js, game-read.js, game-detail.js, ...
+  assets/css/manga.css, style.min.css
+  shared/render.mjs
+  admin.php, config.php (local), supabase-gating.sql, vercel.json, sw.js
 ```
 
-Luồng đăng bài: nhập game → mục **🔒 Khóa tải** chọn loại + tick điều kiện + số → **👁 Xem trước** thử modal → **💾 Lưu & Đồng bộ** (ghi `data/games.json` + backup + push GitHub + sitemap). Link file **tự mã hóa `ENC:`** khi lưu nếu có `LOCK_SECRET` (dòng trạng thái trong form báo xanh/đỏ). Bài cũ còn plaintext: bấm **🔐 Mã hóa link cũ** ở danh sách game.
-Duyệt bình luận trong admin (pending → approved). Backup tự giữ 10 bản (`data/backups`), có nút Khôi phục.
+## 3. Env (Vercel → Settings → Environment Variables, Secret, Production, Redeploy)
+| Biến | Bắt buộc | Lấy ở đâu |
+|---|---|---|
+| `GITHUB_TOKEN` | Có | fine-grained PAT `Contents RW` cho `bichchixanh-collab/blog` |
+| `LOCK_SECRET` | Có | `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"` ≥16 |
+| `SUPABASE_JWT_SECRET` | Có | Supabase → Settings → JWT Keys → Legacy JWT secret |
+| `SUPABASE_SERVICE_KEY` | Có | Supabase → Settings → API Keys → Secret `sb_secret_...` |
+| `SUPABASE_URL` | Tùy | Mặc định `https://pmotbltodyyilarnvtpn.supabase.co` |
+| `SITE_URL` | Tùy | `https://j2me.vercel.app` |
+| `FILES_HOST` | Tùy | thêm host tải riêng |
+| `TURNSTILE_SECRET` | Chỉ khi gắn widget | Cloudflare Turnstile |
+| `UPSTASH_REDIS_REST_URL/TOKEN` | Tùy | Upstash Console |
 
----
+Chi tiết xem `HUONGDAN.md`.
 
-## 6. Vận hành hàng ngày
+## 4. Chạy local
+```bash
+# XAMPP: đặt blog-v2 dưới htdocs
+# config.php mẫu trong HUONGDAN.md
+npm run validate   # kiểm tra data/games.json
+```
 
-- **Đăng bài khóa**: admin → loại khóa → tick điều kiện → lưu. Muốn ép login: chọn `Bắt đăng nhập` hoặc tick `🔐 Bắt buộc đăng nhập`.
-- **Đổi điều kiện bài đã đăng**: sửa gate → **vé cũ chết ngay** (ràng buộc `gateHash`), user bấm Tải lại là có vé mới — đúng thiết kế.
-- **Kiểm tra khóa cứng**: đăng nhập web → Góc Senpai cày → mở game khóa → modal hiện **🔒 Theo tài khoản** + checklist ✓/✗.
-- ** comment không lên số**: xem dòng nhỏ trong popup (ghi đang tính theo tên nào/tài khoản nào), Ctrl+F5, đợi duyệt (pending không tính).
+## 5. Vận hành
+- Đăng bài: `admin.php` → nhập → `gate` → `Xem trước` → `Lưu & Đồng bộ` (backup 10 bản, sitemap)
+- Đổi gate: vé cũ chết (`gateHash`), user bấm Tải lại
+- Bình luận: admin duyệt, auto-duyệt sạch, AI nếu bật
 
-## 7. Xử lý sự cố nhanh
-
-| Hiện tượng | Cách xử |
-|---|---|
-| `403 locked (minutes/likes/...)` | Chưa đủ chỉ số — cày thêm theo checklist |
-| `403 login required` | Bài bắt đăng nhập (`dang-nhap.html`) |
-| `503 stats unavailable` | Supabase ngủ/lỗi hoặc thiếu service key — đợi 30s thử lại |
-| Vé hết hạn ở `go.html` | Vé 15 phút — về trang game bấm Tải lại |
-| Admin báo đỏ mã hóa | Thiếu `LOCK_SECRET` local (env hoặc `config.php`) |
-| Web hiện code cũ sau deploy | Ctrl+F5 (SW `j2me-v6` tự purge cache cũ) |
-| Push rejected | Remote có commit auto → `fetch` + `rebase origin/main` + push lại |
-| Bình luận 403 toàn bộ | Kiểm tra có lỡ set `TURNSTILE_SECRET` mà chưa gắn widget không |
-
-Chi tiết khóa tải (schema `gate`, luồng vé, mã hóa, test đã chạy): xem **`HUONG-DAN-KHOA-TAI.md`**.
+## 6. Ý tưởng mở rộng miễn phí
+Xem `YTUONGKHAC.md` (100% free, không tốn phí Vercel/Supabase/GitHub).
