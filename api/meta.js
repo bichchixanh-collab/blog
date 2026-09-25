@@ -23,8 +23,16 @@ module.exports = async (req, res) => {
     const games = loadGames();
     const g = games.find((x) => x && x.id === t.id);
     if (!g) { send(res, 404, { error: 'not found' }); return; }
-    const gate = (g.gate && g.gate.type && g.gate.type !== 'none') ? g.gate : null;
-    if (gateHash(gate || { type: 'none' }) !== t.gh) { send(res, 403, { error: 'gate changed' }); return; }
+    // Chuẩn hóa gate giống hệt ticket.js để hash khớp
+    let gate = (g.gate && g.gate.type && g.gate.type !== 'none') ? g.gate : null;
+    if (!gate) {
+      gate = { type: 'stats', require: { read: Math.max(1, Math.min(3600, parseInt(g.read_secs,10)||10)) } };
+    } else if (gate.type === 'stats' && gate.require && gate.require.read == null && g.read_secs) {
+      gate.require.read = Math.max(1, Math.min(3600, parseInt(g.read_secs,10)||10));
+    } else if (gate.type === 'stats' && (!gate.require || Object.keys(gate.require).length===0)) {
+      gate.require = { read: Math.max(1, Math.min(3600, parseInt(g.read_secs,10)||10)) };
+    }
+    if (gateHash(gate) !== t.gh) { send(res, 403, { error: 'gate changed' }); return; }
     const resList = Array.isArray(g.res) ? g.res : [];
     if (resList.indexOf(t.res) < 0) { send(res, 400, { error: 'res invalid' }); return; }
     const host = {};
