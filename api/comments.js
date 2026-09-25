@@ -10,9 +10,51 @@ const fs = require('fs');
 const path = require('path');
 const https = require('https');
 const crypto = require('crypto');
-const { bearerToken, verifySbTokenAsync, getLastAuthDbg } = require('./_sb');
+const { bearerToken, verifySbTokenAsync, getLastAuthDbg, sbFetch } = require('./_sb');
 const { checkComment, isAutoApprove } = require('./_moderate');
 const { creditCommentBonus } = require('./economy');
+// Supabase helper for LIMIT/OFFSET pagination (free, không tốn GitHub API)
+// Dùng Supabase khi có SUPABASE_SERVICE_KEY, fallback GitHub JSON khi chưa có.
+// Triển khai ORDER BY created_at DESC + LIMIT/OFFSET để chịu >500 cmt mà không tải hết file.
+async function fetchSupabaseComments(game, page, limit){
+  try{
+    if(!process.env.SUPABASE_SERVICE_KEY) return null;
+    const pg=Math.max(1, parseInt(page,10)||1), lm=Math.min(20, Math.max(1, parseInt(limit,10)||5));
+    const off=(pg-1)*lm;
+    // Lấy total qua header Content-Range với limit=1 để không tải hết
+    let total = 0;
+    try{
+      const cntR=await sbFetch(`/rest/v1/comments?game=eq.${encodeURIComponent(game)}&status=eq.approved&select=id&limit=1`, {headers:{Prefer:'count=exact'}});
+      if(typeof cntR.total==='number' && cntR.total>=0) total=cntR.total;
+      else if(cntR.json && Array.isArray(cntR.json)) total=cntR.json.length;
+    }catch(e){}
+    // Lấy page hiện tại
+    const r=await sbFetch(`/rest/v1/comments?game=eq.${encodeURIComponent(game)}&status=eq.approved&order=created_at.desc&limit=${lm}&offset=${off}&select=id,name,stars,text,created_at,parent_id`);
+    if(r.status===200 && Array.isArray(r.json)){
+      const list=r.json.map(c=>({id:c.id, game:game, name:c.name, stars:c.stars, text:c.text, created_at:c.created_at, parentId:c.parent_id||undefined, status:'approved'}));
+      if(!total){
+        try{
+          const allR=await sbFetch(`/rest/v1/comments?game=eq.${encodeURIComponent(game)}&status=eq.approved&select=stars`, {headers:{Prefer:'count=exact'}});
+          if(typeof allR.total==='number') total=allR.total;
+          else if(allR.json) total=allR.json.length;
+        }catch(e){}
+      }
+      // avg chính xác từ tất cả sao của game (không chỉ page)
+      let avg=0;
+      try{
+        const avgR=await sbFetch(`/rest/v1/comments?game=eq.${encodeURIComponent(game)}&status=eq.approved&select=stars`);
+        if(avgR.status===200 && Array.isArray(avgR.json) && avgR.json.length){
+          const sum=avgR.json.reduce((a,c)=>a+(c.stars||0),0);
+          avg=Math.round((sum/avgR.json.length)*10)/10;
+        } else if(list.length){
+          avg=Math.round((list.reduce((a,c)=>a+(c.stars||0),0)/list.length)*10)/10;
+        }
+      }catch(e){ if(list.length) avg=Math.round((list.reduce((a,c)=>a+(c.stars||0),0)/list.length)*10)/10; }
+      return {list, total: total||list.length, avg, page:pg, limit:lm};
+    }
+  }catch(e){}
+  return null;
+}
 
 const REPO = process.env.GITHUB_REPO || 'bichchixanh-collab/blog';
 const BRANCH = process.env.GITHUB_BRANCH || 'main';
@@ -87,13 +129,34 @@ async function loadList() {
 }
 function normName(s) { return String(s || '').trim().toLowerCase().slice(0, 30); }
 async function countApproved(names, uid) {
+  // Ưu tiên Supabase khi có SERVICE_KEY (chịu >500 cmt, LIMIT/OFFSET)
+  if(process.env.SUPABASE_SERVICE_KEY){
+    try{
+      const want = (Array.isArray(names) ? names : []).map(normName).filter(Boolean).slice(0, 5);
+      if (!uid && !want.length) return 0;
+      // Xây or= cho PostgREST: or=(uid.eq.xxx,name.eq.a,name.eq.b)
+      const ors=[];
+      if(uid) ors.push(`uid.eq.${encodeURIComponent(uid)}`);
+      want.forEach(n=> ors.push(`name.eq.${encodeURIComponent(n)}`));
+      if(!ors.length) return 0;
+      const q = `status=eq.approved&select=id,uid,name&or=(${ors.join(',')})&limit=1000`;
+      const r = await sbFetch(`/rest/v1/comments?${q}`);
+      if(r.status===200 && Array.isArray(r.json)){
+        // Dùng Set để khử trùng id
+        const seen={}; let n=0;
+        for(const row of r.json){
+          if(!row || !row.id || seen[row.id]) continue;
+          seen[row.id]=1; n++;
+        }
+        return n;
+      }
+    }catch(e){}
+    // rớt xuống GitHub
+  }
   try {
     const list = await loadList();
     const want = (Array.isArray(names) ? names : []).map(normName).filter(Boolean).slice(0, 5);
     if (!uid && !want.length) return 0;
-    // Đếm theo uid HOẶC tên đã dùng (chống trùng id): bao cả bình luận cũ
-    // đăng trước khi gắn uid, và tên user tự khai. Ké tên người khác để mở
-    // khóa vẫn possible ở mức mềm — chấp nhận như thiết kế (xem HUONG-DAN).
     let n = 0;
     const seen = {};
     for (const c of list) {
@@ -294,6 +357,12 @@ module.exports = async (req, res) => {
       if (!game) return send(res, 400, { error: 'missing game' });
       const page = (req.query && req.query.page) || 1;
       const limit = (req.query && req.query.limit) || 5;
+      // Ưu tiên Supabase LIMIT/OFFSET (chỉ trả đúng trang), fallback GitHub JSON
+      const supa = await fetchSupabaseComments(game, page, limit);
+      if(supa){
+        const avg = (typeof supa.avg==='number') ? supa.avg : (supa.list.length ? Math.round((supa.list.reduce((s,c)=>s+(c.stars||0),0)/supa.list.length)*10)/10 : 0);
+        return send(res, 200, {game, avg, total: supa.total, page: supa.page, limit: supa.limit, pages: Math.max(1, Math.ceil(supa.total/(supa.limit))), comments: supa.list.map(pubComment)}, 30);
+      }
       let list;
       if (token) {
         try {
@@ -327,6 +396,36 @@ module.exports = async (req, res) => {
       if (name.length < 2) return send(res, 400, { error: 'name too short' });
       if (text.length < 2) return send(res, 400, { error: 'text too short' });
       if (!replyTo && !stars) return send(res, 400, { error: 'stars invalid' });
+      // Ưu tiên Supabase khi có SERVICE_KEY (không cần GitHub token)
+      if(process.env.SUPABASE_SERVICE_KEY){
+        try{
+          let parentId=null;
+          if(replyTo){
+            const pr = await sbFetch(`/rest/v1/comments?id=eq.${encodeURIComponent(replyTo)}&game=eq.${encodeURIComponent(game)}&select=id,status,parent_id`);
+            const par = pr.json && pr.json[0];
+            if(!par || par.status!=='approved' || par.parent_id) return send(res, 400, { error: 'reply target invalid' });
+            parentId=par.id;
+          }
+          const autoOn = isAutoApprove();
+          const chk = autoOn ? await checkComment({ text, name }) : {ok:false, reason:'auto tắt'};
+          const nextStatus = autoOn && chk.ok ? 'approved' : 'pending';
+          const newId = `c${Date.now().toString(36)}${crypto.randomBytes(4).toString('hex')}`;
+          const row = {id:newId, game, name, stars: parentId?0:stars, text, status:nextStatus, parent_id: parentId||null, uid: cmtUid||null, created_at: new Date().toISOString()};
+          if(nextStatus==='pending' && !chk.ok) row.mod_reason = chk.reason;
+          const ins = await sbFetch('/rest/v1/comments', {method:'POST', headers:{Prefer:'return=representation'}, body: JSON.stringify(row)});
+          if(ins.status===201 || ins.status===200){
+            let xpBonus=false, xpReason='';
+            if(nextStatus==='approved' && cmtUid){
+              try{ const bc = await creditCommentBonus({ uid: cmtUid, commentId: newId, text, list: [] }); xpBonus=!!bc.credited; xpReason=bc.credited?'':String(bc.reason||''); }catch(e){}
+            } else if(nextStatus==='approved' && !cmtUid) xpReason='no_uid';
+            return send(res, 200, { ok: true, status: nextStatus, reason: chk.reason||undefined, xpBonus, xpReason, auth: cmtUid ? 'ok' : (sbtHad ? 'stale' : 'guest') }, 0);
+          } else {
+            console.error('supabase insert fail', ins.status, String(ins.text||'').slice(0,200));
+          }
+        }catch(e){ console.error('supabase insert error', e && e.message); }
+        // Nếu Supabase rớt và không có GitHub token thì báo 503
+        if(!token) return send(res, 503, { error: 'comments not configured (supabase insert failed)' });
+      }
       if (!token) return send(res, 503, { error: 'comments not configured' });
 
       let lastErr = null;

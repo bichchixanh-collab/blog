@@ -12,7 +12,7 @@
         { "key": "X-Frame-Options", "value": "SAMEORIGIN" },
         { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
         { "key": "Strict-Transport-Security", "value": "max-age=63072000; includeSubDomains; preload" },
-        { "key": "Content-Security-Policy", "value": "default-src 'self'; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-inline'; connect-src 'self' https://pmotbltodyyilarnvtpn.supabase.co; frame-ancestors 'self'; base-uri 'self'; form-action 'self'" },
+        { "key": "Content-Security-Policy", "value": "default-src 'self'; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; style-src 'self' https://fonts.googleapis.com; style-src-attr 'unsafe-inline'; script-src 'self' 'sha256-z0aYBccCH4T8t9pSbIn7Fb5vVQW7JP1oNAE4CHGaiyM=' 'sha256-BmDW4ZAhqkLFtPsRJF28hbsJux8s1KtBLQiDPZLn2zA='; connect-src 'self' https://pmotbltodyyilarnvtpn.supabase.co https://api.imgbb.com https://api.qrserver.com; frame-ancestors 'self'; base-uri 'self'; form-action 'self'; object-src 'none'" },
         { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=()" }
       ]
     },

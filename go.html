@@ -41,14 +41,14 @@ a.btn.off{opacity:.45;pointer-events:none}
 .foot{background:#1a3a5c;color:#b8d8f8;text-align:center;padding:12px;font-size:11px}
 .foot a{color:#fff}
 </style>
-<link rel="stylesheet" href="assets/css/manga.css?v=7">
+<link rel="stylesheet" href="assets/css/manga.min.css?v=7">
 </head>
 <body>
 <div class="app">
 <div class="top"><span>◉ JAVA J2ME</span><span id="clock">00:00</span><span>▂▃▅ ⚠️</span></div>
 <div class="hero">
-<img class="site-logo" src="assets/logo.png" alt="J2ME.VERCEL.APP" width="720" height="287" style="display:block;width:100%;max-width:320px;height:auto;margin:0 auto 8px" decoding="async" fetchpriority="high" onerror="this.style.display='none'">
-<img class="mascot" src="assets/anime-girl.png" alt="anime" width="72" height="72" onerror="this.style.display='none'">
+<img class="site-logo" src="assets/logo.webp" alt="J2ME.VERCEL.APP" width="720" height="287" style="display:block;width:100%;max-width:320px;height:auto;margin:0 auto 8px" decoding="async" fetchpriority="high" onerror="this.style.display='none'">
+<img class="mascot" src="assets/anime-girl.webp" alt="anime" width="72" height="72" onerror="this.style.display='none'">
 <h1>J2ME.VERCEL.APP</h1>
 <p>Kho game Java .JAR • Anime</p>
 </div>
@@ -180,6 +180,6 @@ function stCid(){try{var c=localStorage.getItem('j2me_cid');if(typeof c==='strin
 function stApprovedCount(cb){var now=Date.now();if(_stApprCache.n>=0&&now-_stApprCache.at<60000){cb(_stApprCache.n);return;}var tk='';try{tk=stToken();}catch(e){}var names=stNames();if(!tk&&!names.length){cb(0);return;}var url=stApiRoot()+'/api/comments?mine=1'+(names.length?'&names='+encodeURIComponent(names.join(',')):'');var hh=tk?{'Authorization':'Bearer '+tk}:{};fetch(url,{headers:hh,cache:'no-store'}).then(function(r){return r.json();}).then(function(j){var n=+(j&&j.mine)||0;_stApprCache={at:now,n:n};cb(n);}).catch(function(){cb(_stApprCache.n>=0?_stApprCache.n:0);});}
 (function(){try{setInterval(function(){try{if(document.hidden)return;var ms=+localStorage.getItem('j2me_online_ms')||0;localStorage.setItem('j2me_online_ms',String(ms+60000));}catch(e){}try{var tk=stToken();if(tk)fetch(stApiRoot()+'/api/ustats',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+tk},body:JSON.stringify({t:'heartbeat'}),keepalive:true}).catch(function(){});}catch(e){}try{var pr=null;try{pr=JSON.parse(localStorage.getItem('j2me_presence')||'null');}catch(e){}fetch(stApiRoot()+'/api/presence',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({tok:(pr&&pr.tok)||'',cid:stCid()}),keepalive:true}).then(function(r){return r.json();}).then(function(j){if(j&&j.tok)try{localStorage.setItem('j2me_presence',JSON.stringify({tok:j.tok,n:j.n||0}));}catch(e){}}).catch(function(){});}catch(e){}},60000);}catch(e){}})();
 </script>
-<script src="assets/i18n.js?v=5"></script>
+<script src="assets/i18n.min.js?v=11"></script>
 </body>
 </html>

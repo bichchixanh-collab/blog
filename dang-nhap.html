@@ -33,14 +33,14 @@ input:focus{outline:2px solid #4da6ff;border-color:#0066cc}
 .foot a{color:#fff}
 small.dim{color:#4a7a9a;font-size:10px}
 </style>
-<link rel="stylesheet" href="assets/css/manga.css?v=7">
+<link rel="stylesheet" href="assets/css/manga.min.css?v=7">
 </head>
 <body>
 <div class="app">
 <div class="top"><span>◉ TÀI KHOẢN</span><span id="clock">00:00</span><span>♡ J2ME</span></div>
 <div class="hero">
-<img class="site-logo" src="assets/logo.png" alt="J2ME.VERCEL.APP" width="720" height="287" style="display:block;width:100%;max-width:320px;height:auto;margin:0 auto 8px" decoding="async" fetchpriority="high" onerror="this.style.display='none'">
-<img class="mascot" src="assets/anime-girl.png" alt="anime" width="72" height="72" onerror="this.style.display='none'">
+<img class="site-logo" src="assets/logo.webp" alt="J2ME.VERCEL.APP" width="720" height="287" style="display:block;width:100%;max-width:320px;height:auto;margin:0 auto 8px" decoding="async" fetchpriority="high" onerror="this.style.display='none'">
+<img class="mascot" src="assets/anime-girl.webp" alt="anime" width="72" height="72" onerror="this.style.display='none'">
 <h1 data-i18n="li_title">Đăng nhập Senpai</h1>
 <p data-i18n="li_sub">1 tài khoản, đồng bộ pet + bingo mọi máy</p>
 </div>
@@ -52,7 +52,6 @@ small.dim{color:#4a7a9a;font-size:10px}
 <label data-i18n="li_pass">Mật khẩu (≥6 ký tự)</label>
 <input id="sbPass" type="password" placeholder="••••••" autocomplete="current-password">
 <div class="rowbtns"><button class="btn" id="btnIn" data-i18n="li_in">Đăng nhập</button><button class="btn ghost" id="btnUp" data-i18n="li_up">Đăng ký</button></div>
-<div class="rowbtns"><button class="btn ghost" id="btnMagic" data-i18n="li_magic" style="flex:1">✉️ Gửi link đăng nhập ma thuật</button></div>
 </div>
 <div id="sbMsg" data-i18n="li_msg0">Chưa đăng nhập — pet và bingo vẫn lưu trên máy này, đăng nhập để giữ khi đổi máy.</div>
 <p style="margin-top:8px"><a href="index.html" data-i18n="back_home" style="font-size:11px">‹ Về trang chủ</a></p>
@@ -107,7 +106,6 @@ small.dim{color:#4a7a9a;font-size:10px}
   function val(){return {e:$('sbEmail').value.trim(),p:$('sbPass').value};}
   $('btnIn').onclick=function(){var v=val();if(!v.e||v.p.length<6)return say(T('li_need','Nhập email + mật khẩu ≥6 ký tự.'),'err');say(T('li_logging','Đang đăng nhập…'));window.SBAuth.signIn(v.e,v.p).then(function(){location.reload();}).catch(function(e){say(T('li_err','Lỗi: ')+e.message,'err');});};
   $('btnUp').onclick=function(){var v=val();if(!v.e||v.p.length<6)return say(T('li_need','Nhập email + mật khẩu ≥6 ký tự.'),'err');say(T('li_creating','Đang tạo tài khoản…'));window.SBAuth.signUp(v.e,v.p).then(function(r){if(r.session)location.reload();else say(T('li_created','Đã tạo! Check mail bấm link xác nhận rồi đăng nhập.'),'ok');}).catch(function(e){say(T('li_err','Lỗi: ')+e.message,'err');});};
-  $('btnMagic').onclick=function(){var v=val();if(!v.e)return say(T('li_needmail','Nhập email trước đã.'),'err');say(T('li_sending','Đang gửi link…'));window.SBAuth.magic(v.e).then(function(){say(T('li_sent','Đã gửi! Mở mail bấm link để vào.'),'ok');}).catch(function(e){say(T('li_err','Lỗi: ')+e.message,'err');});};
   paint();
   // Vẽ lại chữ động khi i18n sẵn sàng / đổi ngôn ngữ
   document.addEventListener('i18n-ready',function(){try{if(window.I18N&&I18N.lang&&I18N.lang()!=='vi')paint();}catch(e){}});

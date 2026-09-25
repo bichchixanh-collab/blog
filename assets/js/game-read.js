@@ -22,6 +22,8 @@ function tick(){
     var gid=getId(); if(!gid) return;
     var k=key(gid);
     var cur=Math.max(0, parseInt(sessionStorage.getItem(k)||'0',10)||0);
+    var max=3600; try{if(window.__READ_NEED>0)max=window.__READ_NEED;}catch(e){}
+    if(cur>=max) return;
     if(cur<2 || window.scrollY>30 || document.documentElement.scrollTop>30){
       var nv=cur+1;
       try{sessionStorage.setItem(k,String(nv));}catch(e){}

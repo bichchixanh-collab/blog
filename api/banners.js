@@ -13,11 +13,18 @@ module.exports = async (req, res) => {
     const dir = path.join(process.cwd(), 'assets', 'banners');
     let files = [];
     if (fs.existsSync(dir)) {
-      files = fs
+      const all = fs
         .readdirSync(dir, { withFileTypes: true })
         .filter((d) => d.isFile())
         .map((d) => d.name)
-        .filter((name) => /\.(png|jpe?g|gif|webp)$/i.test(name))
+        .filter((name) => /\.(png|jpe?g|gif|webp)$/i.test(name));
+      const webpBase = new Set(all.filter((n) => /\.webp$/i.test(n)).map((n) => n.replace(/\.webp$/i, '').toLowerCase()));
+      files = all
+        .filter((name) => {
+          // Bỏ .png/.jpg khi đã có bản .webp cùng tên (tránh trùng random)
+          if (webpBase.has(name.replace(/\.(png|jpe?g)$/i, '').toLowerCase()) && !/\.webp$/i.test(name)) return false;
+          return true;
+        })
         .sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }));
     }
     res.statusCode = 200;

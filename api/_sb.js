@@ -149,13 +149,25 @@ async function verifySbTokenAsync(token) {
 async function sbFetch(path, opts) {
   const key = serviceKey();
   if (!key) throw new Error('no service key');
-  const r = await fetch(`${SB_URL}${path}`, Object.assign({
-    headers: { apikey: key, Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
-  }, opts || {}));
+  const o = opts || {};
+  const mergedHeaders = Object.assign(
+    { apikey: key, Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
+    (o.headers || {})
+  );
+  const r = await fetch(`${SB_URL}${path}`, Object.assign({}, o, { headers: mergedHeaders }));
   const text = await r.text().catch(() => '');
   let j = null;
   try { j = text ? JSON.parse(text) : null; } catch { j = null; }
-  return { status: r.status, json: j };
+  const headers = {};
+  try { r.headers.forEach((v,k)=>{ headers[k.toLowerCase()]=v; }); } catch(e){}
+  // PostgREST count via Prefer: count=exact -> Content-Range: 0-.../total
+  let total = null;
+  try {
+    const cr = headers['content-range'] || '';
+    const m = cr.match(/\/(\d+)$/);
+    if(m) total = parseInt(m[1],10);
+  } catch(e){}
+  return { status: r.status, json: j, headers, total };
 }
 function cleanStats(row) {
   const bingo = (row && row.bingo && typeof row.bingo === 'object' && !Array.isArray(row.bingo)) ? row.bingo : {};
@@ -263,4 +275,4 @@ async function eventUserStats(uid, ev) {
     return null;
   } catch { return null; }
 }
-module.exports = { SB_URL, jwtSecret, serviceKey, bearerToken, verifySbToken, verifySbTokenAsync, getLastAuthDbg, diagService, getUserStats, getSenpai, eventUserStats };
+module.exports = { SB_URL, jwtSecret, serviceKey, bearerToken, verifySbToken, verifySbTokenAsync, getLastAuthDbg, diagService, getUserStats, getSenpai, eventUserStats, sbFetch };

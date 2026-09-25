@@ -33,7 +33,7 @@ export function detailHead(g, siteUrl) {
   const catHref = siteUrl
     ? `${siteUrl}/category.html?cat=${encodeURIComponent(g.cat || '')}`
     : `category.html?cat=${encodeURIComponent(g.cat || '')}`;
-  return `<img src="${esc(g.thumb)}" alt="${esc(g.name)} thumb" width="84" height="84" decoding="async" fetchpriority="high"><div><h2>${esc(g.name)} ${badges(g)}</h2>`
+  return `<img src="${esc(g.thumb)}" alt="${esc(g.name)} thumb" width="84" height="84" decoding="async" fetchpriority="high"><div><h1 style="font-size:14px;line-height:1.3;margin:0">${esc(g.name)} ${badges(g)}</h1>`
     + `<table class="info-table"><tr><th>Thể loại</th><td><a href="${esc(catHref)}" style="color:#0066cc">${esc(g.cat)}</a></td></tr>`
     + `<tr><th>Dung lượng</th><td>${esc(g.size)}</td></tr>`
     + `<tr><th>Màn hình</th><td>${res.map((r) => `<span class="res-tag">${esc(r)}</span>`).join(' ')}</td></tr>`

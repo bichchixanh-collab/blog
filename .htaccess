@@ -1,0 +1,41 @@
+# .htaccess - Cho XAMPP (Apache) - J2ME WAP blog-v3
+# Đặt file này tại thư mục gốc dự án (blog-v3/.htaccess)
+# Yêu cầu: mod_rewrite bật (mặc định XAMPP đã bật)
+
+RewriteEngine On
+# Base tự động - nếu đặt trong http://localhost/blog/blog-v3/ thì base là /blog/blog-v3/
+# Không cần RewriteBase cố định, để tự động
+
+# 1. Bảo vệ file nhạy cảm
+<FilesMatch "^(config\.php|\.env|.*\.sql)$">
+  Require all denied
+</FilesMatch>
+# Chặn truy cập trực tiếp data/*.json qua trình duyệt nếu muốn (để API đọc thôi)
+# Uncomment nếu cần:
+# <FilesMatch "\.json$">
+#   Require all denied
+# </FilesMatch>
+
+# 2. Pretty URL cho game: /game/<slug>.html -> /game.html?id=<slug> (dùng khi không có Vercel SSR)
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^game/([a-z0-9\-]+)\.html$ game.html?id=$1 [L,QSA,NC]
+
+# 3. Clean URL cho /dl -> /go.html?ticket=... (fallback local, Vercel dùng /api/dl)
+RewriteRule ^dl$ go.html [L,QSA]
+
+# 4. Cache static
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresByType image/png "access plus 7 days"
+  ExpiresByType image/jpeg "access plus 7 days"
+  ExpiresByType image/webp "access plus 7 days"
+  ExpiresByType text/css "access plus 7 days"
+  ExpiresByType application/javascript "access plus 7 days"
+</IfModule>
+
+# 5. Charset
+AddDefaultCharset UTF-8
+
+# 6. 404 fallback
+ErrorDocument 404 /404.html

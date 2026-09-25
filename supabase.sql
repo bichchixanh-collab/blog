@@ -38,17 +38,23 @@ create index if not exists idx_used_tickets_used_at on public.used_tickets (used
 -- select cron.schedule('clean-used-tickets', '0 3 * * *', $$delete from public.used_tickets where used_at < now() - interval '1 day'$$);
 -- Hoặc thủ công: delete from public.used_tickets where used_at < now() - interval '1 day';
 
--- 4. (Tùy chọn - cho comment Supabase LIMIT/OFFSET sau này, hiện vẫn dùng data/comments.json qua GitHub)
--- create table if not exists public.comments (
---   id text primary key,
---   game text not null,
---   name text not null,
---   stars integer not null default 0,
---   text text not null,
---   status text not null default 'pending',
---   parent_id text,
---   uid uuid,
---   created_at timestamptz not null default now()
--- );
--- alter table public.comments enable row level security;
--- create index if not exists idx_comments_game_status_created on public.comments (game, status, created_at desc);
+-- 4. comments: Supabase LIMIT/OFFSET (thay data/comments.json khi lớn)
+create table if not exists public.comments (
+  id text primary key,
+  game text not null,
+  name text not null,
+  stars integer not null default 0,
+  text text not null,
+  status text not null default 'pending',
+  parent_id text,
+  uid uuid,
+  created_at timestamptz not null default now()
+);
+alter table public.comments enable row level security;
+create index if not exists idx_comments_game_status_created on public.comments (game, status, created_at desc);
+-- RLS: cho phép đọc approved công khai, chỉ service_role ghi
+do $$ begin
+  if not exists (select 1 from pg_policies where policyname='allow_read_approved' and tablename='comments') then
+    create policy allow_read_approved on public.comments for select using (status='approved');
+  end if;
+end $$;

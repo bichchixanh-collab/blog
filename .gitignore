@@ -1,0 +1,6 @@
+node_modules/
+assets/.orig-backup/
+config.php
+*.log
+.DS_Store
+Thumbs.db

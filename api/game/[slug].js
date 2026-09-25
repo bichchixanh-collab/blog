@@ -58,6 +58,9 @@ module.exports = async (req, res) => {
     html = html.replace(/<title>[\s\S]*?<\/title>/, `<title>${title}</title>`);
     html = html.replace(/(<meta name="description" content=")[\s\S]*?(">)/, `$1${desc}$2`);
     html = html.replace(/(<link rel="canonical" href=")[\s\S]*?(">)/, `$1${pageUrl}$2`);
+    html = html.replace(/(<link rel="alternate" hreflang="vi" href=")[\s\S]*?(">)/, `$1${pageUrl}$2`);
+    html = html.replace(/(<link rel="alternate" hreflang="id" href=")[\s\S]*?(">)/, `$1${pageUrl}?lang=id$2`);
+    html = html.replace(/(<link rel="alternate" hreflang="x-default" href=")[\s\S]*?(">)/, `$1${pageUrl}$2`);
     html = html.replace(/(<meta property="og:title" content=")[\s\S]*?(">)/, `$1${R.esc(game.name)} - Game Java$2`);
     html = html.replace(/(<meta property="og:description" content=")[\s\S]*?(">)/, `$1${desc}$2`);
     html = html.replace(/(<meta property="og:image" content=")[\s\S]*?(">)/, `$1${R.esc(thumb)}$2`);

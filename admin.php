@@ -260,12 +260,12 @@ if(file_exists(__DIR__.'/sitemap_lib.php')) require_once __DIR__.'/sitemap_lib.p
 if(!function_exists('build_sitemap_xml')){
     function build_sitemap_xml($games){
         $x='<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
-        $x.='<url><loc>https://J2ME.VERCEL.APP/</loc><changefreq>daily</changefreq></url>';
-        $x.='<url><loc>https://J2ME.VERCEL.APP/category.html</loc><changefreq>weekly</changefreq></url>';
+        $x.='<url><loc>https://j2me.vercel.app/</loc><changefreq>daily</changefreq></url>';
+        $x.='<url><loc>https://j2me.vercel.app/category.html</loc><changefreq>weekly</changefreq></url>';
         if(is_array($games)) foreach($games as $g){
             $id=preg_replace('/[^a-z0-9\-]/i','',strval($g['id']??''));
             if($id==='')continue;
-            $x.='<url><loc>https://J2ME.VERCEL.APP/game/'.htmlspecialchars($id).'.html</loc><changefreq>weekly</changefreq></url>';
+            $x.='<url><loc>https://j2me.vercel.app/game/'.htmlspecialchars($id).'.html</loc><changefreq>weekly</changefreq></url>';
         }
         return $x.'</urlset>';
     }
@@ -273,7 +273,7 @@ if(!function_exists('build_sitemap_xml')){
 if (!function_exists('lock_secret')){ function lock_secret(){ $s=getenv('LOCK_SECRET'); if($s && strlen($s)>=16) return $s; global $config; $c=$config['LOCK_SECRET']??null; return $c && strlen($c)>=16 ? $c : null; } }
 // Ping Google/Bing báo sitemap mới (không chặn, lỗi thì bỏ qua).
 function ping_sitemap(){
-    $sm=rawurlencode('https://J2ME.VERCEL.APP/sitemap.xml');
+    $sm=rawurlencode('https://j2me.vercel.app/sitemap.xml');
     foreach(['https://www.google.com/ping?sitemap='.$sm,'https://www.bing.com/ping?sitemap='.$sm] as $u){
         try{ @file_get_contents($u,false,stream_context_create(['http'=>['timeout'=>5,'ignore_errors'=>true]])); }catch(Exception $e){}
     }
@@ -375,6 +375,7 @@ if (isset($_POST['save'])) {
             // + thời gian đọc bài (giây, mặc định 10) để mở tải
             $dlCost = max(0, min(100000, (int)($_POST['dl_cost'] ?? 10)));
             $readSecs = max(1, min(3600, (int)($_POST['read_secs'] ?? 10)));
+            $voluntary = ['fog'=>isset($_POST['vol_fog'])?1:0];
             $createdAt = $editGame['created_at'] ?? date('c');
             $g = [
                 'id'=>$id,
@@ -388,6 +389,7 @@ if (isset($_POST['save'])) {
                 'gate'=>$gate,
                 'dl_cost'=>$dlCost,
                 'read_secs'=>$readSecs,
+                'voluntary'=>$voluntary,
                 'desc'=>trim($_POST['desc'] ?? ''),
                 'thumb'=>$thumb,
                 'shots'=>$shots,
@@ -830,7 +832,7 @@ hr{border:none;border-top:1px dashed #d6deea;margin:12px 0}
         <button type="button" class="btn small outline" onclick="insertCredit()">＋ Chèn credit chủ quyền</button>
         <small style="color:#5a6b87">[credit]…[/credit] hiển thị nổi bật ngoài web + theo bài khi bị copy. Xem trước bằng nút “Xem trước”.</small>
       </div>
-      <script>function insertCredit(){var ta=document.querySelector('textarea[name=desc]');if(!ta)return;if(ta.value.indexOf('[credit]')>=0){alert('Mô tả đã có [credit] rồi.');try{ta.focus();}catch(e){}return;}var tpl='© NGUỒN: J2ME.VERCEL.APP\n[credit]Game java hay - vào ngay https://J2ME.VERCEL.APP\nVui lòng ghi thêm 2 dòng này khi chia sẻ lại bài viết.[/credit]\n';try{var s=ta.selectionStart||ta.value.length,e=ta.selectionEnd||ta.value.length;ta.value=ta.value.slice(0,s)+tpl+ta.value.slice(e);}catch(err){ta.value+=tpl;}try{ta.focus();}catch(e){}}</script>
+      <script>function insertCredit(){var ta=document.querySelector('textarea[name=desc]');if(!ta)return;if(ta.value.indexOf('[credit]')>=0){alert('Mô tả đã có [credit] rồi.');try{ta.focus();}catch(e){}return;}var tpl='© NGUỒN: J2ME.VERCEL.APP\n[credit]Game java hay - vào ngay https://j2me.vercel.app\nVui lòng ghi thêm 2 dòng này khi chia sẻ lại bài viết.[/credit]\n';try{var s=ta.selectionStart||ta.value.length,e=ta.selectionEnd||ta.value.length;ta.value=ta.value.slice(0,s)+tpl+ta.value.slice(e);}catch(err){ta.value+=tpl;}try{ta.focus();}catch(e){}}</script>
       <label>Thumb (URL ảnh)</label><input type="text" id="thumbUrl" name="thumb" value="<?=htmlspecialchars($editGame['thumb'] ?? '')?>" placeholder="https://... (hoặc dùng nút Watermark & Upload bên dưới)">
       <?php if(!empty($editGame['thumb'])) echo '<div style="margin-top:6px"><img src="'.htmlspecialchars($editGame['thumb']).'" style="width:64px;height:64px;border-radius:8px;border:1px solid #d6deea;object-fit:cover" onerror="this.style.display=\'none\'"><br><small style="color:#5a6b87">Ảnh hiện tại</small></div>'; ?>
       <div class="wm-box" data-target="thumbUrl" data-multi="0">
@@ -882,6 +884,11 @@ hr{border:none;border-top:1px dashed #d6deea;margin:12px 0}
           <small style="color:#5a6b87">Tích nhiều điều kiện = phải đủ TẤT CẢ. Mặc định 10s đọc + 1 like thay cho bình luận.</small>
         </div>
         <div id="gateLoginRow" style="display:<?=($egT==='none'?'none':'block')?>"><label style="font-size:11px"><input type="checkbox" name="gate_login" <?=!empty($eg['login'])?'checked':''?>> 🔐 Bắt buộc đăng nhập (áp dụng mọi loại khóa — khách không tải được)</label></div>
+          <div style="margin-top:6px;background:#f0f8ff;border:1px dashed #a8c0e0;border-radius:6px;padding:6px;display:grid;gap:4px"><b style="font-size:11px;color:#0066cc">✨ Hiệu ứng sương mù</b>
+            <?php $vol=$editGame['voluntary']??['fog'=>1]; ?>
+            <label style="font-size:11px"><input type="checkbox" name="vol_fog" <?=!empty($vol['fog'])?'checked':''?>> 🌫️ Sương mù tan theo vùng + % + mẹo (dùng read_secs)</label>
+            <small style="color:#5a6b87">Tick để hiện sương mờ tan dần theo 30s, dùng chung `read_secs` và `i18n`</small>
+          </div>
           <div><small>💰 Giá tải (EXP)</small><input type="number" name="dl_cost" min="0" max="100000" value="<?=htmlspecialchars($editGame['dl_cost']??10)?>" style="width:100px"> <small style="color:#5a6b87">tải lại game đã sở hữu thì miễn phí • gợi ý: kho cũ ~5, game mới ~15</small></div>
           <div style="margin-top:6px"><small>⏱️ Thời gian đọc bài (giây)</small><input type="number" name="read_secs" min="1" max="3600" value="<?=htmlspecialchars($editGame['read_secs']??10)?>" style="width:100px"> <small style="color:#5a6b87">mở trang đủ từng này giây mới mở tải • mặc định 10</small></div>
         <script>function gateTypeChanged(v){try{document.getElementById('gateOpts').style.display=v==='none'?'none':'grid';document.getElementById('gateStats').style.display=v==='stats'?'grid':'none';document.getElementById('gateLoginRow').style.display=v==='none'?'none':'block';}catch(e){}}</script>
@@ -1151,10 +1158,11 @@ const g={
       cat:String(fd.get('cat')||''), size:String(fd.get('size')||''), res:res,
       hot:ck('hot'), vi:ck('vi'), new:ck('new'),
       desc:String(fd.get('desc')||''), thumb:String(fd.get('thumb')||''),
-      dl_cost:Math.max(0,Math.min(100000,parseInt(fd.get('dl_cost')||'10',10)||0)),
-      read_secs:Math.max(1,Math.min(3600,parseInt(fd.get('read_secs')||'10',10)||10)),
-       gate:(function(){var t=String(fd.get('gate_type')||'none');var g={type:t,xp:+(fd.get('gate_xp')||100)};if(t==='stats'){var rq={};if(ck('rq_read_on'))rq.read=+(fd.get('rq_read')||10);if(ck('rq_likes_on'))rq.likes=+(fd.get('rq_likes')||1);if(ck('rq_completed_on'))rq.completed=+(fd.get('rq_completed')||1);g.require=rq;}if(t!=='none'&&ck('gate_login'))g.login=1;return g;})(),
-      shots:shots, jar:jar, created_at:new Date().toISOString()
+       dl_cost:Math.max(0,Math.min(100000,parseInt(fd.get('dl_cost')||'10',10)||0)),
+       read_secs:Math.max(1,Math.min(3600,parseInt(fd.get('read_secs')||'10',10)||10)),
+       voluntary:{fog:ck('vol_fog')?1:0},
+        gate:(function(){var t=String(fd.get('gate_type')||'none');var g={type:t,xp:+(fd.get('gate_xp')||100)};if(t==='stats'){var rq={};if(ck('rq_read_on'))rq.read=+(fd.get('rq_read')||10);if(ck('rq_likes_on'))rq.likes=+(fd.get('rq_likes')||1);if(ck('rq_completed_on'))rq.completed=+(fd.get('rq_completed')||1);g.require=rq;}if(t!=='none'&&ck('gate_login'))g.login=1;return g;})(),
+       shots:shots, jar:jar, created_at:new Date().toISOString()
     };
   try{sessionStorage.setItem('game_preview',JSON.stringify(g));}catch(e){alert('Trình duyệt chặn sessionStorage, không xem trước được.');return;}
   window.open('game.html?preview=1','_blank');

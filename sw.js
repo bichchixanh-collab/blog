@@ -1,6 +1,6 @@
-// sw.js v4 — versioned cache, không cache API POST, giới hạn dung lượng.
-const CACHE = 'j2me-v7';
-const CORE = ['index.html', 'category.html', 'game.html', 'profile.html', 'lien-he.html', '404.html', 'offline.html', 'go.html', 'goc-senpai.html', 'dang-nhap.html', 'assets/js/senpai.js', 'assets/js/sb-auth.js', 'assets/js/sb-config.js', 'assets/js/sb-sync.js', 'assets/js/sb-board.js',            'trang-xep-hang.html', 'style.min.css', 'assets/css/manga.css', 'assets/anime-girl.png', 'assets/logo.png',                     'manifest.webmanifest'];
+// sw.js v10 — precache core + game/index split + data/games.json for offline, versioned
+const CACHE = 'j2me-v10';
+const CORE = ['index.html', 'category.html', 'game.html', 'profile.html', 'lien-he.html', '404.html', 'offline.html', 'go.html', 'goc-senpai.html', 'dang-nhap.html', 'assets/js/sb-auth.js', 'assets/js/sb-config.js', 'assets/js/sb-sync.js', 'assets/js/sb-board.js', 'assets/js/game-core.js', 'assets/js/game-read.js', 'assets/js/game-early.js', 'assets/js/index-core.js', 'assets/js/index-early.js', 'assets/i18n.min.js', 'trang-xep-hang.html', 'style.min.css', 'assets/css/manga.min.css', 'assets/css/game-page.css', 'assets/css/index-page.css', 'assets/anime-girl.webp', 'assets/logo.webp', 'manifest.webmanifest', 'data/games.json', 'data/stats.json'];
 self.addEventListener('install', (e) => {
   e.waitUntil(caches.open(CACHE).then((c) => c.addAll(CORE).catch(() => {})).then(() => self.skipWaiting()));
 });
