@@ -50,10 +50,35 @@ function loadGames() {
 function escH(s) {
   return String(s == null ? '' : s).replace(/[&<>"']/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
 }
+// Ngôn ngữ theo trình duyệt (Accept-Language): id -> Indonesia, còn lại Việt
+function langOf(req) {
+  try {
+    const al = String((req.headers && req.headers['accept-language']) || '').toLowerCase();
+    if (/(^|,)\s*id([-_]|$)/.test(al)) return 'id';
+  } catch {}
+  return 'vi';
+}
+const ERR_TXT = {
+  slow: { vi: ['Bấm nhanh quá', 'Bạn thao tác quá nhanh, chờ khoảng 1 phút rồi thử lại nhé.'], id: ['Terlalu cepat', 'Anda terlalu cepat, tunggu sekitar 1 menit lalu coba lagi.'] },
+  daily: { vi: ['Hết lượt trong ngày', 'Máy này đã tải quá nhiều hôm nay, mai quay lại nhé.'], id: ['Habis hari ini', 'Perangkat ini sudah mengunduh terlalu banyak hari ini, kembali besok.'] },
+  badticket: { vi: ['Vé không hợp lệ', 'Vé tải sai định dạng hoặc đã hết hạn (mỗi vé chỉ sống 15 phút). Về trang game bấm Tải để lấy vé mới.'], id: ['Tiket tidak valid', 'Tiket salah format atau kedaluwarsa (tiap tiket 15 menit). Kembali ke halaman game untuk tiket baru.'] },
+  reused: { vi: ['Vé đã được dùng', 'Mỗi vé chỉ tải được 1 lần duy nhất. Vé này đã có người (hoặc máy khác) dùng rồi — về trang game bấm Tải để lấy vé mới.'], id: ['Tiket sudah dipakai', 'Tiap tiket hanya 1 unduhan. Tiket ini sudah dipakai — kembali ke halaman game untuk tiket baru.'] },
+  binding: { vi: ['Vé gắn với máy khác', 'Vé này được cấp cho máy/mạng khác ({reason}). Hãy bấm nút Tải lại trên chính máy này để lấy vé mới.'], id: ['Tiket milik perangkat lain', 'Tiket ini untuk perangkat/jaringan lain ({reason}). Tekan Unduh lagi di perangkat ini untuk tiket baru.'] },
+  notfound: { vi: ['Không tìm thấy game', 'Game này có thể đã bị xóa hoặc đổi tên.'], id: ['Game tidak ada', 'Game ini mungkin sudah dihapus atau diganti nama.'] },
+  resinvalid: { vi: ['Bản tải không hợp lệ', 'Phiên bản bạn chọn không còn tồn tại.'], id: ['Versi tidak valid', 'Versi yang dipilih sudah tidak ada.'] },
+  idinvalid: { vi: ['Link không hợp lệ', 'Địa chỉ tải sai định dạng.'], id: ['Link tidak valid', 'Alamat unduhan salah format.'] },
+  nofile: { vi: ['Chưa có link', 'Bản này chưa có link tải, admin đang cập nhật.'], id: ['Belum ada link', 'Versi ini belum ada link, admin sedang memperbarui.'] },
+  badurl: { vi: ['Lỗi link tải', 'Link tải bị lỗi, hãy báo admin kiểm tra lại.'], id: ['Link error', 'Link unduhan rusak, minta admin periksa.'] },
+  error: { vi: ['Lỗi hệ thống', 'Có lỗi xảy ra, thử lại sau ít phút nhé.'], id: ['Sistem error', 'Terjadi kesalahan, coba lagi nanti.'] },
+  back: { vi: '‹ Về trang game lấy vé mới', id: '‹ Kembali ambil tiket baru' },
+};
 // Trang lỗi đẹp kiểu WAP (chỉ dùng style="" để qua được CSP, không <style>/<script>)
-function errPage(res, code, title, msg, gameId) {
+function errPage(req, res, code, key, gameId, extra) {
+  const lang = langOf(req);
+  const t = ERR_TXT[key] || ERR_TXT.error;
+  const title = t[lang][0], msg = t[lang][1].replace('{reason}', String((extra && extra.reason) || 'không khớp'));
   const back = gameId ? `/game/${encodeURIComponent(gameId)}.html` : '/index.html';
-  const html = '<!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8">'
+  const html = '<!DOCTYPE html><html lang="' + lang + '"><head><meta charset="UTF-8">'
     + '<meta name="viewport" content="width=device-width,initial-scale=1">'
     + '<meta name="robots" content="noindex"><title>' + escH(title) + ' — J2ME</title></head>'
     + '<body style="margin:0;padding:12px;background:#e8f4fd;font-family:system-ui,sans-serif;color:#1a3a5c;min-height:100vh;box-sizing:border-box">'
@@ -63,7 +88,7 @@ function errPage(res, code, title, msg, gameId) {
     + '<div style="font-size:48px">🔒</div>'
     + '<h2 style="font-size:15px;color:#0066cc;margin:10px 0 6px">' + escH(title) + '</h2>'
     + '<p style="font-size:12px;color:#4a7a9a;line-height:1.7">' + escH(msg) + '</p>'
-    + '<a href="' + back + '" style="display:inline-block;margin-top:12px;background:linear-gradient(180deg,#4da6ff,#0066cc);color:#fff;padding:9px 22px;border-radius:24px;font-weight:800;font-size:12px;text-decoration:none;border:2px solid #fff;box-shadow:0 4px 0 #004499">‹ Về trang game lấy vé mới</a>'
+    + '<a href="' + back + '" style="display:inline-block;margin-top:12px;background:linear-gradient(180deg,#4da6ff,#0066cc);color:#fff;padding:9px 22px;border-radius:24px;font-weight:800;font-size:12px;text-decoration:none;border:2px solid #fff;box-shadow:0 4px 0 #004499">' + escH(ERR_TXT.back[lang]) + '</a>'
     + '</div>'
     + '<div style="background:#1a3a5c;color:#b8d8f8;text-align:center;padding:10px;font-size:11px">© J2ME.VERCEL.APP</div>'
     + '</div></body></html>';
@@ -120,20 +145,20 @@ module.exports = async (req, res) => {
   const q = req.query || {};
   // --- Luồng vé (go.html): ?ticket=... ---
   if (q.ticket) {
-    if (!await check({ ip: ipOf(req), route: 'dl', limit: 30, windowS: 60 })) { errPage(res, 429, 'Bấm nhanh quá', 'Bạn thao tác quá nhanh, chờ khoảng 1 phút rồi thử lại nhé.', null); return; }
+    if (!await check({ ip: ipOf(req), route: 'dl', limit: 30, windowS: 60 })) { errPage(req, res, 429, 'slow', null); return; }
     const t = verifyTicket(q.ticket);
-    if (!t) { errPage(res, 403, 'Vé không hợp lệ', 'Vé tải sai định dạng hoặc đã hết hạn (mỗi vé chỉ sống 15 phút). Về trang game bấm Tải để lấy vé mới.', null); return; }
+    if (!t) { errPage(req, res, 403, 'badticket', null); return; }
     // One-time: v2 dùng jti, v1 legacy dùng sha256(ticket) làm khóa
     try {
       const tkey = (t.v === 2 && t.jti) ? String(t.jti) : ('v1-' + crypto.createHash('sha256').update(String(q.ticket), 'utf8').digest('hex').slice(0, 32));
-      if (await isTicketUsed(tkey)) { errPage(res, 403, 'Vé đã được dùng', 'Mỗi vé chỉ tải được 1 lần duy nhất. Vé này đã có người (hoặc máy khác) dùng rồi — về trang game bấm Tải để lấy vé mới.', t.id); return; }
-    } catch { errPage(res, 403, 'Vé đã được dùng', 'Mỗi vé chỉ tải được 1 lần duy nhất. Về trang game bấm Tải để lấy vé mới.', t.id); return; }
+      if (await isTicketUsed(tkey)) { errPage(req, res, 403, 'reused', t.id); return; }
+    } catch { errPage(req, res, 403, 'reused', t.id); return; }
     // Binding check: IP subnet / sub hash
     const bind = verifyTicketBinding(t, req);
-    if (!bind.ok) { errPage(res, 403, 'Vé gắn với máy khác', 'Vé này được cấp cho máy/mạng khác (' + (bind.reason || 'không khớp') + '). Hãy bấm nút Tải lại trên chính máy này để lấy vé mới.', t.id); return; }
+    if (!bind.ok) { errPage(req, res, 403, 'binding', t.id, { reason: bind.reason }); return; }
     const games = loadGames();
     const g = games.find((x) => x && x.id === t.id);
-    if (!g) { errPage(res, 404, 'Không tìm thấy game', 'Game này có thể đã bị xóa hoặc đổi tên.', null); return; }
+    if (!g) { errPage(req, res, 404, 'notfound', null); return; }
     const gate = (g.gate && g.gate.type && g.gate.type !== 'none') ? g.gate : null;
     if (gateHash(gate || { type: 'none' }) !== t.gh) {
       res.statusCode = 302;
@@ -142,19 +167,19 @@ module.exports = async (req, res) => {
       return;
     }
     const resList = Array.isArray(g.res) ? g.res : [];
-    if (resList.indexOf(t.res) < 0) { errPage(res, 400, 'Bản tải không hợp lệ', 'Phiên bản bạn chọn không còn tồn tại.', t.id); return; }
+    if (resList.indexOf(t.res) < 0) { errPage(req, res, 400, 'resinvalid', t.id); return; }
     await finishDl(req, res, g, t.res);
     return;
   }
   // --- Luồng cũ: ?id=&res=[&proof=] (giữ tương thích, vẫn kiểm khóa) ---
   const id = String((q.id || q.game) || '').slice(0, 120);
   const resName = String(q.res || '').slice(0, 16);
-  if (!/^[a-z0-9][a-z0-9\-]{0,119}$/i.test(id)) { errPage(res, 400, 'Link không hợp lệ', 'Địa chỉ tải sai định dạng.', null); return; }
-  if (!await check({ ip: ipOf(req), route: 'dl', limit: 30, windowS: 60 })) { errPage(res, 429, 'Bấm nhanh quá', 'Bạn thao tác quá nhanh, chờ khoảng 1 phút rồi thử lại nhé.', id); return; }
-  if (!await check({ ip: ipOf(req), route: 'dl-day', limit: 300, windowS: 86400 })) { errPage(res, 429, 'Hết lượt trong ngày', 'Máy này đã tải quá nhiều hôm nay, mai quay lại nhé.', id); return; }
+  if (!/^[a-z0-9][a-z0-9\-]{0,119}$/i.test(id)) { errPage(req, res, 400, 'idinvalid', null); return; }
+  if (!await check({ ip: ipOf(req), route: 'dl', limit: 30, windowS: 60 })) { errPage(req, res, 429, 'slow', id); return; }
+  if (!await check({ ip: ipOf(req), route: 'dl-day', limit: 300, windowS: 86400 })) { errPage(req, res, 429, 'daily', id); return; }
   const games = loadGames();
   const g = games.find((x) => x && x.id === id);
-  if (!g) { errPage(res, 404, 'Không tìm thấy game', 'Game này có thể đã bị xóa hoặc đổi tên.', null); return; }
+  if (!g) { errPage(req, res, 404, 'notfound', null); return; }
   const gate = (g.gate && g.gate.type && g.gate.type !== 'none') ? g.gate : null;
   // Luồng trực tiếp không mang token → bài bắt đăng nhập luôn chuyển về trang khóa
   if (gate && (gate.type === 'login' || gate.login)) {
@@ -173,14 +198,14 @@ module.exports = async (req, res) => {
 };
 async function finishDl(req, res, g, resName) {
   const target = resolveJarUrl(g.jar, resName, g.id);
-  if (!target) { errPage(res, 404, 'Chưa có link', 'Bản này chưa có link tải, admin đang cập nhật.', g.id); return; }
+  if (!target) { errPage(req, res, 404, 'nofile', g.id); return; }
   let host = '', urlObj = null;
-  try { urlObj = new URL(target); host = urlObj.hostname.toLowerCase(); } catch { errPage(res, 500, 'Lỗi link tải', 'Link tải bị lỗi, hãy báo admin kiểm tra lại.', g.id); return; }
+  try { urlObj = new URL(target); host = urlObj.hostname.toLowerCase(); } catch { errPage(req, res, 500, 'badurl', g.id); return; }
   // Strict validation: https only, no credentials, exact host match
-  if (urlObj.protocol !== 'https:') { errPage(res, 500, 'Lỗi link tải', 'Link tải không an toàn, hãy báo admin kiểm tra lại.', g.id); return; }
-  if (urlObj.username || urlObj.password) { errPage(res, 500, 'Lỗi link tải', 'Link tải bị lỗi, hãy báo admin kiểm tra lại.', g.id); return; }
+  if (urlObj.protocol !== 'https:') { errPage(req, res, 500, 'badurl', g.id); return; }
+  if (urlObj.username || urlObj.password) { errPage(req, res, 500, 'badurl', g.id); return; }
   // No fallback to first entry if resName mismatch — must be exact
-  if (g.jar && typeof g.jar === 'object' && g.jar[resName] == null) { errPage(res, 400, 'Bản tải không hợp lệ', 'Phiên bản bạn chọn không còn tồn tại.', g.id); return; }
+  if (g.jar && typeof g.jar === 'object' && g.jar[resName] == null) { errPage(req, res, 400, 'resinvalid', g.id); return; }
   if (!ALLOW_HOSTS.has(host)) {
     // Host lạ: không redirect thẳng, đưa qua trang cảnh báo go.html bằng vé mới
     // (vé giữ nguyên hiệu lực, không lộ URL).
@@ -193,7 +218,7 @@ async function finishDl(req, res, g, resName) {
       res.setHeader('Location', `${siteOf(req)}/go.html?ticket=${encodeURIComponent(t.ticket)}`);
       res.end();
       return;
-    } catch { errPage(res, 500, 'Lỗi hệ thống', 'Có lỗi xảy ra, thử lại sau ít phút nhé.', g.id); return; }
+    } catch { errPage(req, res, 500, 'error', g.id); return; }
   }
   try { await countDl(g.id); } catch {}
   res.statusCode = 302;
