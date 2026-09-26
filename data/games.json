@@ -346,6 +346,9 @@
         },
         "dl_cost": 10,
         "read_secs": 10,
+        "voluntary": {
+            "fog": 1
+        },
         "desc": "Halo semuanya! 👋 Setelah sekian lama menghilang, akhirnya saya kembali lagi! 😎🔥 Kali ini saya membawa sebuah game yang benar-benar menarik dan wajib kalian coba! 🎮👀\r\n\r\n\r\n\r\n🔥 SIAPA SANGKA… “HONOR OF KINGS” TERNYATA PUNYA VERSI JAVA OFFLINE?! 😱\r\n\r\n\r\n\r\nTidak perlu server. Tidak perlu internet. Tidak perlu HP dengan spesifikasi tinggi… cukup punya satu HP Java jadul! 📱🔥\r\n\r\n\r\n\r\nSebuah game fanmade yang terinspirasi dari Honor of Kings telah dibuat kembali dengan gaya khas game Java zaman dulu. Map, karakter, pertarungan, dan berbagai elemen MOBA semuanya dibuat dalam versi yang lebih sederhana, menghadirkan sensasi bermain offline yang penuh nostalgia! 👀\r\n\r\n\r\n\r\n⚔️ GAME JAVA KLASIK + MOBA ALA HONOR OF KINGS = APA YANG AKAN TERJADI?!\r\n\r\n\r\n\r\nYang paling menarik… game ini BUKAN game resmi Honor of Kings. Ini adalah game fanmade yang dibuat dengan nuansa khas game Java era dulu.\r\n\r\n\r\n\r\n👉 Buat kamu yang pernah menikmati game Java jadul, GAME INI WAJIB DICOBA! 🔥📱\r\n\r\n\r\n\r\n💨 CHEAT SPEED:\r\nMasuk ke Shop, lalu tekan tombol 2 sebanyak 2 kali atau tekan tombol Atas (↑).\r\n\r\n\r\n\r\n[credit]Game Java keren — kunjungi: https:\/\/J2ME.VERCEL.APP\r\nMohon sertakan 2 baris ini saat membagikan ulang postingan ini.[\/credit]",
         "thumb": "https:\/\/i.ibb.co\/5WBvXmp8\/wm-1789867217581.jpg",
         "shots": [
@@ -360,7 +363,7 @@
         },
         "downloads": 0,
         "created_at": "2026-09-20T03:27:01+02:00",
-        "updated_at": "2026-09-24T07:51:34+02:00"
+        "updated_at": "2026-09-26T17:01:09+02:00"
     },
     {
         "id": "moba-vuong-gia-vinh-dieu",
