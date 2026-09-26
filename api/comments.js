@@ -397,14 +397,40 @@ module.exports = async (req, res) => {
       if (text.length < 2) return send(res, 400, { error: 'text too short' });
       if (!replyTo && !stars) return send(res, 400, { error: 'stars invalid' });
       // Ưu tiên Supabase khi có SERVICE_KEY (không cần GitHub token)
-      if(process.env.SUPABASE_SERVICE_KEY){
+      // Nếu bảng comments chưa tồn tại / lỗi hạ tầng / parent chỉ có bên GitHub
+      // (dữ liệu chưa migrate) thì RỚT XUỐNG luồng GitHub thay vì 400 oan.
+      let useSupa = !!process.env.SUPABASE_SERVICE_KEY;
+      let ghParentId = null, ghParentMiss = false;
+      if(useSupa && replyTo){
         try{
-          let parentId=null;
-          if(replyTo){
-            const pr = await sbFetch(`/rest/v1/comments?id=eq.${encodeURIComponent(replyTo)}&game=eq.${encodeURIComponent(game)}&select=id,status,parent_id`);
-            const par = pr.json && pr.json[0];
-            if(!par || par.status!=='approved' || par.parent_id) return send(res, 400, { error: 'reply target invalid' });
-            parentId=par.id;
+          const pr = await sbFetch(`/rest/v1/comments?id=eq.${encodeURIComponent(replyTo)}&game=eq.${encodeURIComponent(game)}&select=id,status,parent_id`);
+          if(pr.status===200 && Array.isArray(pr.json)){
+            const par = pr.json[0];
+            if(par && par.status==='approved' && !par.parent_id){ ghParentId = par.id; }
+            else if(!par || par.status!=='approved' || par.parent_id){
+              // Bảng OK nhưng không thấy parent hợp lệ: kiểm tra nốt bên GitHub
+              // (trường hợp dữ liệu cũ chưa migrate) trước khi kết luận 400.
+              try{
+                const ghList = await loadList();
+                const gp = ghList.find((c) => c && c.id === replyTo && c.game === game && !c.parentId);
+                if(gp && gp.status==='approved'){ ghParentId=gp.id; useSupa=false; }
+                else ghParentMiss=true;
+              }catch(e){ ghParentMiss=true; }
+            }
+          } else { useSupa=false; } // bảng chưa có / lỗi hạ tầng -> GitHub
+        }catch(e){ useSupa=false; }
+        if(ghParentMiss) return send(res, 400, { error: 'reply target invalid' });
+      }
+      if(useSupa){
+        try{
+          // parentId đã xác minh ở bước trên (ghParentId set khi Supabase OK,
+          // hoặc khi rớt sang GitHub mà parent chỉ tồn tại bên đó).
+          let parentId = ghParentId || null;
+          if(replyTo && !parentId){
+            const pr2 = await sbFetch(`/rest/v1/comments?id=eq.${encodeURIComponent(replyTo)}&game=eq.${encodeURIComponent(game)}&select=id,status,parent_id`);
+            const par2 = pr2.json && pr2.json[0];
+            if(!par2 || par2.status!=='approved' || par2.parent_id) return send(res, 400, { error: 'reply target invalid' });
+            parentId = par2.id;
           }
           const autoOn = isAutoApprove();
           const chk = autoOn ? await checkComment({ text, name }) : {ok:false, reason:'auto tắt'};
