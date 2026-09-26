@@ -10,27 +10,38 @@ const { countDl } = require('./_store');
 const { verifyTicket, verifyTicketBinding, gateHash, mintTicket, resolveJarUrl, checkProofExtended } = require('./_lock');
 const { countApproved } = require('./comments');
 const ALLOW_HOSTS = new Set(['sfile.mobi', 'sfile.co', 'drive.google.com', 'www.mediafire.com', 'mediafire.com', 'github.com', 'raw.githubusercontent.com', 'cdn.jsdelivr.net', (process.env.FILES_HOST || '').toLowerCase()].filter(Boolean));
-// One-time ticket: Redis SETNX or in-memory fallback
+// One-time ticket: Supabase used_tickets (atomic INSERT, PK=jti).
+// INSERT 201 = lần đầu; 409 = vé đã dùng (replay) -> chặn.
+// Memory Map chỉ là pre-filter giảm query DB (true-positive), không thay thế DB
+// vì serverless mỗi instance memory riêng. Lỗi hạ tầng -> fail-open (cho qua,
+// ghi log) để không chặn lượt tải thật khi DB gián đoạn.
+const crypto = require('crypto');
 const usedTicketsMem = new Map();
 async function isTicketUsed(jti) {
   if (!jti) return false;
-  // Upstash Redis if configured
-  const url = process.env.UPSTASH_REDIS_REST_URL, tk = process.env.UPSTASH_REDIS_REST_TOKEN;
-  if (url && tk) {
-    try {
-      const r = await fetch(`${url}/set/${encodeURIComponent('used_ticket:'+jti)}/1/EX/900/NX`, { headers: { Authorization: `Bearer ${tk}` } });
-      const j = await r.json().catch(() => ({}));
-      // result null means already exists (NX failed)
-      if (j.result === null) return true;
-      return false;
-    } catch {}
-  }
   if (usedTicketsMem.has(jti)) return true;
-  usedTicketsMem.set(jti, Date.now());
-  // cleanup old entries >30min
-  for (const [k, v] of usedTicketsMem) if (Date.now() - v > 30*60*1000) usedTicketsMem.delete(k);
-  if (usedTicketsMem.size > 5000) usedTicketsMem.clear();
-  return false;
+  try {
+    const { sbFetch } = require('./_sb');
+    const ins = await sbFetch('/rest/v1/used_tickets', {
+      method: 'POST',
+      headers: { Prefer: 'return=minimal' },
+      body: JSON.stringify({ jti: String(jti).slice(0, 128) }),
+    });
+    if (ins.status === 201 || ins.status === 200 || ins.status === 204) {
+      usedTicketsMem.set(jti, Date.now());
+      if (usedTicketsMem.size > 5000) usedTicketsMem.clear();
+      return false;
+    }
+    if (ins.status === 409) {
+      usedTicketsMem.set(jti, Date.now());
+      return true;
+    }
+    try { console.error('[dl] used_tickets insert status', ins.status); } catch {}
+    return false;
+  } catch (e) {
+    try { console.error('[dl] used_tickets error', e && e.message); } catch {}
+    return false;
+  }
 }
 
 function loadGames() {
@@ -87,10 +98,11 @@ module.exports = async (req, res) => {
     if (!await check({ ip: ipOf(req), route: 'dl', limit: 30, windowS: 60 })) { res.statusCode = 429; res.end('slow down'); return; }
     const t = verifyTicket(q.ticket);
     if (!t) { res.statusCode = 403; res.end('bad ticket'); return; }
-    // One-time check for v2 tickets
-    if (t.v === 2 && t.jti) {
-      if (await isTicketUsed(t.jti)) { res.statusCode = 403; res.end('ticket reused'); return; }
-    }
+    // One-time: v2 dùng jti, v1 legacy dùng sha256(ticket) làm khóa
+    try {
+      const tkey = (t.v === 2 && t.jti) ? String(t.jti) : ('v1-' + crypto.createHash('sha256').update(String(q.ticket), 'utf8').digest('hex').slice(0, 32));
+      if (await isTicketUsed(tkey)) { res.statusCode = 403; res.end('ticket reused'); return; }
+    } catch { res.statusCode = 403; res.end('ticket reused'); return; }
     // Binding check: IP subnet / sub hash
     const bind = verifyTicketBinding(t, req);
     if (!bind.ok) { res.statusCode = 403; res.end('ticket binding failed: ' + (bind.reason || '')); return; }
