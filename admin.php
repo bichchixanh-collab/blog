@@ -502,6 +502,68 @@ if(isset($_POST['notice_save'])){
         } else { $msg='Đã lưu thông báo local (chưa đẩy GitHub: thiếu token).'; $msgType='info'; }
     }
 }
+// Tìm uid Supabase theo email (Auth Admin API, cần SUPABASE_SERVICE_KEY trong config.php)
+function supa_find_uid_by_email($sbUrl, $sbKey, $email){
+    $want = mb_strtolower(trim((string)$email), 'UTF-8');
+    if ($want === '') return null;
+    for ($page = 1; $page <= 20; $page++) {
+        $ch = curl_init(rtrim($sbUrl, '/').'/auth/v1/admin/users?page='.$page.'&per_page=100');
+        curl_setopt_array($ch, [CURLOPT_RETURNTRANSFER => true, CURLOPT_TIMEOUT => 10,
+            CURLOPT_HTTPHEADER => ["apikey: $sbKey", "Authorization: Bearer $sbKey"]]);
+        $res = curl_exec($ch); $code = curl_getinfo($ch, CURLINFO_HTTP_CODE); curl_close($ch);
+        if ($code !== 200) return null;
+        $j = json_decode($res, true);
+        $users = (is_array($j) && isset($j['users']) && is_array($j['users'])) ? $j['users'] : (is_array($j) ? $j : []);
+        if (!$users) return null;
+        foreach ($users as $u) {
+            if (is_array($u) && mb_strtolower((string)($u['email'] ?? ''), 'UTF-8') === $want) return (string)($u['id'] ?? '');
+        }
+        if (count($users) < 100) break;
+    }
+    return null;
+}
+// Cộng/đặt EXP ví cho tài khoản theo email (ghi data/economy.json, key u_<uid>)
+$expLookup = null;
+if (isset($_POST['exp_lookup']) || isset($_POST['exp_adjust'])) {
+    if (!check_csrf()) { $msg = 'Token bảo mật không hợp lệ.'; $msgType = 'error'; }
+    else {
+        $expEmail = trim((string)($_POST['exp_email'] ?? ''));
+        $sbUrl = rtrim((string)($config['SUPABASE_URL'] ?? 'https://pmotbltodyyilarnvtpn.supabase.co'), '/');
+        $sbKey = (string)($config['SUPABASE_SERVICE_KEY'] ?? '');
+        if (!filter_var($expEmail, FILTER_VALIDATE_EMAIL)) { $msg = 'Email không hợp lệ.'; $msgType = 'error'; }
+        elseif ($sbKey === '') { $msg = 'Chưa cấu hình SUPABASE_SERVICE_KEY trong config.php nên không tra được uid theo email.'; $msgType = 'error'; }
+        else {
+            $expUid = supa_find_uid_by_email($sbUrl, $sbKey, $expEmail);
+            if (!$expUid) { $msg = 'Không tìm thấy tài khoản với email này (chưa đăng ký?).'; $msgType = 'error'; }
+            else {
+                $eGot = githubGetFile($config, 'data/economy.json');
+                if ($eGot['error']) { $msg = '❌ '.$eGot['error']; $msgType = 'error'; }
+                else {
+                    $emap = is_array($eGot['data']) ? $eGot['data'] : [];
+                    $ek = 'u_'.$expUid;
+                    $er = is_array($emap[$ek] ?? null) ? $emap[$ek] : [];
+                    $bal = max(0, (int)($er['bal'] ?? 0));
+                    if (isset($_POST['exp_adjust'])) {
+                        $amt = (int)($_POST['exp_amount'] ?? 0);
+                        $mode = ($_POST['exp_mode'] ?? 'add') === 'set' ? 'set' : 'add';
+                        $newBal = ($mode === 'set') ? max(0, min(100000, $amt)) : max(0, min(100000, $bal + $amt));
+                        $er['bal'] = $newBal;
+                        if (!isset($er['last'])) $er['last'] = '';
+                        if (!isset($er['streak'])) $er['streak'] = 0;
+                        if (!isset($er['owned']) || !is_array($er['owned'])) $er['owned'] = [];
+                        if (!isset($er['bonus']) || !is_array($er['bonus'])) $er['bonus'] = [];
+                        $emap[$ek] = $er;
+                        $eSync = '';
+                        $ok = githubPutFile($config, 'data/economy.json', $emap, 'economy: manual '.$mode.' '.($mode === 'set' ? $newBal : (($amt >= 0 ? '+' : '').$amt)).' '.$ek, $eSync);
+                        if ($ok) { $bal = $newBal; $msg = 'Đã '.($mode === 'set' ? 'đặt' : 'cộng').' EXP cho <b>'.htmlspecialchars($expEmail).'</b>: số dư <b>'.$bal.'</b>. '.$eSync; $msgType = 'success'; }
+                        else { $msg = '❌ '.$eSync; $msgType = 'error'; }
+                    }
+                    $expLookup = ['email' => $expEmail, 'uid' => $expUid, 'bal' => $bal];
+                }
+            }
+        }
+    }
+}
 // Đổi mật khẩu admin (POST + CSRF): kiểm tra mật khẩu cũ, hash mật khẩu mới, ghi lại config.php
 if(isset($_POST['change_pass'])){
     if(!check_csrf()){ $msg='Token bảo mật không hợp lệ.'; $msgType='error'; }
@@ -1067,6 +1129,24 @@ hr{border:none;border-top:1px dashed #d6deea;margin:12px 0}
           <?php if(!empty($noticeCur['updated_at'])) echo '<small style="color:#5a6a7a">Cập nhật: '.htmlspecialchars($noticeCur['updated_at']).'</small>'; ?>
         </div>
       </form>
+    </div>
+  </div>
+
+  <!-- CỘNG EXP THEO EMAIL -->
+  <div class="card" style="grid-column:1/-1">
+    <div class="card-title">💰 Nhập số EXP cho tài khoản (email)</div>
+    <div class="card-body">
+      <form method="post" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><?=csrf_field()?>
+        <input type="email" name="exp_email" placeholder="ban@email.com" required value="<?=htmlspecialchars($expLookup['email'] ?? '')?>" style="flex:2;min-width:200px">
+        <input type="number" name="exp_amount" placeholder="+/- EXP" value="10" style="flex:0 0 110px">
+        <select name="exp_mode" style="flex:0 0 130px"><option value="add">Cộng/trừ</option><option value="set">Đặt bằng</option></select>
+        <button name="exp_lookup" class="btn small outline" type="submit">Xem số dư</button>
+        <button name="exp_adjust" class="btn small" type="submit" onclick="return confirm('Chốt số EXP này?')">Lưu EXP</button>
+      </form>
+      <?php if ($expLookup): ?>
+        <div style="margin-top:8px;font-size:12px">📧 <b><?=htmlspecialchars($expLookup['email'])?></b> <small style="color:#5a6b87">(<?=htmlspecialchars($expLookup['uid'])?>)</small> — số dư ví: <b><?=htmlspecialchars($expLookup['bal'])?> EXP</b></div>
+      <?php endif; ?>
+      <small style="color:#5a6b87">Cần <code>SUPABASE_URL</code> + <code>SUPABASE_SERVICE_KEY</code> trong config.php để tra uid theo email. Ghi vào <code>data/economy.json</code> (khóa <code>u_&lt;uid&gt;</code>), tối đa 100000.</small>
     </div>
   </div>
 

@@ -42,7 +42,6 @@ a.btn.off{opacity:.45;pointer-events:none}
 .foot a{color:#fff}
 </style>
 <link rel="stylesheet" href="assets/css/manga.min.css?v=7">
-<script src="assets/js/game-read.js?v=1"></script>
 </head>
 <body>
 <div class="app">
@@ -67,9 +66,6 @@ a.btn.off{opacity:.45;pointer-events:none}
 </div>
 <script>
 var el=document.getElementById('clock');if(el)el.textContent=new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'});
-// Fallback stRead (tránh lỗi khi game-read.js chưa load)
-function stRead(id){try{var k='j2me_read_'+String(id||'').slice(0,120);var s=sessionStorage.getItem(_rk); if(s!=null) return Math.max(0, parseInt(s,10)||0); return 0;}catch(e){return 0;}}
-var _rk='j2me_read_'+(function(){try{var p=location.pathname||'/';var gi=p.indexOf('/game/');var id=p.get('id');if(id)return id.replace(/\.html$/,'');var m=location.pathname.match(/\/game\/([^\/]+)\.html$/);if(m)return decodeURIComponent(m[1]);var m2=location.pathname.match(/\/game\/([^\/]+)$/);if(m2)return decodeURIComponent(m2[1]);return '';}())();
 (function(){
   function T(k,fb){ try{ if(window.I18N&&window.I18N.T) return window.I18N.T(k,fb); }catch(e){} return fb; }
   // Mọi link tải đều qua đây bằng vé server — KHÔNG đọc URL file từ games.json,
@@ -100,10 +96,12 @@ var _rk='j2me_read_'+(function(){try{var p=location.pathname||'/';var gi=p.index
     try{q=new URLSearchParams(location.search);}catch(e){fail(T('go_old','Trình duyệt quá cũ.'));return;}
     var ticket=q.get('ticket');
     if(!ticket){document.getElementById('gname').textContent=T('go_noTicket','Thiếu vé tải');fail(T('go_noTicketMsg','Hãy bấm nút Tải ở trang game để lấy vé mới.'));return;}
-    var metaFetch = fetch(root()+'/api/meta?ticket='+encodeURIComponent(ticket)+'&_='+Date.now(),{cache:'no-store'});
-    var metaTimeout = setTimeout(function(){try{metaFetch.abort();}catch(e){}},10000);
-    metaFetch.then(function(r){return r.json().then(function(j){return {st:r.status,j:j};});}).then(function(o){
-    clearTimeout(metaTimeout);
+    var settled=false;
+    var ac=null; try{ac=(typeof AbortController!=='undefined')?new AbortController():null;}catch(e){ac=null;}
+    var fetchOpts={cache:'no-store'}; try{if(ac)fetchOpts.signal=ac.signal;}catch(e){}
+    var metaTimer=setTimeout(function(){ if(!settled){ settled=true; try{if(ac)ac.abort();}catch(e){} fail(T('go_nocheck','Không kiểm tra được vé lúc này.')); } },15000);
+    fetch(root()+'/api/meta?ticket='+encodeURIComponent(ticket)+'&_='+Date.now(),fetchOpts).then(function(r){return r.json().then(function(j){return {st:r.status,j:j};});}).then(function(o){
+    if(settled)return; settled=true; clearTimeout(metaTimer);
     if(o.st!==200||!o.j||!o.j.game){
       fail(o.st===403?T('go_expired','Vé hết hạn hoặc đã đổi điều kiện khóa. Quay lại trang game bấm Tải để lấy vé mới.'):T('go_nocheck','Không kiểm tra được vé lúc này.'));return;
     }
@@ -158,7 +156,7 @@ var _rk='j2me_read_'+(function(){try{var p=location.pathname||'/';var gi=p.index
           },15000);
         }catch(e){}
       });
-    }).catch(function(){fail(T('go_nocheck','Không kiểm tra được vé lúc này.'));});
+    }).catch(function(){ if(settled)return; settled=true; try{clearTimeout(metaTimer);}catch(e){} fail(T('go_nocheck','Không kiểm tra được vé lúc này.'));});
   }
   if(typeof stMinutes==='function')boot();
   else document.addEventListener('DOMContentLoaded',boot,{once:true});
@@ -188,6 +186,7 @@ var _stApprCache={at:0,n:-1};
 function stCid(){try{var c=localStorage.getItem('j2me_cid');if(typeof c==='string'&&/^[0-9a-f]{24}$/.test(c))return c;c='';var ch='0123456789abcdef';for(var i=0;i<24;i++)c+=ch[Math.floor(Math.random()*16)];try{localStorage.setItem('j2me_cid',c);}catch(e){}return c;}catch(e){return '';}}
 function stApprovedCount(cb){var now=Date.now();if(_stApprCache.n>=0&&now-_stApprCache.at<60000){cb(_stApprCache.n);return;}var tk='';try{tk=stToken();}catch(e){}var names=stNames();if(!tk&&!names.length){cb(0);return;}var url=stApiRoot()+'/api/comments?mine=1'+(names.length?'&names='+encodeURIComponent(names.join(',')):'');var hh=tk?{'Authorization':'Bearer '+tk}:{};fetch(url,{headers:hh,cache:'no-store'}).then(function(r){return r.json();}).then(function(j){var n=+(j&&j.mine)||0;_stApprCache={at:now,n:n};cb(n);}).catch(function(){cb(_stApprCache.n>=0?_stApprCache.n:0);});}
 (function(){try{setInterval(function(){try{if(document.hidden)return;var ms=+localStorage.getItem('j2me_online_ms')||0;localStorage.setItem('j2me_online_ms',String(ms+60000));}catch(e){}try{var tk=stToken();if(tk)fetch(stApiRoot()+'/api/ustats',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+tk},body:JSON.stringify({t:'heartbeat'}),keepalive:true}).catch(function(){});}catch(e){}try{var pr=null;try{pr=JSON.parse(localStorage.getItem('j2me_presence')||'null');}catch(e){}fetch(stApiRoot()+'/api/presence',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({tok:(pr&&pr.tok)||'',cid:stCid()}),keepalive:true}).then(function(r){return r.json();}).then(function(j){if(j&&j.tok)try{localStorage.setItem('j2me_presence',JSON.stringify({tok:j.tok,n:j.n||0}));}catch(e){}}).catch(function(){});}catch(e){}},60000);}catch(e){}})();
+</script>
 <script src="assets/i18n.min.js?v=11"></script>
 </body>
 </html>

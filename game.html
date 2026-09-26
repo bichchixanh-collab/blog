@@ -660,11 +660,11 @@ function __pullSrvVals(cb){
       if(cb)cb();
     }).catch(function(){ if(cb)cb(); });
 }
-function __statVals(){if(__srvVals)return __srvVals;var o={min:0,likes:0,done:0,read:0};try{o.min=stVerifiedMin();}catch(e){}try{o.likes=stLikes();}catch(e){}try{o.done=stDone();}catch(e){}try{var gid='';try{gid=getId();}catch(e){} o.read=stRead(gid);}catch(e){}return o;}
+function __statVals(){var o;if(__srvVals){o={min:__srvVals.min||0,likes:__srvVals.likes||0,done:__srvVals.done||0,read:0};}else{o={min:0,likes:0,done:0,read:0};try{o.min=stVerifiedMin();}catch(e){}try{o.likes=stLikes();}catch(e){}try{o.done=stDone();}catch(e){}}try{var gid='';try{gid=getId();}catch(e){}if(typeof stRead==='function')o.read=stRead(gid);}catch(e){}return o;}
 function __statsRows(g,apprN){
   var rq=(g.gate&&g.gate.require)||{},rows=[],v=__statVals();
   if(rq.read!=null){
-    var have=v.read||0;
+    var _raw=v.read||0,have=Math.min(_raw,+rq.read);
     var pct=Math.min(100, Math.floor(have*100/Math.max(1,rq.read)));
     rows.push({k:'r',need:+rq.read,has:have,ok:have>=+rq.read,label:cmtT('g_readReq','Đọc bài {n} giây').replace('{n}',rq.read),hint:'<small>'+cmtT('g_readWait','Đã đọc {s}/{n}s…').replace('{s}',have).replace('{n}',rq.read)+' <span style="display:inline-block;width:40px;height:4px;background:#e8f4fd;border-radius:4px;vertical-align:middle"><span style="display:block;width:'+pct+'%;height:100%;background:#0066cc;border-radius:4px"></span></span> <span style="font-size:10px">'+cmtT('g_readHint','cứ mở trang là tính giờ')+'</span></small>'});
   }
@@ -705,7 +705,8 @@ function __lockLive(gid,gm,msg,res,head,foot){
         };
         paint(rows);
       };
-      // tick 1s realtime cho Đọc bài; server sync mỗi 30s
+      // tick 1s realtime cho Đọc bài; server sync mỗi 30s; ví EXP refresh mỗi 15s (giữ cờ retry)
+      if(__lockTick%15===0){ try{ var _rt=(typeof ECO!=='undefined'&&ECO.retry)?true:false; ecoLoad(ECO.cost,gid); if(typeof ECO!=='undefined')ECO.retry=ECO.retry||_rt; }catch(e){} }
       if(__lockTick%30===0){ try{__pullSrvVals(doPaint);}catch(e){doPaint();} }
       else doPaint();
     }catch(e){}
