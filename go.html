@@ -100,8 +100,13 @@ var _rk='j2me_read_'+(function(){try{var p=location.pathname||'/';var gi=p.index
     try{q=new URLSearchParams(location.search);}catch(e){fail(T('go_old','Trình duyệt quá cũ.'));return;}
     var ticket=q.get('ticket');
     if(!ticket){document.getElementById('gname').textContent=T('go_noTicket','Thiếu vé tải');fail(T('go_noTicketMsg','Hãy bấm nút Tải ở trang game để lấy vé mới.'));return;}
-    fetch(root()+'/api/meta?ticket='+encodeURIComponent(ticket)+'&_='+Date.now(),{cache:'no-store'}).then(function(r){return r.json().then(function(j){return {st:r.status,j:j};});}).then(function(o){
-      if(o.st!==200||!o.j||!o.j.game){fail(o.st===403?T('go_expired','Vé hết hạn hoặc đã đổi điều kiện khóa. Quay lại trang game bấm Tải để lấy vé mới.'):T('go_nocheck','Không kiểm tra được vé lúc này.'));return;}
+    var metaFetch = fetch(root()+'/api/meta?ticket='+encodeURIComponent(ticket)+'&_='+Date.now(),{cache:'no-store'});
+    var metaTimeout = setTimeout(function(){try{metaFetch.abort();}catch(e){}},10000);
+    metaFetch.then(function(r){return r.json().then(function(j){return {st:r.status,j:j};});}).then(function(o){
+    clearTimeout(metaTimeout);
+    if(o.st!==200||!o.j||!o.j.game){
+      fail(o.st===403?T('go_expired','Vé hết hạn hoặc đã đổi điều kiện khóa. Quay lại trang game bấm Tải để lấy vé mới.'):T('go_nocheck','Không kiểm tra được vé lúc này.'));return;
+    }
       var g=o.j.game,hosts=o.j.host||{};
       document.getElementById('gname').textContent=(g.name||g.id)+' ('+o.j.res+')';
       var h=hosts[o.j.res]||'';
